@@ -27,7 +27,7 @@ class Kordle(Plugin):
 
     @listen_to("^꼬들알림시작 (1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24)$")
     def kordle_alarm(self, message: Message, at: str):
-        oclock: str = str('{:02d}'.format(int(at))) + ":00"
+        oclock: str = str('{:02d}'.format(int(at))) + ":20"
 
         self.driver.direct_message(message.user_id, "꼬들 알림이 매일 ``" + oclock + "``시에 전달됩니다.")
 

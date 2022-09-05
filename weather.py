@@ -1,5 +1,6 @@
 import datetime
 import urllib
+
 from urllib.request import urlopen, Request
 
 import bs4
@@ -150,12 +151,12 @@ class Weather(Plugin):
     ## 스케쥴링
     @listen_to("^날씨알림시작 ([가-힣]+) (1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24)$")
     def weather_alarm(self, message: Message, loc: str, at: str):
-        oclock: str = str('{:02d}'.format(int(at))) + ":00"
+        oclock: str = str('{:02d}'.format(int(at))) + ":30"
 
         self.driver.direct_message(message.user_id, "날씨 알림이 매일 ``" + oclock + "``시에 전달됩니다.")
 
         schedule.every().day.at(oclock).do(
-            self.alarm_funcs, message, loc
+            self.alarm_funcs, loc
         )
 
     @listen_to("^날씨알림종료$")
