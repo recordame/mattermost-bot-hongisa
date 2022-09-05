@@ -1,0 +1,10 @@
+
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/mattermost-bot-1404.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+__pycache__/constant.cpython-310.pyc
+__pycache__/help.cpython-310.pyc
+__pycache__/kordle.cpython-310.pyc
+__pycache__/weather.cpython-310.pyc
