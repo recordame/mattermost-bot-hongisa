@@ -1,9 +1,11 @@
 # !/usr/bin/env python
+
 from mmpy_bot import Bot, Settings
 
 import constant
 from help import Help
 from kordle import Kordle
+from mass import Mass
 from weather import Weather
 
 bot = Bot(
@@ -15,6 +17,6 @@ bot = Bot(
         BOT_TEAM=constant.BOT_TEAM,
         SSL_VERIFY=False,
     ),
-    plugins=[Kordle(), Weather(), Help()],
+    plugins=[Kordle(), Weather(), Mass(), Help()],
 )
 bot.run()
