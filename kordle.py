@@ -25,7 +25,7 @@ class Kordle(Plugin):
     schedule = BackgroundScheduler()
 
     # 전체공유
-    @listen_to("^꼬들공유$")
+    @listen_to("^꼬들알림$")
     def notify(self, message: Message):
         self.driver.create_post(constant.CH_KORDLE_ID, generate_msg())
 
