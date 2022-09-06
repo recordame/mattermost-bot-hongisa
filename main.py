@@ -6,6 +6,7 @@ import constant
 from help import Help
 from kordle import Kordle
 from mass import Mass
+from process import Process
 from weather import Weather
 
 bot = Bot(
@@ -18,6 +19,6 @@ bot = Bot(
         SSL_VERIFY=False,
         LOG_FILE="./log.txt"
     ),
-    plugins=[Kordle(), Weather(), Mass(), Help()],
+    plugins=[Kordle(), Weather(), Mass(), Help(), Process()],
 )
 bot.run()

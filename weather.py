@@ -3,14 +3,17 @@ import urllib
 from urllib.request import urlopen, Request
 
 import bs4
-from apscheduler.schedulers.blocking import BlockingScheduler
+import urllib3
+from apscheduler.schedulers.background import BackgroundScheduler
 from mmpy_bot import Message
 from mmpy_bot import Plugin, listen_to
 
 import constant
 
+urllib3.disable_warnings()
 
-## 전체 날씨 정보 획득
+
+# 네이버 날씨 페이지 로드
 def get_info(loc: str = ""):
     # 네이버 날씨
     url: str = "https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=1&ie=utf8&query="
@@ -27,7 +30,7 @@ def get_info(loc: str = ""):
     return soup
 
 
-## 오늘 날씨 정보 추출
+# 오늘 날씨 정보 추출
 def extract_today(info: str):
     now = datetime.datetime.now()
 
@@ -80,7 +83,7 @@ def extract_today(info: str):
     return msg
 
 
-## 내일 날씨 정보 추출
+# 내일 날씨 정보 추출
 def extract_tomorrow(info: str):
     status_am = info.find('div', class_="weather_info type_tomorrow").find('ul', class_="weather_info_list _tomorrow").find('div', class_="weather_main").text.strip(" ")
     temp_am = info.find('div', class_="weather_info type_tomorrow").find('ul', class_="weather_info_list _tomorrow").find('div', class_="temperature_text").text.replace("예측 온도", "").replace(" ", "")
@@ -119,46 +122,49 @@ def extract_tomorrow(info: str):
     return msg
 
 
-## 날씨 메시지 생성
+# 날씨 메시지 생성
 def generate_message(loc: str = ""):
-    info = get_info(loc);
+    info = get_info(loc)
     msg = extract_today(info) + "\n" + extract_tomorrow(info)
 
     return msg
 
 
 class Weather(Plugin):
-    schedule = BlockingScheduler()
+    schedule = BackgroundScheduler()
 
-    @listen_to("^날씨$")
-    def weather(self, message: Message, loc: str = ""):
+    # 나에게만
+    @listen_to("^날씨(\s[가-힣]+)?$")
+    def direct(self, message: Message, loc: str = ""):
         self.driver.direct_message(message.user_id, generate_message(loc))
 
-    ## 지역 날씨
-    @listen_to("^날씨 ([가-힣]+)$")
-    def weather_at_location(self, message: Message, loc: str):
-        self.weather(message, loc)
-
-    ## 지역 날씨 공유
-    @listen_to("^날씨알림 ([가-힣]+)$")
-    def weather_at_location(self, message: Message, loc: str):
+    # 전체알림
+    @listen_to("^날씨알림(\s[가-힣]+)?$")
+    def notify(self, message: Message, loc: str = ""):
         self.driver.create_post(constant.CH_NOTIFICATIONS_ID, "@here " + generate_message(loc))
 
-    ## 스케줄링시 날씨 정보를 갱신해서 가지고 오는 부분
-    def alarm_funcs(self, loc: str):
-        self.driver.create_post(constant.CH_NOTIFICATIONS_ID, "@here " + generate_message(loc))
+    # 날씨 알림 예약
+    @listen_to("^날씨예약(\s[가-힣]+)? ([1-9]|1[0-9]|2[0-4]) ([1-9]|1[0-9]|2[0-4])$")
+    def add_alarm(self, message: Message, loc: str, at1: int, at2: int):
+        self.schedule.add_job(func=lambda: self.alarm(loc),
+                              trigger='cron',
+                              day_of_week='mon-fri',
+                              hour=str(at1) + ',' + str(at2),
+                              minute=00)
 
-    ## 스케쥴링
-    @listen_to("^날씨알림시작 ([가-힣]+) (1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24) (1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24)$")
-    def weather_alarm(self, message: Message, loc: str, at1: str, at2: str):
-        self.schedule.add_job(lambda: self.alarm_funcs(loc), 'cron', day_of_week='mon-fri', hour=at1 + ',' + at2, minute=00)
-
-        oclock: str = str('{:02d}'.format(int(at1))) + ", " + str('{:02d}'.format(int(at2)))
-        self.driver.direct_message(message.user_id, "날씨 알림이 매일 ``" + oclock + "``시에 전달됩니다.")
+        oclocks: str = str(at1) + ", " + str(at2)
+        self.driver.direct_message(message.user_id, "날씨 알림이 매일 ``" + oclocks + "``시에 전달됩니다.")
 
         self.schedule.start()
+        constant.JOBS.append(self.schedule.get_jobs())
 
-    @listen_to("^날씨알림종료$")
-    def cancel_jobs(self, message: Message):
+    # 날씨 알림 취소
+    @listen_to("^날씨예약취소$")
+    def cancel_alarm(self, message: Message):
+        constant.JOBS.remove(self.schedule.get_jobs())
         self.schedule.shutdown()
         self.driver.direct_message(message.user_id, "날씨 알림이 종료되었습니다.")
+
+    # 스케줄링 시 날씨 정보를 갱신해서 가지고 오는 부분
+    def alarm(self, loc: str):
+        self.driver.create_post(constant.CH_NOTIFICATIONS_ID, "@here " + generate_message(loc))

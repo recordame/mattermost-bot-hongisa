@@ -1,13 +1,17 @@
 from urllib.request import urlopen, Request
 
 import bs4
-from apscheduler.schedulers.blocking import BlockingScheduler
+import urllib3
+from apscheduler.schedulers.background import BackgroundScheduler
 from mmpy_bot import Message
 from mmpy_bot import Plugin, listen_to
 
 import constant
 
+urllib3.disable_warnings()
 
+
+# 서울대교구 매일미사 페이지 로드
 def get_info():
     # 서울대교구
     url: str = "https://aos.catholic.or.kr/pro1021/everydayMass"
@@ -20,6 +24,7 @@ def get_info():
     return soup
 
 
+# 매일미사 정보 추출
 def extract_mass(info: str):
     today = info.find('p', class_="bibleBox").text.replace("  ", " ")
     mass_day = info.find('em').text
@@ -30,34 +35,49 @@ def extract_mass(info: str):
     return msg
 
 
+# 채널 알림용 문구 생성
+def generate_msg():
+    info = get_info()
+    mass = extract_mass(info)
+
+    msg = "@here " + mass + "\n" \
+          + "평화를 빕니다 :pray:\n" \
+          + "https://aos.catholic.or.kr/pro1021/everydayMass"
+
+    return msg
+
+
 class Mass(Plugin):
-    schedule = BlockingScheduler()
+    schedule = BackgroundScheduler()
 
+    # 나에게만
+    @listen_to("^미사$")
+    def direct(self, message: Message):
+        self.driver.direct_message(message.user_id, generate_msg())
+
+    # 전체공유
     @listen_to("^미사알림$")
-    def mass(self, message: Message):
-        info = get_info()
-        mass = extract_mass(info)
+    def notify(self, message: Message):
+        self.driver.create_post(constant.CH_NOTIFICATIONS_ID, generate_msg())
 
-        msg = "@here " + mass + "\n" \
-              + "평화를 빕니다 :pray:\n" \
-              + "https://aos.catholic.or.kr/pro1021/everydayMass"
+    # 미사 알림 예약
+    @listen_to("^미사예약 ([1-9]|1[0-9]|2[0-4])$")
+    def add_alarm(self, message: Message, at: int):
+        self.schedule.add_job(func=lambda: self.driver.create_post(constant.CH_NOTIFICATIONS_ID, generate_msg()),
+                              trigger='cron',
+                              day_of_week='sun',
+                              hour=at,
+                              minute=00)
 
-        self.driver.create_post(constant.CH_NOTIFICATIONS_ID, msg)
-
-    @listen_to("^미사알림시작 (1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24)$")
-    def mass_alarm(self, message: Message, at: str):
-        msg = "@here\n" \
-              + "미사 시간입니다. 평화를 빕니다 :pray:\n" \
-              + "https://aos.catholic.or.kr/pro1021/everydayMass"
-
-        self.schedule.add_job(lambda: self.driver.create_post(constant.CH_NOTIFICATIONS_ID, msg), 'cron', day_of_week='sun', hour=int(at), minute=00)
-
-        oclock: str = str('{:02d}'.format(int(at))) + ":00"
+        oclock: str = str(at) + ":00"
         self.driver.direct_message(message.user_id, "미사 알림이 매주 일요일 ``" + oclock + "``시에 전달됩니다.")
 
         self.schedule.start()
+        constant.JOBS.append(self.schedule.get_jobs())
 
-    @listen_to("^미사알림종료$")
-    def cancel_jobs(self, message: Message):
+    # 미사 알림 종료
+    @listen_to("^미사예약취소$")
+    def cancel_alarm(self, message: Message):
+        constant.JOBS.remove(self.schedule.get_jobs())
         self.schedule.shutdown()
         self.driver.direct_message(message.user_id, "미사 알림이 종료되었습니다.")
