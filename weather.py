@@ -1,10 +1,9 @@
 import datetime
 import urllib
-
 from urllib.request import urlopen, Request
 
 import bs4
-import schedule
+from apscheduler.schedulers.blocking import BlockingScheduler
 from mmpy_bot import Message
 from mmpy_bot import Plugin, listen_to
 
@@ -129,6 +128,7 @@ def generate_message(loc: str = ""):
 
 
 class Weather(Plugin):
+    schedule = BlockingScheduler()
 
     @listen_to("^날씨$")
     def weather(self, message: Message, loc: str = ""):
@@ -149,17 +149,16 @@ class Weather(Plugin):
         self.driver.create_post(constant.CH_NOTIFICATIONS_ID, "@here " + generate_message(loc))
 
     ## 스케쥴링
-    @listen_to("^날씨알림시작 ([가-힣]+) (1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24)$")
-    def weather_alarm(self, message: Message, loc: str, at: str):
-        oclock: str = str('{:02d}'.format(int(at))) + ":30"
+    @listen_to("^날씨알림시작 ([가-힣]+) (1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24) (1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24)$")
+    def weather_alarm(self, message: Message, loc: str, at1: str, at2: str):
+        self.schedule.add_job(lambda: self.alarm_funcs(loc), 'cron', day_of_week='mon-fri', hour=at1 + ',' + at2, minute=00)
 
+        oclock: str = str('{:02d}'.format(int(at1))) + ", " + str('{:02d}'.format(int(at2)))
         self.driver.direct_message(message.user_id, "날씨 알림이 매일 ``" + oclock + "``시에 전달됩니다.")
 
-        schedule.every().day.at(oclock).do(
-            self.alarm_funcs, loc
-        )
+        self.schedule.start()
 
     @listen_to("^날씨알림종료$")
     def cancel_jobs(self, message: Message):
-        schedule.clear()
+        self.schedule.shutdown()
         self.driver.direct_message(message.user_id, "날씨 알림이 종료되었습니다.")

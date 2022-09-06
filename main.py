@@ -15,7 +15,8 @@ bot = Bot(
         MATTERMOST_API_PATH="/api/v4",
         BOT_TOKEN=constant.BOT_TOKEN,
         BOT_TEAM=constant.BOT_TEAM,
-        SSL_VERIFY=True,
+        SSL_VERIFY=False,
+        LOG_FILE="./log.txt"
     ),
     plugins=[Kordle(), Weather(), Mass(), Help()],
 )

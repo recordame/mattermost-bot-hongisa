@@ -1,0 +1,12 @@
+[09/06/2022 10:37:23][mmpy.bot][INFO] Starting bot Bot.
+[09/06/2022 10:37:23][mmpy.threadpool][INFO] Scheduler thread started.
+[09/06/2022 10:37:24][mattermostdriver.websocket][INFO] Websocket authentification OK
+[09/06/2022 10:38:02][apscheduler.scheduler][INFO] Adding job tentatively -- it will be properly scheduled when the scheduler starts
+[09/06/2022 10:38:03][apscheduler.scheduler][INFO] Added job "Weather.weather_alarm.<locals>.<lambda>" to job store "default"
+[09/06/2022 10:38:03][apscheduler.scheduler][INFO] Scheduler started
+[09/06/2022 10:38:41][apscheduler.scheduler][INFO] Adding job tentatively -- it will be properly scheduled when the scheduler starts
+[09/06/2022 10:38:42][apscheduler.scheduler][INFO] Added job "Kordle.kordle_alarm.<locals>.<lambda>" to job store "default"
+[09/06/2022 10:38:42][apscheduler.scheduler][INFO] Scheduler started
+[09/06/2022 10:38:53][apscheduler.scheduler][INFO] Adding job tentatively -- it will be properly scheduled when the scheduler starts
+[09/06/2022 10:38:54][apscheduler.scheduler][INFO] Added job "Mass.mass_alarm.<locals>.<lambda>" to job store "default"
+[09/06/2022 10:38:54][apscheduler.scheduler][INFO] Scheduler started
