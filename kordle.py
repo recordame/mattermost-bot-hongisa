@@ -72,4 +72,5 @@ class KordleAlarm(Plugin):
 
         self.schedule.shutdown()
         self.driver.direct_message(message.user_id, "꼬들 알림이 종료되었습니다.")
+        # 다음 스케쥴 등록을 위해 새로운 스케쥴러 생성
         self.schedule = BackgroundScheduler()
