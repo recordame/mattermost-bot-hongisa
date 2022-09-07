@@ -143,7 +143,7 @@ class WeatherAlarm(Plugin):
         self.driver.direct_message(message.user_id, generate_msg(loc))
 
     # 전체알림
-    @listen_to("^날씨공유(\s[가-힣]+)?$")
+    @listen_to("^날씨알림(\s[가-힣]+)?$")
     def notify(self, message: Message, loc: str):
         self.driver.create_post(constant.CH_NOTIFICATIONS_ID, "@here " + generate_msg(loc))
 

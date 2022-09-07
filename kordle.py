@@ -31,7 +31,7 @@ class KordleAlarm(Plugin):
         self.driver.create_post(constant.CH_KORDLE_ID, generate_msg())
 
     # 꼬들 알림 예약
-    @listen_to("^꼬들예약 ([1-9]|1[0-9]|2[0-4]) ([1-9]|[0-5][0-9])$")
+    @listen_to("^꼬들알림예약 ([1-9]|1[0-9]|2[0-4]) ([1-9]|[0-5][0-9])$")
     def add_alarm(self, message: Message, hour: int, minute: int):
         if self.schedule.get_jobs().__len__() == 1:
             # 기존에 등록된 알림이 있는 경우, 기존 알림 정보 출력
@@ -59,7 +59,7 @@ class KordleAlarm(Plugin):
             constant.ALARMS.update({job.id: alarm})
 
     # 꼬들 예약 취소
-    @listen_to("^꼬들예약취소$")
+    @listen_to("^꼬들알림예약취소$")
     def cancel_alarm(self, message: Message):
         # 알림 목록에서 취소할 알림의 정보를 불러와, 알림 생성자에게 삭제 내역 전달
         job = self.schedule.get_jobs()[0]
