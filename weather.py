@@ -189,3 +189,4 @@ class WeatherAlarm(Plugin):
 
         self.schedule.shutdown()
         self.driver.direct_message(message.user_id, "날씨 알림이 종료되었습니다.")
+        self.schedule = BackgroundScheduler()

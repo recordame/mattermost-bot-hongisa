@@ -103,3 +103,4 @@ class MassAlarm(Plugin):
 
         self.schedule.shutdown()
         self.driver.direct_message(message.user_id, "미사 알림이 종료되었습니다.")
+        self.schedule = BackgroundScheduler()

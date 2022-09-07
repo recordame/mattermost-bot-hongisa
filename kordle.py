@@ -31,7 +31,7 @@ class KordleAlarm(Plugin):
         self.driver.create_post(constant.CH_KORDLE_ID, generate_msg())
 
     # 꼬들 알림 예약
-    @listen_to("^꼬들예약 ([1-9]|1[0-9]|2[0-4]) ([0-5][0-9])$")
+    @listen_to("^꼬들예약 ([1-9]|1[0-9]|2[0-4]) ([1-9]|[0-5][0-9])$")
     def add_alarm(self, message: Message, hour: int, minute: int):
         if self.schedule.get_jobs().__len__() == 1:
             # 기존에 등록된 알림이 있는 경우, 기존 알림 정보 출력
@@ -44,7 +44,7 @@ class KordleAlarm(Plugin):
                                        )
         else:
             # 기존에 등록된 작업이 없는 경우, 새로운 알림 등록 및 시작
-            self.driver.direct_message(message.user_id, "꼬들 알림이 매일 `%d:%2d`에 전달됩니다." % (int(hour), int(minute)))
+            self.driver.direct_message(message.user_id, "꼬들 알림이 매일 `%d:%02d`에 전달됩니다." % (int(hour), int(minute)))
             self.schedule.add_job(func=lambda: self.driver.create_post(constant.CH_NOTIFICATIONS_ID, generate_msg()),
                                   trigger='cron',
                                   day_of_week='mon-sun',
@@ -55,7 +55,7 @@ class KordleAlarm(Plugin):
 
             # 알림 정보 저장
             job = self.schedule.get_jobs()[0]
-            alarm = Alarm(message.sender_name, message.user_id, job, "mon-sun", "%d:%2d" % (int(hour), int(minute)))
+            alarm = Alarm(message.sender_name, message.user_id, job, "mon-sun", "%d:%02d" % (int(hour), int(minute)))
             constant.ALARMS.update({job.id: alarm})
 
     # 꼬들 예약 취소
@@ -72,3 +72,4 @@ class KordleAlarm(Plugin):
 
         self.schedule.shutdown()
         self.driver.direct_message(message.user_id, "꼬들 알림이 종료되었습니다.")
+        self.schedule = BackgroundScheduler()
