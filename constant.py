@@ -10,4 +10,4 @@ CH_KORDLE_ID: str = "9aic13fzstdgmxro1c9f9i7yho"
 CH_TOWN_SQUARE_ID: str = "7oc3baakktfxudigcjjdhmh4my"
 CH_NOTIFICATIONS_ID: str = "9doiodruepdwmnbx8ejg395u7o"
 
-JOBS: list = []
+ALARMS: dict = {}

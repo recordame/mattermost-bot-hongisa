@@ -1,3 +1,15 @@
-[09/06/2022 17:23:59][mmpy.bot][INFO] Starting bot Bot.
-[09/06/2022 17:23:59][mmpy.threadpool][INFO] Scheduler thread started.
-[09/06/2022 17:24:00][mattermostdriver.websocket][INFO] Websocket authentification OK
+[09/07/2022 17:23:19][mmpy.bot][INFO] Starting bot Bot.
+[09/07/2022 17:23:19][mmpy.threadpool][INFO] Scheduler thread started.
+[09/07/2022 17:23:20][mattermostdriver.websocket][INFO] Websocket authentification OK
+[09/07/2022 17:23:28][apscheduler.scheduler][INFO] Adding job tentatively -- it will be properly scheduled when the scheduler starts
+[09/07/2022 17:23:28][apscheduler.scheduler][INFO] Added job "MedicineAlarm.add_alarm.<locals>.<lambda>" to job store "default"
+[09/07/2022 17:23:28][apscheduler.scheduler][INFO] Scheduler started
+[09/07/2022 17:23:49][apscheduler.scheduler][INFO] Adding job tentatively -- it will be properly scheduled when the scheduler starts
+[09/07/2022 17:23:49][apscheduler.scheduler][INFO] Added job "WeatherAlarm.add_alarm.<locals>.<lambda>" to job store "default"
+[09/07/2022 17:23:49][apscheduler.scheduler][INFO] Scheduler started
+[09/07/2022 17:23:55][apscheduler.scheduler][INFO] Adding job tentatively -- it will be properly scheduled when the scheduler starts
+[09/07/2022 17:23:55][apscheduler.scheduler][INFO] Added job "MassAlarm.add_alarm.<locals>.<lambda>" to job store "default"
+[09/07/2022 17:23:55][apscheduler.scheduler][INFO] Scheduler started
+[09/07/2022 17:24:02][apscheduler.scheduler][INFO] Adding job tentatively -- it will be properly scheduled when the scheduler starts
+[09/07/2022 17:24:02][apscheduler.scheduler][INFO] Added job "KordleAlarm.add_alarm.<locals>.<lambda>" to job store "default"
+[09/07/2022 17:24:02][apscheduler.scheduler][INFO] Scheduler started
