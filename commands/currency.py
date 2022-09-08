@@ -41,7 +41,7 @@ def extract_currency(info: str):
 def generate_msg():
     info = get_info()
 
-    msg = '**오늘의 환율** :dollar:\n` - ' + extract_currency(info) + '`'
+    msg = '**오늘의 환율** :dollar:\n`- ' + extract_currency(info) + '`'
 
     return msg
 
