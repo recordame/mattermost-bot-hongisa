@@ -17,7 +17,7 @@ class MedicineAlarm(Plugin):
     schedule = BackgroundScheduler()
 
     # 복약 알림 예약
-    @listen_to("^복약알림예약 ([1-9]|1[0-9]|2[0-4]) ([1-9]|1[0-9]|2[0-4]) ([1-9]|[0-5][0-9])$")
+    @listen_to("^복약알림예약 ([1-9]|1[0-9]|2[0-4]) ([1-9]|1[0-9]|2[0-4]) ([0-9]|[1-5][0-9])$")
     def add_alarm(self, message: Message, hour1: int, hour2: int, minute: int):
         if self.schedule.get_jobs().__len__() == 1:
             # 기존에 등록된 알림이 있는 경우, 기존 알림 정보 출력

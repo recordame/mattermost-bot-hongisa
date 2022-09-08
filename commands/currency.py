@@ -29,7 +29,7 @@ def extract_currency(info: str):
     won_dollar = won_dollar[:(index + '지수'.__len__())] + ': ' + won_dollar[(index + '지수'.__len__()):]
 
     index = won_dollar.find('전일대비하락')
-    won_dollar = won_dollar[:index - 1] + '원, ' + won_dollar[index:]
+    won_dollar = won_dollar[:index - 1] + '원`\n`- ' + won_dollar[index:]
 
     index = won_dollar.find('전일대비하락')
     won_dollar = won_dollar[:(index + '전일대비하락'.__len__())] + ': ' + won_dollar[(index + '전일대비하락'.__len__()):]
@@ -41,7 +41,7 @@ def extract_currency(info: str):
 def generate_msg():
     info = get_info()
 
-    msg = '**오늘의 환율** :dollar:\n`' + extract_currency(info) + '`'
+    msg = '**오늘의 환율** :dollar:\n` - ' + extract_currency(info) + '`'
 
     return msg
 

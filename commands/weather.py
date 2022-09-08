@@ -53,7 +53,7 @@ def extract_today(info: str):
     minute = str(int(now.strftime("%M")))
     second = str(int(now.strftime("%S")))
 
-    msg = "`" + now.strftime(month + "월 " + day + "일 " + hour + "시 " + minute + "분 " + second + "초") + "`\n" \
+    msg = "`" + now.strftime(month + "월 " + day + "일 " + hour + "시") + "`\n" \
           + "현재 `" + location + "` 날씨\n" \
           + "- 현재 : " + status + "\n" \
           + "- 기온 : " + temp + "(어제보다 " + temp_yesterday + ")" + "\n"
