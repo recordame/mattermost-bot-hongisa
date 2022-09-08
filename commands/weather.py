@@ -16,7 +16,7 @@ urllib3.disable_warnings()
 
 # 네이버 날씨 페이지 로드
 def get_info(loc: str):
-    if loc == None:
+    if loc is None:
         loc = ""
 
     # 네이버 날씨
@@ -50,8 +50,6 @@ def extract_today(info: str):
     month = str(int(now.strftime("%m")))
     day = str(int(now.strftime("%d")))
     hour = str(int(now.strftime("%H")))
-    minute = str(int(now.strftime("%M")))
-    second = str(int(now.strftime("%S")))
 
     msg = "`" + now.strftime(month + "월 " + day + "일 " + hour + "시") + "`\n" \
           + "현재 `" + location + "` 날씨\n" \

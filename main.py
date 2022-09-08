@@ -8,6 +8,7 @@ from commands.help import Help
 from commands.kordle import KordleAlarm
 from commands.mass import MassAlarm
 from commands.medicine import MedicineAlarm
+from commands.plan import Plan
 from commands.weather import WeatherAlarm
 from commons import constant
 
@@ -21,6 +22,6 @@ bot = Bot(
         SSL_VERIFY=False,
         LOG_FILE="./log.txt"
     ),
-    plugins=[KordleAlarm(), MedicineAlarm(), WeatherAlarm(), MassAlarm(), Help(), Alarms(), CurrencyAlarm()],
+    plugins=[KordleAlarm(), MedicineAlarm(), WeatherAlarm(), MassAlarm(), Help(), Alarms(), CurrencyAlarm(), Plan()],
 )
 bot.run()

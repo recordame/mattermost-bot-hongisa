@@ -23,16 +23,28 @@ def get_info():
 
 # 미국 원달러 환율 정보 추출
 def extract_currency(info: str):
-    won_dollar: str = info.find('span', class_='spt_con dw').text.strip(" ").replace("  ", " ")
+    won_dollar: str
 
-    index = won_dollar.find('지수')
-    won_dollar = won_dollar[:(index + '지수'.__len__())] + ': ' + won_dollar[(index + '지수'.__len__()):]
+    try:
+        won_dollar = info.find('span', class_='spt_con dw').text.strip(" ").replace("  ", " ")
+        index = won_dollar.find('지수')
+        won_dollar = won_dollar[:(index + '지수'.__len__())] + ': ' + won_dollar[(index + '지수'.__len__()):]
 
-    index = won_dollar.find('전일대비하락')
-    won_dollar = won_dollar[:index - 1] + '원`\n`- ' + won_dollar[index:]
+        index = won_dollar.find('전일대비하락')
+        won_dollar = won_dollar[:index - 1] + '원`\n`- ' + won_dollar[index:]
 
-    index = won_dollar.find('전일대비하락')
-    won_dollar = won_dollar[:(index + '전일대비하락'.__len__())] + ': ' + won_dollar[(index + '전일대비하락'.__len__()):]
+        index = won_dollar.find('전일대비하락')
+        won_dollar = won_dollar[:(index + '전일대비하락'.__len__())] + ': ' + won_dollar[(index + '전일대비하락'.__len__()):]
+    except:
+        won_dollar = info.find('span', class_='spt_con up').text.strip(" ").replace("  ", " ")
+        index = won_dollar.find('지수')
+        won_dollar = won_dollar[:(index + '지수'.__len__())] + ': ' + won_dollar[(index + '지수'.__len__()):]
+
+        index = won_dollar.find('전일대비상승')
+        won_dollar = won_dollar[:index - 1] + '원`\n`- ' + won_dollar[index:]
+
+        index = won_dollar.find('전일대비상승')
+        won_dollar = won_dollar[:(index + '전일대비상승'.__len__())] + ': ' + won_dollar[(index + '전일대비상승'.__len__()):]
 
     return won_dollar
 
