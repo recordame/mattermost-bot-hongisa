@@ -1,10 +1,8 @@
 import datetime
 
-
 from apscheduler.schedulers.background import BackgroundScheduler
 from mmpy_bot import Message
 from mmpy_bot import Plugin, listen_to
-
 
 # 꼬들 메시지 생성
 from commons import constant
