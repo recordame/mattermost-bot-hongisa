@@ -2,13 +2,14 @@
 
 from mmpy_bot import Bot, Settings
 
-import constant
-from alarms import Alarms
-from help import Help
-from kordle import KordleAlarm
-from mass import MassAlarm
-from medicine import MedicineAlarm
-from weather import WeatherAlarm
+from commands.alarms import Alarms
+from commands.currency import CurrencyAlarm
+from commands.help import Help
+from commands.kordle import KordleAlarm
+from commands.mass import MassAlarm
+from commands.medicine import MedicineAlarm
+from commands.weather import WeatherAlarm
+from commons import constant
 
 bot = Bot(
     settings=Settings(
@@ -20,6 +21,6 @@ bot = Bot(
         SSL_VERIFY=False,
         LOG_FILE="./log.txt"
     ),
-    plugins=[KordleAlarm(), MedicineAlarm(), WeatherAlarm(), MassAlarm(), Help(), Alarms()],
+    plugins=[KordleAlarm(), MedicineAlarm(), WeatherAlarm(), MassAlarm(), Help(), Alarms(), CurrencyAlarm()],
 )
 bot.run()

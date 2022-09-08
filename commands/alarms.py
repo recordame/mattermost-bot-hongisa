@@ -1,7 +1,7 @@
 from mmpy_bot import Message
 from mmpy_bot import Plugin, listen_to
 
-import constant
+from commons import constant
 
 
 class Alarms(Plugin):

@@ -3,7 +3,7 @@ from apscheduler.job import Job
 
 class Alarm:
     creator: str
-    creater_id: str
+    creator_id: str
     job_id: str
     class_name: str
     interval: str
@@ -12,7 +12,7 @@ class Alarm:
 
     def __init__(self, creator, creator_id, job: Job, interval, time):
         self.creator = creator
-        self.creater_id = creator_id
+        self.creator_id = creator_id
         self.job_id = job.id
         self.class_name = job.name
         self.job = job

@@ -2,8 +2,8 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from mmpy_bot import Message
 from mmpy_bot import Plugin, listen_to
 
-import constant
-from alarm import Alarm
+from commons import constant
+from commons.alarm import Alarm
 
 
 # 복약 메시지 생성
@@ -50,7 +50,7 @@ class MedicineAlarm(Plugin):
         # 알림 목록에서 취소할 알림의 정보를 불러와, 알림 생성자에게 삭제 내역 전달
         job = self.schedule.get_jobs()[0]
         alarm: Alarm = constant.ALARMS.get(job.id)
-        self.driver.direct_message(alarm.creater_id, "등록하신 복약 알림이 %s님에 의해 삭제되었습니다. \n\n"
+        self.driver.direct_message(alarm.creator_id, "등록하신 복약 알림이 %s님에 의해 삭제되었습니다. \n\n"
                                    % (message.sender_name) + "**알림정보**\n" + alarm.get_info() + "\n")
 
         # 알림 종료 및 알림 리스트에서 제거
