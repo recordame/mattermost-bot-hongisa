@@ -171,7 +171,7 @@ class WeatherAlarm(Plugin):
             job = constant.SCHEDULE.get_job(self.alarm_id)
 
             # 알림 정보 저장
-            alarm = Alarm(message.sender_name, job.id, "mon-sun", "%d, %d" % (int(hour1), int(hour2)))
+            alarm = Alarm(message.sender_name, message.user_id, job.id, "mon-sun", "%d, %d" % (int(hour1), int(hour2)))
             constant.ALARMS.update({job.id: alarm})
 
     # 날씨 알림 취소

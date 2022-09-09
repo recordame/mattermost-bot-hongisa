@@ -87,7 +87,7 @@ class MassAlarm(Plugin):
             job = constant.SCHEDULE.get_job(self.alarm_id)
 
             # 알림 정보 저장
-            alarm = Alarm(message.sender_name, job.id, "sun", "%s:00" % (int(hour)))
+            alarm = Alarm(message.sender_name, message.user_id, job.id, "sun", "%s:00" % (int(hour)))
             constant.ALARMS.update({job.id: alarm})
 
     # 미사 알림 취소

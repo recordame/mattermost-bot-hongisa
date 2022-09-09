@@ -8,8 +8,8 @@ from commons.alarm import Alarm
 class MyAlarm(Plugin):
 
     @listen_to("^내알림등록 ([a-zA-Z]+) (.+) (.+) (\*|[0-9]|[1-5][0-9]) (\*|[0-9]|[1-5][0-9]) (.+)$")
-    def add_my_alarm(self, message: Message, name: str, dow: str, h: str, m: str, s: str, txt: str):
-        alarm_id = message.sender_name + "_" + name
+    def add_my_alarm(self, message: Message, label: str, dow: str, h: str, m: str, s: str, txt: str):
+        alarm_id = message.sender_name + "_" + label
 
         if constant.MY_SCHEDULE.get_job(alarm_id) is not None:
             self.driver.direct_message(message.user_id, "동일한 알림이 존재합니다. `내알림목록`으로 확인해주세요.")
@@ -26,11 +26,11 @@ class MyAlarm(Plugin):
             )
 
             job = constant.MY_SCHEDULE.get_job(alarm_id)
-            alarm = Alarm(message.sender_name, job.id, dow, "%s:%s:%s" % (h, m, s), txt)
+            alarm = Alarm(message.sender_name, message.user_id, job.id, dow, "%s:%s:%s" % (h, m, s), label, txt)
 
             self.driver.direct_message(message.user_id,
                                        "- 등록: `%s`\n" % message.sender_name +
-                                       "- 알림: `%s`\n" % name +
+                                       "- 알림: `%s`\n" % label +
                                        "- 요일: `%s`\n" % dow +
                                        "- 패턴: `%s:%s:%s`\n" % (h, m, s) +
                                        "- 내용 : `%s`" % txt
@@ -39,17 +39,17 @@ class MyAlarm(Plugin):
             my_alarms = constant.MY_ALARMS.get(message.sender_name)
 
             if my_alarms is not None:
-                constant.MY_ALARMS[message.sender_name].update({name: alarm})
+                constant.MY_ALARMS[message.sender_name].update({label: alarm})
             else:
-                constant.MY_ALARMS.update({message.sender_name: {name: alarm}})
+                constant.MY_ALARMS.update({message.sender_name: {label: alarm}})
 
     @listen_to("^내알림목록$")
     def get_my_alarm(self, message: Message):
         msg: str = ""
 
-        my_alarms = constant.MY_ALARMS[message.sender_name]
+        if constant.MY_ALARMS.get(message.sender_name) is not None:
+            my_alarms = constant.MY_ALARMS[message.sender_name]
 
-        if my_alarms is not None:
             for alarm in my_alarms.values():
                 msg += "[알림]\n" + alarm.get_info() + "\n"
 
@@ -58,15 +58,15 @@ class MyAlarm(Plugin):
             self.driver.direct_message(message.user_id, "등록된 알림 : 0 개")
 
     @listen_to("^내알림취소 (.+)$")
-    def cancel_my_alarm(self, message: Message, name: str):
-        job_id = message.sender_name + "_" + name
+    def cancel_my_alarm(self, message: Message, label: str):
+        job_id = message.sender_name + "_" + label
         job = constant.MY_SCHEDULE.get_job(job_id)
 
         if job is not None:
             # 알림 리스트 및 백그라운드 스케쥴에서 제거
-            del constant.MY_ALARMS[message.sender_name][name]
+            del constant.MY_ALARMS[message.sender_name][label]
             constant.MY_SCHEDULE.get_job(job_id).remove()
 
-            self.driver.direct_message(message.user_id, "`" + name + "` 알림이 종료되었습니다.")
+            self.driver.direct_message(message.user_id, "`" + label + "` 알림이 종료되었습니다.")
         else:
             self.driver.direct_message(message.user_id, "등록된 알림이 없습니다.")

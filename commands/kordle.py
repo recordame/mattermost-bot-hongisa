@@ -57,7 +57,7 @@ class KordleAlarm(Plugin):
             job = constant.SCHEDULE.get_job(self.alarm_id)
 
             # 알림 정보 저장
-            alarm = Alarm(message.sender_name, job.id, "mon-sun", "%d:%02d" % (int(hour), int(minute)))
+            alarm = Alarm(message.sender_name, message.user_id, job.id, "mon-sun", "%d:%02d" % (int(hour), int(minute)))
             constant.ALARMS.update({job.id: alarm})
 
     # 꼬들 예약 취소
@@ -69,7 +69,7 @@ class KordleAlarm(Plugin):
             # 알림 목록에서 취소할 알림의 정보를 불러와, 알림 생성자에게 삭제 내역 전달
             alarm: Alarm = constant.ALARMS.get(job.id)
 
-            self.driver.direct_message(alarm.creater_id, "등록하신 꼬들 알림이 %s님에 의해 삭제되었습니다. \n\n"
+            self.driver.direct_message(alarm.creator_id, "등록하신 꼬들 알림이 %s님에 의해 삭제되었습니다. \n\n"
                                        % (message.sender_name) + "**알림정보**\n" + alarm.get_info() + "\n")
 
             # 알림 리스트 및 백그라운드 스케쥴에서 제거

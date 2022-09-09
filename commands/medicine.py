@@ -42,7 +42,7 @@ class MedicineAlarm(Plugin):
             job = constant.SCHEDULE.get_job(self.alarm_id)
 
             # 알림 정보 저장
-            alarm = Alarm(message.sender_name, job.id, "mon-sun", "%d:%02d, %d:%02d" % (int(hour1), int(minute), int(hour2), int(minute)))
+            alarm = Alarm(message.sender_name, message.user_id, job.id, "mon-sun", "%d:%02d, %d:%02d" % (int(hour1), int(minute), int(hour2), int(minute)))
             constant.ALARMS.update({job.id: alarm})
 
     # 예약 취소
