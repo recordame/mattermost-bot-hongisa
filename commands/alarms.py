@@ -8,7 +8,7 @@ class Alarms(Plugin):
 
     # 알람 정보 출력
     @listen_to("^알림목록$")
-    def notify(self, message: Message):
+    def get_alarms(self, message: Message):
         msg: str = ""
 
         for alarm in constant.ALARMS.values():

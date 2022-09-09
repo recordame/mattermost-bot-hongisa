@@ -1,28 +1,22 @@
-from apscheduler.job import Job
-
-
 class Alarm:
     creator: str
-    creator_id: str
     job_id: str
-    class_name: str
     interval: str
     time: str
-    job: Job
-    txt: str
+    msg: str
 
-    def __init__(self, creator, creator_id, job: Job, interval, time, txt=""):
+    def __init__(self, creator, job_id, interval, time, msg=""):
         self.creator = creator
-        self.creator_id = creator_id
-        self.job_id = job.id
-        self.class_name = job.name
-        self.job = job
+        self.job_id = job_id
         self.interval = interval
         self.time = time
-        self.txt = txt
+        self.msg = msg
 
     def get_info(self):
-        msg = "   - 등록인 : `%s`\n   - 식별값 : `%s`\n   - 유형 : `%s`\n   - 주기 : `%s %s`\n   - 사용자 메시지 : `%s`" % \
-              (self.creator, self.job_id, self.class_name, self.interval, self.time, self.txt)
+        msg = "   - 등록 : `%s`\n   - 알림 : `%s`\n   - 주기 : `%s %s`" % \
+              (self.creator, self.job_id, self.interval, self.time)
+
+        if len(self.msg) != 0:
+            msg += "\n   - 내용 : `%s`" % self.msg
 
         return msg

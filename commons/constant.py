@@ -1,4 +1,6 @@
 # 매터모스트 정보
+from apscheduler.schedulers.background import BackgroundScheduler
+
 BOT_TOKEN: str = "dzme7z5wa38gmc8dswoupb55da"
 BOT_TEAM: str = "1404"
 MATTERMOST_URL = "https://recordame.cloud.mattermost.com"
@@ -12,3 +14,10 @@ CH_NOTIFICATIONS_ID: str = "9doiodruepdwmnbx8ejg395u7o"
 
 # 알림 목록 저장용 변수
 ALARMS: dict = {}
+# 알림 백그라운드 JOB
+SCHEDULE = BackgroundScheduler()
+
+# 사용자 정의 알림 목록 저장용 변수
+MY_ALARMS: dict = {}
+# 사용자 정의 알림 백그라운드 JOB
+MY_SCHEDULE = BackgroundScheduler()
