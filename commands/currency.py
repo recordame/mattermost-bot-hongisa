@@ -28,7 +28,7 @@ def extract_currency(info: str):
     try:
         won_dollar = info.find('span', class_='spt_con dw').text.strip(" ").replace("  ", " ")
         index = won_dollar.find('지수')
-        won_dollar = won_dollar[:(index + '지수'.__len__())] + ': ' + won_dollar[(index + '지수'.__len__()):]
+        won_dollar = '`- ' + won_dollar[:(index + '지수'.__len__())] + ': ' + won_dollar[(index + '지수'.__len__()):]
 
         index = won_dollar.find('전일대비하락')
         won_dollar = won_dollar[:index - 1] + '원`\n`- ' + won_dollar[index:]
@@ -38,7 +38,7 @@ def extract_currency(info: str):
     except:
         won_dollar = info.find('span', class_='spt_con up').text.strip(" ").replace("  ", " ")
         index = won_dollar.find('지수')
-        won_dollar = won_dollar[:(index + '지수'.__len__())] + ': ' + won_dollar[(index + '지수'.__len__()):]
+        won_dollar = '`- ' + won_dollar[:(index + '지수'.__len__())] + ': ' + won_dollar[(index + '지수'.__len__()):]
 
         index = won_dollar.find('전일대비상승')
         won_dollar = won_dollar[:index - 1] + '원`\n`- ' + won_dollar[index:]
@@ -46,20 +46,17 @@ def extract_currency(info: str):
         index = won_dollar.find('전일대비상승')
         won_dollar = won_dollar[:(index + '전일대비상승'.__len__())] + ': ' + won_dollar[(index + '전일대비상승'.__len__()):]
 
-    return won_dollar
-
-
-# 채널 알림용 문구 생성
-def generate_msg():
-    info = get_info()
-
-    msg = '**오늘의 환율** :dollar:\n`- ' + extract_currency(info) + '`'
-
-    return msg
+    return won_dollar + '`'
 
 
 class CurrencyAlarm(Plugin):
-    # 나에게만
     @listen_to("^환율$")
     def direct(self, message: Message):
-        self.driver.direct_message(message.user_id, generate_msg())
+        self.driver.direct_message(message.user_id, self.generate_msg())
+
+    def generate_msg(self):
+        info = get_info()
+
+        msg = '**오늘의 환율** :dollar:\n%s' % extract_currency(info)
+
+        return msg

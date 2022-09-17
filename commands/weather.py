@@ -5,12 +5,14 @@ from urllib.request import urlopen, Request
 import bs4
 import urllib3
 from mmpy_bot import Message
-from mmpy_bot import Plugin, listen_to
+from mmpy_bot import listen_to
 
 from commons import constant
-from commons.alarm import Alarm
+from commons.abstract_alarm import AbstractAlarm
 
 urllib3.disable_warnings()
+
+loc: str = "성남위례"
 
 
 # 네이버 날씨 페이지 로드
@@ -95,12 +97,10 @@ def extract_tomorrow(info: str):
     precipitation_pm = info.find('div', class_="weather_info type_tomorrow").find('div', class_="_pm").find('dd', class_="desc").text
 
     msg = "내일 예상 날씨\n" \
-          + "- 오전\n" \
-          + "   - 기상예보 : " + status_am + "\n" \
+          + "- 오전: " + status_am + "\n" \
           + "   - 예상기온 : " + temp_am + "\n" \
           + "   - 강수확률 : " + precipitation_am + "\n" \
-          + "- 오후\n" \
-          + "   - 기상예보 : " + status_pm + "\n" \
+          + "- 오후 : " + status_pm + "\n" \
           + "   - 예상기온 : " + temp_pm + "\n" \
           + "   - 강수확률 : " + precipitation_pm + "\n"
 
@@ -123,80 +123,38 @@ def extract_tomorrow(info: str):
     return msg
 
 
-# 날씨 메시지 생성
-def generate_msg(loc: str):
-    info = get_info(loc)
-    msg = extract_today(info) + "\n" + extract_tomorrow(info)
+class WeatherAlarm(AbstractAlarm):
+    name = "날씨"
 
-    return msg
+    def __init__(self):
+        self.id = "WeatherAlarm"
+        self.day = "mon-sun"
+        self.ch = constant.CH_NOTIFICATIONS_ID
 
+    def generate_msg(self, loc: str):
+        info = get_info(loc)
+        msg = extract_today(info) + "\n" + extract_tomorrow(info)
 
-class WeatherAlarm(Plugin):
-    alarm_id: str = "WeatherAlarm"
-    alarm_name: str = "날씨"
-    alarm_day: str = "mon-sun"
-    alarm_text: str = generate_msg()
+        return msg
 
     # 나에게만
-    @listen_to("^%s(\s[가-힣]+)?$" % alarm_name)
-    def direct(self, message: Message, loc: str):
-        self.driver.direct_message(message.user_id, generate_msg(loc))
+    @listen_to("^%s(\s[가-힣]+)?$" % name)
+    def direct(self, message: Message, location: str):
+        self.msg = self.generate_msg(location)
+        self.alarm(message.user_id, False)
 
     # 전체알림
-    @listen_to("^%s알림(\s[가-힣]+)?$" % alarm_name)
-    def notify(self, message: Message, loc: str):
-        self.driver.create_post(constant.CH_NOTIFICATIONS_ID, "@here " + generate_msg(loc))
+    @listen_to("^%s알림(\s[가-힣]+)?$" % name)
+    def notify(self, message: Message, location: str = loc):
+        self.msg = self.generate_msg(location)
+        self.alarm(self.ch)
 
     # 날씨 알림 예약
-    @listen_to("^%s알림예약(\s[가-힣]+)? ([1-9]|1[0-9]|2[0-4]) ([1-9]|1[0-9]|2[0-4])$" % alarm_name)
-    def add_alarm(self, message: Message, loc: str, hour1: int, hour2: int):
-        # 기존에 등록된 알림 여부 확인
-        job = constant.SCHEDULE.get_job(self.alarm_id)
+    @listen_to("^%s알림예약(\s[가-힣]+)? (.+) (.+)$" % name)
+    def add_alarm(self, message: Message, location: str, hour: str, minute: str):
+        self.msg = self.generate_msg(location)
+        self.schedule_alarm(message, hour, minute)
 
-        if job is not None:
-            # 기존에 등록된 알림이 있는 경우, 기존 알림 정보 출력
-            alarm: Alarm = constant.ALARMS.get(job.id)
-
-            self.driver.direct_message(message.user_id,
-                                       "이미 등록된 알림이 있습니다. `%s예약취소` 후 재등록 해주세요.\n"
-                                       "**알림정보**\n"
-                                       "%s\n"
-                                       % (self.alarm_name, alarm.get_info()))
-        else:
-            # 기존에 등록된 작업이 없는 경우, 새로운 알림 등록 및 시작
-            self.driver.direct_message(message.user_id, "`%s` 알림이 `%s %d, %d`시에 전달됩니다." % (self.alarm_name, self.alarm_day, int(hour1), int(hour2)))
-            constant.SCHEDULE.add_job(id=self.alarm_id,
-                                      func=lambda: self.driver.create_post(constant.CH_NOTIFICATIONS_ID, generate_msg(loc)),
-                                      trigger='cron',
-                                      day_of_week=self.alarm_day,
-                                      hour=str(hour1) + ',' + str(hour2),
-                                      minute=00)
-
-            job = constant.SCHEDULE.get_job(self.alarm_id)
-
-            # 알림 정보 저장
-            alarm = Alarm(message.sender_name, message.user_id, job.id, self.alarm_day, "%d, %d" % (int(hour1), int(hour2)))
-            constant.ALARMS.update({job.id: alarm})
-
-    # 날씨 알림 취소
-    @listen_to("^%s알림예약취소$" % alarm_name)
+    @listen_to("^%s알림예약취소$" % name)
     def cancel_alarm(self, message: Message):
-        job = constant.SCHEDULE.get_job(self.alarm_id)
-
-        if job is not None:
-            # 알림 목록에서 취소할 알림의 정보를 불러와, 알림 생성자에게 삭제 내역 전달
-            alarm: Alarm = constant.ALARMS.get(job.id)
-
-            self.driver.direct_message(alarm.creator_id,
-                                       "등록하신 `%s` 알림이 %s님에 의해 삭제되었습니다.\n\n"
-                                       "**알림정보**\n"
-                                       "%s\n"
-                                       % (message.sender_name, self.alarm_name, alarm.get_info()))
-
-            # 알림 리스트 및 백그라운드 스케쥴에서 제거
-            constant.ALARMS.pop(job.id)
-            constant.SCHEDULE.remove_job(job.id)
-
-            self.driver.direct_message(message.user_id, "`%s` 알림이 종료되었습니다." % self.alarm_name)
-        else:
-            self.driver.direct_message(message.user_id, "등록된 알림이 없습니다.")
+        self.unschedule_alarm(self.name, message)

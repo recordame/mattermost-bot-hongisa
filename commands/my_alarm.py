@@ -2,11 +2,10 @@ from mmpy_bot import Message
 from mmpy_bot import Plugin, listen_to
 
 from commons import constant
-from commons.alarm import Alarm
+from commons.alarm_context import AlarmContext
 
 
 class MyAlarm(Plugin):
-
     @listen_to("^내알림등록 ([a-zA-Z]+) (.+) (.+) (\*|[0-9]|[1-5][0-9]) (\*|[0-9]|[1-5][0-9]) (.+)$")
     def add_my_alarm(self, message: Message, label: str, dow: str, h: str, m: str, s: str, txt: str):
         alarm_id = message.sender_name + "_" + label
@@ -26,7 +25,7 @@ class MyAlarm(Plugin):
             )
 
             job = constant.MY_SCHEDULE.get_job(alarm_id)
-            alarm = Alarm(message.sender_name, message.user_id, job.id, dow, "%s:%s:%s" % (h, m, s), label, txt)
+            alarm_ctx = AlarmContext(message.sender_name, message.user_id, job.id, dow, "%s:%s:%s" % (h, m, s), label, txt)
 
             self.driver.direct_message(message.user_id,
                                        "- 등록: `%s`\n" % message.sender_name +
@@ -39,9 +38,9 @@ class MyAlarm(Plugin):
             my_alarms = constant.MY_ALARMS.get(message.sender_name)
 
             if my_alarms is not None:
-                constant.MY_ALARMS[message.sender_name].update({label: alarm})
+                constant.MY_ALARMS[message.sender_name].update({label: alarm_ctx})
             else:
-                constant.MY_ALARMS.update({message.sender_name: {label: alarm}})
+                constant.MY_ALARMS.update({message.sender_name: {label: alarm_ctx}})
 
     @listen_to("^내알림목록$")
     def get_my_alarm(self, message: Message):

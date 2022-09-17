@@ -1,20 +1,20 @@
-class Alarm:
+class AlarmContext:
     creator: str
     creator_id: str
     job_id: str
     interval: str
     time: str
     alarm_name: str
-    alarm_text: str
+    alarm_msg: str
 
-    def __init__(self, creator: str, creator_id: str, job_id: str, interval: str, time: str, alarm_name: str = "", alarm_text: str = ""):
+    def __init__(self, creator: str, creator_id: str, job_id: str, interval: str, time: str, alarm_name: str = "", alarm_msg: str = ""):
         self.creator = creator
         self.creator_id = creator_id
         self.job_id = job_id
         self.interval = interval
         self.time = time
         self.alarm_name = alarm_name
-        self.alarm_text = alarm_text
+        self.alarm_msg = alarm_msg
 
     def get_info(self):
         msg = "   - 등록 : `%s`\n" % self.creator
@@ -26,7 +26,7 @@ class Alarm:
 
         msg += "   - 주기 : `%s %s`\n" % (self.interval, self.time)
 
-        if str(self.alarm_text).__len__() != 0:
-            msg += "   - 내용 : `%s`" % self.alarm_text
+        if str(self.alarm_msg).__len__() != 0:
+            msg += "   - 내용 : `%s`" % self.alarm_msg
 
         return msg
