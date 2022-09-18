@@ -5,7 +5,6 @@ from commons import constant
 
 
 class Alarms(Plugin):
-
     # 알람 정보 출력
     @listen_to("^알림목록$")
     def get_alarms(self, message: Message):

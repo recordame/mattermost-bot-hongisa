@@ -1,4 +1,6 @@
 # !/usr/bin/env python
+import asyncio
+import json
 
 from mmpy_bot import Bot, Settings
 
@@ -11,6 +13,7 @@ from commands.medicine import MedicineAlarm
 from commands.my_alarm import MyAlarm
 from commands.weather import WeatherAlarm
 from commons import constant
+from commons.alarm_restore import AlarmRestore
 
 # 로봇 설정
 bot = Bot(
@@ -23,7 +26,7 @@ bot = Bot(
         SSL_VERIFY=False,
         LOG_FILE="./bot.log"
     ),
-    plugins=[KordleAlarm(), MedicineAlarm(), WeatherAlarm(), MassAlarm(), Help(), Alarms(), CurrencyAlarm(), MyAlarm()],
+    plugins=[KordleAlarm(), MedicineAlarm(), WeatherAlarm(), MassAlarm(), Help(), Alarms(), CurrencyAlarm(), MyAlarm(), AlarmRestore()],
 )
 
 # 알림을 위한 백그라운드 스케쥴 시작

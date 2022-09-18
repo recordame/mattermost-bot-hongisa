@@ -173,7 +173,7 @@ class WeatherAlarm(AbstractAlarm):
     # 날씨 알림 예약
     @listen_to("^%s알림예약(\s[가-힣]+)? (.+) (.+)$" % name)
     def add_alarm(self, message: Message, location: str, hour: str, minute: str):
-        self.schedule_alarm(message, hour, minute, location)
+        self.schedule_alarm(message, self.name, hour, minute, location)
 
     @listen_to("^%s알림예약취소$" % name)
     def cancel_alarm(self, message: Message):
