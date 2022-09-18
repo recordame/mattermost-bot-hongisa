@@ -43,7 +43,7 @@ class MassAlarm(AbstractAlarm):
         self.day = "sun"
         self.ch = constant.CH_NOTIFICATIONS_ID
 
-    def generate_msg(self):
+    def generate_msg(self, option: str = ""):
         info = get_info()
         mass = extract_mass(info)
 

@@ -15,7 +15,7 @@ class KordleAlarm(AbstractAlarm):
         self.day = "mon-sun"
         self.ch = constant.CH_KORDLE_ID
 
-    def generate_msg(self):
+    def generate_msg(self, option: str = ""):
         now = datetime.datetime.now()
 
         month = str(int(now.strftime("%m")))

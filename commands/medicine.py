@@ -13,7 +13,7 @@ class MedicineAlarm(AbstractAlarm):
         self.day = "mon-sun"
         self.ch = constant.CH_NOTIFICATIONS_ID
 
-    def generate_msg(self):
+    def generate_msg(self, option: str = ""):
         msg = "@here 건강을 위해 **약** 먹을 시간 입니다! :pill::muscle:"
 
         return msg
