@@ -2,10 +2,10 @@ from mmpy_bot import Message
 from mmpy_bot import listen_to
 
 from commons import constant
-from commons.abstract_alarm import AbstractAlarm
+from commons.alarm import Alarm
 
 
-class MedicineAlarm(AbstractAlarm):
+class MedicineAlarm(Alarm):
     name = "복약"
 
     def __init__(self):

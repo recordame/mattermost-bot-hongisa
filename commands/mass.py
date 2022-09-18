@@ -6,7 +6,7 @@ from mmpy_bot import Message
 from mmpy_bot import listen_to
 
 from commons import constant
-from commons.abstract_alarm import AbstractAlarm
+from commons.alarm import Alarm
 
 urllib3.disable_warnings()
 
@@ -35,7 +35,7 @@ def extract_mass(info: str):
     return msg
 
 
-class MassAlarm(AbstractAlarm):
+class MassAlarm(Alarm):
     name = "미사"
 
     def __init__(self):

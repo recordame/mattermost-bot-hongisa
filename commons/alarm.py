@@ -8,7 +8,7 @@ from commons import constant
 from commons.alarm_context import AlarmContext
 
 
-class AbstractAlarm(Plugin, metaclass=ABCMeta):
+class Alarm(Plugin, metaclass=ABCMeta):
     id: str
     day: str
     ch: str
@@ -67,25 +67,7 @@ class AbstractAlarm(Plugin, metaclass=ABCMeta):
             alarm_ctx = AlarmContext(message.sender_name, message.user_id, job.id, self.day, "%s:%02d" % (hour, int(minute)), msg_param=msg_param)
             constant.ALARMS.update({job.id: alarm_ctx})
 
-            # 알림정보 파일 저장
-            alarm_db = open('./alarms', 'w', encoding='UTF-8')
-
-            alarm_db.write('[')
-
-            i = 0
-            cnt = constant.ALARMS.values().__len__()
-            key = list(constant.ALARMS.keys())
-
-            while i < cnt:
-                json.dump(constant.ALARMS.get(key[i]).__dict__, alarm_db, indent=4)
-
-                i += 1
-
-                if i < cnt:
-                    alarm_db.write(',\n')
-
-            alarm_db.write(']')
-            alarm_db.close()
+            self.save_file()
 
     def unschedule_alarm(self, alarm_name, message: Message):
         job = constant.SCHEDULE.get_job(self.id)
@@ -105,5 +87,28 @@ class AbstractAlarm(Plugin, metaclass=ABCMeta):
             constant.SCHEDULE.remove_job(job.id)
 
             self.driver.direct_message(message.user_id, "`%s` 알림이 종료되었습니다." % alarm_name)
+
+            self.save_file()
         else:
             self.driver.direct_message(message.user_id, "등록된 알림이 없습니다.")
+
+    def save_file(self):
+        # 알림정보 파일 저장
+        alarm_db = open('./alarms', 'w', encoding='UTF-8')
+
+        alarm_db.write('[')
+
+        i = 0
+        cnt = constant.ALARMS.values().__len__()
+        key = list(constant.ALARMS.keys())
+
+        while i < cnt:
+            json.dump(constant.ALARMS.get(key[i]).__dict__, alarm_db, indent=4)
+
+            i += 1
+
+            if i < cnt:
+                alarm_db.write(',\n')
+
+        alarm_db.write(']')
+        alarm_db.close()

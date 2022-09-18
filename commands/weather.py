@@ -8,7 +8,7 @@ from mmpy_bot import Message
 from mmpy_bot import listen_to
 
 from commons import constant
-from commons.abstract_alarm import AbstractAlarm
+from commons.alarm import Alarm
 
 urllib3.disable_warnings()
 
@@ -146,7 +146,7 @@ def extract_tomorrow(info: str):
     return msg
 
 
-class WeatherAlarm(AbstractAlarm):
+class WeatherAlarm(Alarm):
     name = "날씨"
 
     def __init__(self):

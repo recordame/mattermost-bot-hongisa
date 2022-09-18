@@ -4,10 +4,10 @@ from mmpy_bot import Message
 from mmpy_bot import listen_to
 
 from commons import constant
-from commons.abstract_alarm import AbstractAlarm
+from commons.alarm import Alarm
 
 
-class KordleAlarm(AbstractAlarm):
+class KordleAlarm(Alarm):
     name = "꼬들"
 
     def __init__(self):
