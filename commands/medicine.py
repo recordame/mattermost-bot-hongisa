@@ -12,7 +12,6 @@ class MedicineAlarm(AbstractAlarm):
         self.id = "MedicineAlarm"
         self.day = "mon-sun"
         self.ch = constant.CH_NOTIFICATIONS_ID
-        self.msg = self.generate_msg()
 
     def generate_msg(self):
         msg = "@here 건강을 위해 **약** 먹을 시간 입니다! :pill::muscle:"

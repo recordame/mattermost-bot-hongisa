@@ -11,10 +11,10 @@ class AbstractAlarm(Plugin, metaclass=ABCMeta):
     id: str
     day: str
     ch: str
-    msg: str
 
     @abstractmethod
-    def generate_msg(self):
+    def generate_msg(self, param: str = ""):
+        print(param)
         return "alarm message"
 
     @abstractmethod
@@ -26,11 +26,11 @@ class AbstractAlarm(Plugin, metaclass=ABCMeta):
         alarm_name = "alarm name"
         self.unschedule_alarm(alarm_name, message)
 
-    def alarm(self, recipient: str, is_post: bool = True):
+    def alarm(self, recipient: str, is_post: bool = True, msg_para: str = ""):
         if is_post:
-            self.driver.create_post(recipient, self.msg)
+            self.driver.create_post(recipient, self.generate_msg(msg_para))
         else:
-            self.driver.direct_message(recipient, self.msg)
+            self.driver.direct_message(recipient, self.generate_msg(msg_para))
 
     def is_already_scheduled(self, alarm_id, alarm_name, message: Message):
         job = constant.SCHEDULE.get_job(alarm_id)
@@ -48,13 +48,13 @@ class AbstractAlarm(Plugin, metaclass=ABCMeta):
         else:
             return False
 
-    def schedule_alarm(self, message: Message, hour: str, minute: str):
+    def schedule_alarm(self, message: Message, hour: str, minute: str, msg_param: str = ""):
         if self.is_already_scheduled(self.id, self.name, message) is False:
             # 기존에 등록된 작업이 없는 경우, 새로운 알림 등록 및 시작
             self.driver.direct_message(message.user_id, "`%s` 알림이 `%s %s:%02d`에 전달됩니다." % (self.name, self.day, hour, int(minute)))
 
             constant.SCHEDULE.add_job(id=self.id,
-                                      func=lambda: self.alarm(self.ch),
+                                      func=lambda: self.alarm(self.ch, msg_param),
                                       trigger='cron',
                                       day_of_week=self.day,
                                       hour=hour,

@@ -14,7 +14,6 @@ class KordleAlarm(AbstractAlarm):
         self.id = "KordleAlarm"
         self.day = "mon-sun"
         self.ch = constant.CH_KORDLE_ID
-        self.msg = self.generate_msg()
 
     def generate_msg(self):
         now = datetime.datetime.now()

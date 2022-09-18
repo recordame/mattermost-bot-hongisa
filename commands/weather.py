@@ -12,8 +12,6 @@ from commons.abstract_alarm import AbstractAlarm
 
 urllib3.disable_warnings()
 
-loc: str = "성남위례"
-
 
 # 네이버 날씨 페이지 로드
 def get_info(loc: str):
@@ -35,11 +33,31 @@ def get_info(loc: str):
     return soup
 
 
+# 날씨정보에 아이콘 추가
+def add_icon(status: str):
+    if str(status).__contains__('맑음'):
+        status += ':sunny:'
+    elif str(status).__contains__('구름'):
+        status += ':partly_sunny: '
+    elif str(status).__contains__('흐림'):
+        status += ':cloud:'
+    elif str(status).__contains__('비'):
+        status += ':umbrella_with_rain_drops:'
+    elif str(status).__contains__('눈'):
+        status += ':snowflake:'
+
+    return status
+
+
 # 오늘 날씨 정보 추출
 def extract_today(info: str):
     now = datetime.datetime.now()
 
-    location = info.find('div', class_="title_area").find('h2').text
+    try:
+        location = info.find('div', class_="title_area").find('h2').text
+    except:
+        return "지역설정이 잘못 되었습니다."
+
     today = info.find('div', class_="weather_info").find('div', class_="status_wrap").find('div', class_="_today")
     status = today.find('div', class_="weather_main").find('span', class_="blind").text
     temp = today.find('div', class_="temperature_text").text.replace("현재 온도", "").replace(" ", "")
@@ -51,6 +69,8 @@ def extract_today(info: str):
     month = str(int(now.strftime("%m")))
     day = str(int(now.strftime("%d")))
     hour = str(int(now.strftime("%H")))
+
+    status = add_icon(str(status))
 
     msg = "`" + now.strftime(month + "월 " + day + "일 " + hour + "시") + "`\n" \
           + "현재 `" + location + "` 날씨\n" \
@@ -96,6 +116,9 @@ def extract_tomorrow(info: str):
     temp_pm = info.find('div', class_="weather_info type_tomorrow").find('div', class_="_pm").find('div', class_="temperature_text").text.replace("예측 온도", "").replace(" ", "")
     precipitation_pm = info.find('div', class_="weather_info type_tomorrow").find('div', class_="_pm").find('dd', class_="desc").text
 
+    status_am = add_icon(str(status_am))
+    status_pm = add_icon(str(status_pm))
+
     msg = "내일 예상 날씨\n" \
           + "- 오전: " + status_am + "\n" \
           + "   - 예상기온 : " + temp_am + "\n" \
@@ -140,20 +163,17 @@ class WeatherAlarm(AbstractAlarm):
     # 나에게만
     @listen_to("^%s(\s[가-힣]+)?$" % name)
     def direct(self, message: Message, location: str):
-        self.msg = self.generate_msg(location)
-        self.alarm(message.user_id, False)
+        self.alarm(message.user_id, False, location)
 
     # 전체알림
     @listen_to("^%s알림(\s[가-힣]+)?$" % name)
-    def notify(self, message: Message, location: str = loc):
-        self.msg = self.generate_msg(location)
-        self.alarm(self.ch)
+    def notify(self, message: Message, location: str):
+        self.alarm(self.ch, location)
 
     # 날씨 알림 예약
     @listen_to("^%s알림예약(\s[가-힣]+)? (.+) (.+)$" % name)
     def add_alarm(self, message: Message, location: str, hour: str, minute: str):
-        self.msg = self.generate_msg(location)
-        self.schedule_alarm(message, hour, minute)
+        self.schedule_alarm(message, hour, minute, location)
 
     @listen_to("^%s알림예약취소$" % name)
     def cancel_alarm(self, message: Message):

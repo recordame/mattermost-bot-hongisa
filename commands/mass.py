@@ -42,7 +42,6 @@ class MassAlarm(AbstractAlarm):
         self.id = "MassAlarm"
         self.day = "sun"
         self.ch = constant.CH_NOTIFICATIONS_ID
-        self.msg = self.generate_msg()
 
     def generate_msg(self):
         info = get_info()
@@ -56,7 +55,7 @@ class MassAlarm(AbstractAlarm):
 
     @listen_to("^%s$" % name)
     def direct(self, message: Message):
-        self.alarm(message.user_id, False)
+        self.alarm(message.user_id, is_post=False)
 
     @listen_to("^%s알림$" % name)
     def notify(self, message: Message):
