@@ -27,11 +27,11 @@ class Alarm(Plugin, metaclass=ABCMeta):
         alarm_name = "alarm name"
         self.unschedule_alarm(alarm_name, message)
 
-    def alarm(self, recipient: str, is_post: bool = True, msg_para: str = ""):
+    def alarm(self, recipient: str, is_post: bool = True, msg_param: str = ""):
         if is_post:
-            self.driver.create_post(recipient, self.generate_msg(msg_para))
+            self.driver.create_post(recipient, self.generate_msg(msg_param))
         else:
-            self.driver.direct_message(recipient, self.generate_msg(msg_para))
+            self.driver.direct_message(recipient, self.generate_msg(msg_param))
 
     def schedule_alarm(self, message: Message, alarm_name: str, hour: str, minute: str, msg_param: str = ""):
         if self.is_already_scheduled(self.id, alarm_name, message) is False:
@@ -39,7 +39,7 @@ class Alarm(Plugin, metaclass=ABCMeta):
             self.driver.direct_message(message.user_id, "`%s` 알림이 `%s %s:%02d`에 전달됩니다." % (alarm_name, self.day, hour, int(minute)))
 
             constants.SCHEDULE.add_job(id=self.id,
-                                       func=lambda: self.alarm(self.ch, msg_param),
+                                       func=lambda: self.alarm(self.ch, is_post=True, msg_param=msg_param),
                                        trigger='cron',
                                        day_of_week=self.day,
                                        hour=hour,
