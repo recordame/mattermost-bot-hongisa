@@ -1,6 +1,3 @@
-import json
-
-
 class AlarmContext:
     creator: str
     creator_id: str
@@ -11,11 +8,11 @@ class AlarmContext:
     alarm_msg: str
     msg_param: str
 
-    def __init__(self, creator: str, creator_id: str, job_id: str, interval: str, time: str, alarm_name: str = "", alarm_msg: str = "", msg_param: str = ""):
+    def __init__(self, creator: str, creator_id: str, job_id: str, day: str, time: str, alarm_name: str = "", alarm_msg: str = "", msg_param: str = ""):
         self.creator = creator
         self.creator_id = creator_id
         self.job_id = job_id
-        self.day = interval
+        self.day = day
         self.time = time
         self.alarm_name = alarm_name
         self.alarm_msg = alarm_msg
