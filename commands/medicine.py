@@ -1,7 +1,7 @@
 from mmpy_bot import Message
 from mmpy_bot import listen_to
 
-from commons import constant
+from commons import constants
 from commons.alarm import Alarm
 
 
@@ -11,7 +11,7 @@ class MedicineAlarm(Alarm):
     def __init__(self):
         self.id = "MedicineAlarm"
         self.day = "mon-sun"
-        self.ch = constant.CH_NOTIFICATIONS_ID
+        self.ch = constants.CH_NOTIFICATIONS_ID
 
     def generate_msg(self, option: str = ""):
         msg = "@here 건강을 위해 **약** 먹을 시간 입니다! :pill::muscle:"

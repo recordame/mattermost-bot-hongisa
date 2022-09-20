@@ -1,7 +1,7 @@
 from mmpy_bot import Message
 from mmpy_bot import Plugin, listen_to
 
-from commons import constant
+from commons import constants
 
 
 class Alarms(Plugin):
@@ -10,8 +10,8 @@ class Alarms(Plugin):
     def get_alarms(self, message: Message):
         msg: str = ""
 
-        for alarm in constant.ALARMS.values():
+        for alarm in constants.ALARMS.values():
             msg += "[알림]\n" + alarm.get_info() + "\n"
 
         self.driver.direct_message(message.user_id,
-                                   "등록된 알림 : %d 개\n" % (constant.ALARMS.__len__()) + msg + "\n")
+                                   "등록된 알림 : %d 개\n" % (constants.ALARMS.__len__()) + msg + "\n")

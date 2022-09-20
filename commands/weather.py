@@ -7,7 +7,7 @@ import urllib3
 from mmpy_bot import Message
 from mmpy_bot import listen_to
 
-from commons import constant
+from commons import constants
 from commons.alarm import Alarm
 
 urllib3.disable_warnings()
@@ -152,7 +152,7 @@ class WeatherAlarm(Alarm):
     def __init__(self):
         self.id = "WeatherAlarm"
         self.day = "mon-sun"
-        self.ch = constant.CH_NOTIFICATIONS_ID
+        self.ch = constants.CH_NOTIFICATIONS_ID
 
     def generate_msg(self, loc: str):
         info = get_info(loc)
@@ -163,17 +163,17 @@ class WeatherAlarm(Alarm):
     # 나에게만
     @listen_to("^%s(\s[가-힣]+)?$" % name)
     def direct(self, message: Message, location: str):
-        self.alarm(message.user_id, False, location)
+        self.alarm(message.user_id, False, location.strip(' '))
 
     # 전체알림
     @listen_to("^%s알림(\s[가-힣]+)?$" % name)
     def notify(self, message: Message, location: str):
-        self.alarm(self.ch, location)
+        self.alarm(self.ch, location.strip(' '))
 
     # 날씨 알림 예약
     @listen_to("^%s알림예약(\s[가-힣]+)? (.+) (.+)$" % name)
     def add_alarm(self, message: Message, location: str, hour: str, minute: str):
-        self.schedule_alarm(message, self.name, hour, minute, location)
+        self.schedule_alarm(message, self.name, hour, minute, location.strip(' '))
 
     @listen_to("^%s알림예약취소$" % name)
     def cancel_alarm(self, message: Message):

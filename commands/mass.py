@@ -5,7 +5,7 @@ import urllib3
 from mmpy_bot import Message
 from mmpy_bot import listen_to
 
-from commons import constant
+from commons import constants
 from commons.alarm import Alarm
 
 urllib3.disable_warnings()
@@ -41,7 +41,7 @@ class MassAlarm(Alarm):
     def __init__(self):
         self.id = "MassAlarm"
         self.day = "sun"
-        self.ch = constant.CH_NOTIFICATIONS_ID
+        self.ch = constants.CH_NOTIFICATIONS_ID
 
     def generate_msg(self, option: str = ""):
         info = get_info()

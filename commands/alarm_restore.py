@@ -7,9 +7,10 @@ from commands.kordle import KordleAlarm
 from commands.mass import MassAlarm
 from commands.medicine import MedicineAlarm
 from commands.weather import WeatherAlarm
+from commons import constants
 
 
-def load_from_file(message: Message):
+def load_file(message: Message):
     alarm_db = open('./alarms', 'r', encoding='UTF-8')
     alarms_from_db = json.load(alarm_db)
 
@@ -40,7 +41,34 @@ def load_from_file(message: Message):
                                      alarm.get('time').split(':')[1])
 
 
+def save_file():
+    # 알림정보 파일 저장
+    alarm_db = open('./alarms', 'w', encoding='UTF-8')
+
+    alarm_db.write('[')
+
+    i = 0
+    cnt = constants.ALARMS.values().__len__()
+    key = list(constants.ALARMS.keys())
+
+    while i < cnt:
+        json.dump(constants.ALARMS.get(key[i]).__dict__, alarm_db, indent=4, ensure_ascii=False)
+
+        i += 1
+
+        if i < cnt:
+            alarm_db.write(',\n')
+
+    alarm_db.write(']')
+    alarm_db.close()
+
+
 class AlarmRestore(Plugin):
     @listen_to('^알림복원$')
     def load_alarms(self, message: Message):
-        load_from_file(message)
+        load_file(message)
+
+    @listen_to('^알림저장$')
+    def save_alarms(self, message: Message):
+        save_file()
+        self.driver.direct_message(message.user_id, '알림이 `alarms`파일에 저장되었습니다.')

@@ -3,7 +3,7 @@ import datetime
 from mmpy_bot import Message
 from mmpy_bot import listen_to
 
-from commons import constant
+from commons import constants
 from commons.alarm import Alarm
 
 
@@ -13,7 +13,7 @@ class KordleAlarm(Alarm):
     def __init__(self):
         self.id = "KordleAlarm"
         self.day = "mon-sun"
-        self.ch = constant.CH_KORDLE_ID
+        self.ch = constants.CH_KORDLE_ID
 
     def generate_msg(self, option: str = ""):
         now = datetime.datetime.now()
