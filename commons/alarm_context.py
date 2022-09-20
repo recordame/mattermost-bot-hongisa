@@ -9,7 +9,7 @@ class AlarmContext:
     time: str
     alarm_name: str
     alarm_msg: str
-    msg_param: str;
+    msg_param: str
 
     def __init__(self, creator: str, creator_id: str, job_id: str, interval: str, time: str, alarm_name: str = "", alarm_msg: str = "", msg_param: str = ""):
         self.creator = creator
