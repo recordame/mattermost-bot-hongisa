@@ -1,12 +1,6 @@
 .idea/
-__pycache__/constant.cpython-310.pyc
-__pycache__/help.cpython-310.pyc
-__pycache__/kordle.cpython-310.pyc
-__pycache__/weather.cpython-310.pyc
-__pycache__/mass.cpython-310.pyc
+__pycache__/
 *.pyc
-*.txt
 *.log
 alarms
-/.vscode/launch.json
-/.vscode/tasks.json
+/.vscode
