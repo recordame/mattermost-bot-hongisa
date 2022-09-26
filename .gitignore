@@ -8,3 +8,5 @@ __pycache__/mass.cpython-310.pyc
 *.txt
 *.log
 alarms
+/.vscode/launch.json
+/.vscode/tasks.json
