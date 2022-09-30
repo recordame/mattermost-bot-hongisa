@@ -27,14 +27,14 @@ class KordleAlarm(Alarm):
 
         return msg
 
-    @listen_to("^%s알림$" % name)
+    @listen_to("^%s알람$" % name)
     def notify(self, message: Message):
         self.alarm(self.ch)
 
-    @listen_to("^%s알림예약 (.+) (.+)$" % name)
+    @listen_to("^%s알람예약 (.+) (.+)$" % name)
     def add_alarm(self, message: Message, hour: str, minute: str):
         self.schedule_alarm(message, self.name, hour, minute)
 
-    @listen_to("^%s알림예약취소$" % name)
+    @listen_to("^%s알람예약취소$" % name)
     def cancel_alarm(self, message: Message):
         self.unschedule_alarm(self.name, message)

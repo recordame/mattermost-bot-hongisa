@@ -22,9 +22,9 @@ class AlarmContext:
         msg = "   - 등록 : `%s`\n" % self.creator
 
         if str(self.alarm_name).__len__() != 0:
-            msg += "   - 알림 : `%s`\n" % self.alarm_name
+            msg += "   - 알람 : `%s`\n" % self.alarm_name
         else:
-            msg += "   - 알림 : `%s`\n" % self.job_id
+            msg += "   - 알람 : `%s`\n" % self.job_id
 
         msg += "   - 주기 : `%s %s`\n" % (self.day, self.time)
 

@@ -18,11 +18,11 @@ class MedicineAlarm(Alarm):
 
         return msg
 
-    # 복약 알림 예약
-    @listen_to("^%s알림예약 (.+) (.+)$" % name)
+    # 복약 알람 예약
+    @listen_to("^%s알람예약 (.+) (.+)$" % name)
     def add_alarm(self, message: Message, hour: str, minute: str):
         self.schedule_alarm(message, self.name, hour, minute)
 
-    @listen_to("^%s알림예약취소$" % name)
+    @listen_to("^%s알람예약취소$" % name)
     def cancel_alarm(self, message: Message):
         self.unschedule_alarm(self.name, message)

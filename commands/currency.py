@@ -1,10 +1,9 @@
 import urllib
-from urllib.request import urlopen, Request
+from urllib.request import Request, urlopen
 
 import bs4
 import urllib3
-from mmpy_bot import Message
-from mmpy_bot import Plugin, listen_to
+from mmpy_bot import Message, Plugin, listen_to
 
 urllib3.disable_warnings()
 

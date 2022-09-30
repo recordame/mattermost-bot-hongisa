@@ -22,15 +22,25 @@ bot = Bot(
         BOT_TOKEN=constants.BOT_TOKEN,
         BOT_TEAM=constants.BOT_TEAM,
         SSL_VERIFY=False,
-        LOG_FILE="./bot.log"
+        LOG_FILE="./bot.log",
     ),
-    plugins=[KordleAlarm(), MedicineAlarm(), WeatherAlarm(), MassAlarm(), Help(), Alarms(), CurrencyAlarm(), MyAlarm(), AlarmRestore()],
+    plugins=[
+        KordleAlarm(),
+        MedicineAlarm(),
+        WeatherAlarm(),
+        MassAlarm(),
+        Help(),
+        Alarms(),
+        CurrencyAlarm(),
+        MyAlarm(),
+        AlarmRestore(),
+    ],
 )
 
-# 알림을 위한 백그라운드 스케쥴 시작
+# 알람을 위한 백그라운드 스케쥴 시작
 constants.SCHEDULE.start()
 
-# 사용자 정의 알림을 위한 백그라운드 스케쥴 시작
+# 사용자 정의 알람을 위한 백그라운드 스케쥴 시작
 constants.MY_SCHEDULE.start()
 
 # 로봇 서비스 시작

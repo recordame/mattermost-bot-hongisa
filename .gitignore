@@ -4,3 +4,7 @@ __pycache__/
 *.log
 alarms
 /.vscode
+/personal_alarms
+/channel_alarms
+/channel_alarms.json
+/personal_alarms.json

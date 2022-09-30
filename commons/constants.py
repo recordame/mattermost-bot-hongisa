@@ -12,12 +12,12 @@ CH_KORDLE_ID: str = "9aic13fzstdgmxro1c9f9i7yho"
 CH_TOWN_SQUARE_ID: str = "7oc3baakktfxudigcjjdhmh4my"
 CH_NOTIFICATIONS_ID: str = "9doiodruepdwmnbx8ejg395u7o"
 
-# 알림 목록 저장용 변수
+# 알람 목록 저장용 변수
 ALARMS: dict = {}
-# 알림 백그라운드 JOB
+# 알람 백그라운드 JOB
 SCHEDULE = BackgroundScheduler()
 
-# 사용자 정의 알림 목록 저장용 변수
+# 사용자 정의 알람 목록 저장용 변수
 MY_ALARMS: dict = {}
-# 사용자 정의 알림 백그라운드 JOB
+# 사용자 정의 알람 백그라운드 JOB
 MY_SCHEDULE = BackgroundScheduler()
