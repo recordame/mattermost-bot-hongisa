@@ -1,4 +1,4 @@
-from abc import *
+from abc import ABCMeta, abstractmethod
 
 from mmpy_bot import Message
 from mmpy_bot import Plugin
@@ -20,12 +20,12 @@ class Alarm(Plugin, metaclass=ABCMeta):
 
     @abstractmethod
     def add_alarm(self, message: Message, hour: str, minute: str):
-        self.schedule_alarm(message, hour, minute)
+        self.schedule_alarm(message=message, alarm_name="", hour=hour, minute=minute)
 
     @abstractmethod
     def cancel_alarm(self, message: Message):
         alarm_name = "alarm name"
-        self.unschedule_alarm(alarm_name, message)
+        self.unschedule_alarm(alarm_name=alarm_name, message=message)
 
     def alarm(self, recipient: str, is_post: bool = True, msg_param: str = ""):
         if is_post:
@@ -48,12 +48,13 @@ class Alarm(Plugin, metaclass=ABCMeta):
 
             constants.SCHEDULE.add_job(
                 id=self.id,
-                func=lambda: self.alarm(
-                    self.ch, is_post=True, msg_param=msg_param),
+                func=lambda: self.alarm(self.ch, is_post=True, msg_param=msg_param),
                 trigger='cron',
                 day_of_week=self.day,
                 hour=hour,
-                minute=minute)
+                minute=minute,
+                misfire_grace_time=10
+            )
 
             job = constants.SCHEDULE.get_job(self.id)
 

@@ -22,7 +22,8 @@ class MyAlarm(Plugin):
                 day_of_week=dow,
                 hour=hour,
                 minute=minute,
-                second=second
+                second=second,
+                misfire_grace_time=10
             )
 
             job = constants.MY_SCHEDULE.get_job(alarm_id)
