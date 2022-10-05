@@ -6,11 +6,11 @@ from mmpy_bot import Message, Plugin, listen_to
 from commands.kordle import KordleAlarm
 from commands.mass import MassAlarm
 from commands.medicine import MedicineAlarm
-from commands.my_alarm import MyAlarm
+from commands.user_alarm import UserAlarm
 from commands.weather import WeatherAlarm
 from commons.utils import (
     save_channel_alarms_to_file_in_json,
-    save_personal_alarms_to_file_in_json,
+    save_user_alarms_to_file_in_json,
 )
 
 
@@ -53,16 +53,17 @@ def load_channel_alarms_from_file(message: Message):
             )
 
 
-def load_personal_alarms_from_file(message: Message):
-    alarm_file = open("./personal_alarms.json", "r", encoding="UTF-8")
+def load_user_alarms_from_file(message: Message):
+    alarm_file = open("./user_alarms.json", "r", encoding="UTF-8")
     alarm_json = json.load(alarm_file)
 
-    my_alarm: MyAlarm = getattr(sys.modules[__name__], "MyAlarm")
+    user_alarm: UserAlarm = getattr(sys.modules[__name__], "UserAlarm")
 
     for user in alarm_json:
         for alarm in user["alarm"]:
-            message.sender_name = alarm["creator"]
             message.user_id = alarm["creator_id"]
+            message.sender_name = alarm["creator"]
+
             label = alarm["alarm_name"]
             dow = alarm["day"]
             hour = str(alarm["time"]).split(":")[0]
@@ -70,7 +71,7 @@ def load_personal_alarms_from_file(message: Message):
             second = str(alarm["time"]).split(":")[2]
             msg = alarm["alarm_msg"]
 
-            my_alarm.add_my_alarm(message, label, dow, hour, minute, second, msg)
+            user_alarm.add_user_alarm(message, label, dow, hour, minute, second, msg)
 
 
 class AlarmRestore(Plugin):
@@ -81,13 +82,13 @@ class AlarmRestore(Plugin):
     @listen_to("^알람저장$")
     def save_channel_alarms(self, message: Message):
         save_channel_alarms_to_file_in_json()
-        self.driver.direct_message(message.user_id, "알람이 `channel_alarms`파일에 저장되었습니다.")
+        self.driver.direct_message(message.user_id, "알람이 `channel_alarms.json`파일에 저장되었습니다.")
 
     @listen_to("^개인알람복원$")
-    def load_personal_alarms(self, message: Message):
-        load_personal_alarms_from_file(message)
+    def load_user_alarms(self, message: Message):
+        load_user_alarms_from_file(message)
 
     @listen_to("^개인알람저장$")
-    def save_personal_alarms(self, message: Message):
-        save_personal_alarms_to_file_in_json()
-        self.driver.direct_message(message.user_id, "알람이 `personal_alarms`파일에 저장되었습니다.")
+    def save_user_alarms(self, message: Message):
+        save_user_alarms_to_file_in_json()
+        self.driver.direct_message(message.user_id, "알람이 `user_alarms.json`파일에 저장되었습니다.")

@@ -26,37 +26,37 @@ def save_channel_alarms_to_file_in_json():
     alarm_db.close()
 
 
-def save_personal_alarms_to_file_in_json():
+def save_user_alarms_to_file_in_json():
     # 알람정보 파일 저장
-    alarm_file = open("./personal_alarms.json", "w", encoding="UTF-8")
+    alarm_file = open("./user_alarms.json", "w", encoding="UTF-8")
 
     alarm_file.write("[")
     user_cnt = constants.MY_ALARMS.values().__len__()
     user_ids = list(constants.MY_ALARMS.keys())
 
     for i in range(0, user_cnt):
-        alarms = constants.MY_ALARMS.get(user_ids[i])
+        alarm_file.write('{"user":"' + user_ids[i] + '", "alarm":[')
 
-        alarm_file.write('{"name":"' + user_ids[i] + '", "alarm":[')
-
-        alarm_cnt = dict(alarms).values().__len__()
-        alarm_ids = list(dict(alarms).keys())
+        user_alarms: dict = constants.MY_ALARMS.get(user_ids[i])
+        alarm_cnt = dict(user_alarms).values().__len__()
+        alarm_ids = list(dict(user_alarms).keys())
 
         for j in range(0, alarm_cnt):
             json.dump(
-                dict(alarms).get(alarm_ids[j]).__dict__,
+                user_alarms.get(alarm_ids[j]).__dict__,
                 alarm_file,
                 indent=4,
-                ensure_ascii=False,
+                ensure_ascii=False
             )
 
             if j < alarm_cnt - 1:
                 alarm_file.write(",\n")
 
+        alarm_file.write("]}")
+
         if i < user_cnt - 1:
             alarm_file.write(",\n")
 
-        alarm_file.write("]}")
-
     alarm_file.write("]")
+
     alarm_file.close()
