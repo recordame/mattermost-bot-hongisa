@@ -8,10 +8,8 @@ from commands.mass import MassAlarm
 from commands.medicine import MedicineAlarm
 from commands.user_alarm import UserAlarm
 from commands.weather import WeatherAlarm
-from commons.utils import (
-    save_channel_alarms_to_file_in_json,
-    save_user_alarms_to_file_in_json,
-)
+from commons import constants
+from commons.utils import save_alarms_to_file_in_json
 
 
 def load_channel_alarms_from_file(message: Message):
@@ -23,34 +21,39 @@ def load_channel_alarms_from_file(message: Message):
     mass_alarm: MassAlarm = getattr(sys.modules[__name__], "MassAlarm")
     medicine_alarm: MedicineAlarm = getattr(sys.modules[__name__], "MedicineAlarm")
 
-    for alarm in alarm_json:
-        job_id = alarm.get("job_id")
+    for channel in alarm_json:
+        for alarm in channel["alarm"]:
+            id = alarm.get("id")
 
-        if job_id == "WeatherAlarm":
-            weather_alarm.add_alarm(
-                message,
-                alarm.get("msg_param"),
-                alarm.get("time").split(":")[0],
-                alarm.get("time").split(":")[1],
-            )
-        elif job_id == "KordleAlarm":
-            kordle_alarm.add_alarm(
-                message,
-                alarm.get("time").split(":")[0],
-                alarm.get("time").split(":")[1],
-            )
-        elif job_id == "MassAlarm":
-            mass_alarm.add_alarm(
-                message,
-                alarm.get("time").split(":")[0],
-                alarm.get("time").split(":")[1],
-            )
-        elif job_id == "MedicineAlarm":
-            medicine_alarm.add_alarm(
-                message,
-                alarm.get("time").split(":")[0],
-                alarm.get("time").split(":")[1],
-            )
+            if id == "WeatherAlarm":
+                weather_alarm.add_alarm(
+                    message,
+                    alarm["message_argument"],
+                    alarm["hour"],
+                    alarm["minute"],
+                    alarm["post_to"]
+                )
+            elif id == "KordleAlarm":
+                kordle_alarm.add_alarm(
+                    message,
+                    alarm["hour"],
+                    alarm["minute"],
+                    alarm["post_to"]
+                )
+            elif id == "MassAlarm":
+                mass_alarm.add_alarm(
+                    message,
+                    alarm["hour"],
+                    alarm["minute"],
+                    alarm["post_to"]
+                )
+            elif id == "MedicineAlarm":
+                medicine_alarm.add_alarm(
+                    message,
+                    alarm["hour"],
+                    alarm["minute"],
+                    alarm["post_to"]
+                )
 
 
 def load_user_alarms_from_file(message: Message):
@@ -61,17 +64,25 @@ def load_user_alarms_from_file(message: Message):
 
     for user in alarm_json:
         for alarm in user["alarm"]:
+            message.sender_name = alarm["creator_name"]
             message.user_id = alarm["creator_id"]
-            message.sender_name = alarm["creator"]
 
-            label = alarm["alarm_name"]
-            dow = alarm["day"]
-            hour = str(alarm["time"]).split(":")[0]
-            minute = str(alarm["time"]).split(":")[1]
-            second = str(alarm["time"]).split(":")[2]
-            msg = alarm["alarm_msg"]
+            alarm_id = alarm["id"]
+            day = alarm["day"]
+            hour = alarm["hour"]
+            minute = alarm["minute"]
+            second = alarm["second"]
+            alarm_message = alarm["message"]
 
-            user_alarm.add_user_alarm(message, label, dow, hour, minute, second, msg)
+            user_alarm.add_user_alarm(
+                message,
+                alarm_id,
+                day,
+                hour,
+                minute,
+                second,
+                alarm_message
+            )
 
 
 class AlarmRestore(Plugin):
@@ -81,7 +92,7 @@ class AlarmRestore(Plugin):
 
     @listen_to("^알람저장$")
     def save_channel_alarms(self, message: Message):
-        save_channel_alarms_to_file_in_json()
+        save_alarms_to_file_in_json("channel", constants.CHANNEL_ALARMS)
         self.driver.direct_message(message.user_id, "알람이 `channel_alarms.json`파일에 저장되었습니다.")
 
     @listen_to("^개인알람복원$")
@@ -90,5 +101,5 @@ class AlarmRestore(Plugin):
 
     @listen_to("^개인알람저장$")
     def save_user_alarms(self, message: Message):
-        save_user_alarms_to_file_in_json()
+        save_alarms_to_file_in_json("user", constants.USER_ALARMS)
         self.driver.direct_message(message.user_id, "알람이 `user_alarms.json`파일에 저장되었습니다.")

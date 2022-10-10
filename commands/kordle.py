@@ -5,15 +5,14 @@ from mmpy_bot import listen_to
 
 from commons import constants
 from commons.alarm import Alarm
+from commons.alarm_context import AlarmContextBuilder
 
 
 class KordleAlarm(Alarm):
     name = "꼬들"
-
-    def __init__(self):
-        self.id = "KordleAlarm"
-        self.day = "mon-sun"
-        self.ch = constants.CH_KORDLE_ID
+    id = "KordleAlarm"
+    day = "mon-sun"
+    ch = constants.CH_KORDLE_ID
 
     def generate_msg(self, option: str = ""):
         now = datetime.datetime.now()
@@ -28,13 +27,19 @@ class KordleAlarm(Alarm):
         return msg
 
     @listen_to("^%s알람$" % name)
-    def notify(self, message: Message):
-        self.alarm(self.ch)
+    def notify(self, message: Message, post_to=ch):
+        self.alarm("to_channel", post_to)
 
-    @listen_to("^%s알람예약 (.+) (.+)$" % name)
-    def add_alarm(self, message: Message, hour: str, minute: str):
-        self.schedule_alarm(message, self.name, hour, minute)
+    @listen_to("^%s알람예약 (.+) (\\d+)$" % name)
+    def add_alarm(self, message: Message, hour: str, minute: str, post_to=ch):
+        alarm_context = AlarmContextBuilder() \
+            .creator_name(message.sender_name).creator_id(message.user_id).post_to(post_to) \
+            .name(self.name).id(self.id) \
+            .day(self.day).hour(hour).minute(minute) \
+            .build()
 
-    @listen_to("^%s알람예약취소$" % name)
-    def cancel_alarm(self, message: Message):
-        self.unschedule_alarm(self.name, message)
+        self.schedule_alarm(alarm_context)
+
+    @listen_to("^%s알람예약취소 (.+)$" % name)
+    def cancel_alarm(self, message: Message, post_to=ch):
+        self.unschedule_alarm(self.name, self.id, message, post_to)

@@ -38,10 +38,10 @@ bot = Bot(
 )
 
 # 알람을 위한 백그라운드 스케쥴 시작
-constants.SCHEDULE.start()
+constants.CHANNEL_ALARM_SCHEDULE.start()
 
 # 사용자 정의 알람을 위한 백그라운드 스케쥴 시작
-constants.MY_SCHEDULE.start()
+constants.USER_ALARM_SCHEDULE.start()
 
 # 로봇 서비스 시작
 bot.run()

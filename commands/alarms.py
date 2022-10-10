@@ -1,16 +1,19 @@
-from commons import constants
 from mmpy_bot import Message, Plugin, listen_to
+
+from commons import constants
+from commons.utils import get_alarms
 
 
 class Alarms(Plugin):
     # 알람 정보 출력
     @listen_to("^알람목록$")
-    def get_alarms(self, message: Message):
-        msg: str = ""
+    def get_channel_alarms(self, message: Message):
+        msg = get_alarms(constants.CHANNEL_ALARMS)
 
-        for alarm in constants.ALARMS.values():
-            msg += "[알람]\n" + alarm.get_info() + "\n"
+        self.driver.direct_message(message.user_id, msg)
 
-        self.driver.direct_message(
-            message.user_id,
-            "등록된 알람 : %d 개\n" % (constants.ALARMS.__len__()) + msg + "\n")
+    @listen_to("^개인알람목록$")
+    def get_user_alarm(self, message: Message):
+        msg = get_alarms(constants.USER_ALARMS, message.user_id)
+
+        self.driver.direct_message(message.user_id, msg)

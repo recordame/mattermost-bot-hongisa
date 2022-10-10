@@ -1,88 +1,64 @@
 from mmpy_bot import Message, Plugin, listen_to
 
 from commons import constants
-from commons.alarm_context import AlarmContext
-from commons.utils import save_user_alarms_to_file_in_json
+from commons.alarm_context import AlarmContextBuilder
+from commons.utils import save_alarms_to_file_in_json
 
 
 class UserAlarm(Plugin):
-    @listen_to("^개인알람등록 (.+) (.+) (.+) (\*|[0-9]|[1-5][0-9]) (\*|[0-9]|[1-5][0-9]) (.+)$")
-    def add_user_alarm(self, message: Message, label: str, dow: str, hour: str, minute: str, second: str, msg: str):
-        alarm_id = message.sender_name + "_" + label
+    @listen_to("^개인알람등록 (.+) (.+) (.+) (\\d+) (\\d+) (.+)$")
+    def add_user_alarm(self, message: Message, alarm_id: str, day_of_week: str, hour: str, minute: str, second: str, alarm_message: str):
+        job_id = message.sender_name + "_" + alarm_id
 
-        if constants.MY_SCHEDULE.get_job(alarm_id) is not None:
-            self.driver.direct_message(message.user_id,
-                                       "동일한 알람이 존재합니다. `내알람목록`으로 확인해주세요.")
+        if constants.USER_ALARM_SCHEDULE.get_job(job_id) is not None:
+            self.driver.direct_message(message.user_id, "동일한 알람이 존재합니다. `내알람목록`으로 확인해주세요.")
         else:
+            ctx = AlarmContextBuilder() \
+                .creator_name(message.sender_name).creator_id(message.user_id).post_to(message.user_id) \
+                .id(alarm_id) \
+                .day(day_of_week).hour(hour).minute(minute).second(second) \
+                .message(alarm_message) \
+                .build()
+
+            user_alarms = constants.USER_ALARMS.get(ctx.post_to)
+
+            if user_alarms is not None:
+                constants.USER_ALARMS[ctx.post_to].update({ctx.id: ctx})
+            else:
+                constants.USER_ALARMS.update({ctx.post_to: {ctx.id: ctx}})
+
             # 기존에 등록된 작업이 없는 경우, 새로운 알람 등록 및 시작
-            constants.MY_SCHEDULE.add_job(
-                id=alarm_id,
-                func=lambda: self.driver.direct_message(message.user_id, msg),
+            constants.USER_ALARM_SCHEDULE.add_job(
+                id=ctx.job_id,
+                func=lambda: self.driver.direct_message(ctx.post_to, ctx.message),
                 trigger="cron",
-                day_of_week=dow,
-                hour=hour,
-                minute=minute,
-                second=second,
+                day_of_week=ctx.day,
+                hour=ctx.hour,
+                minute=ctx.minute,
+                second=ctx.second,
                 misfire_grace_time=10
             )
 
-            job = constants.MY_SCHEDULE.get_job(alarm_id)
-            alarm_ctx = AlarmContext(
-                message.sender_name,
-                message.user_id,
-                job.id,
-                dow,
-                "%s:%s:%s" % (hour, minute, second),
-                label,
-                msg
-            )
+            save_alarms_to_file_in_json("user", constants.USER_ALARMS)
 
             self.driver.direct_message(
-                message.user_id,
-                "- 등록: `%s`\n" % message.sender_name
-                + "- 알람: `%s`\n" % label
-                + "- 요일: `%s`\n" % dow
-                + "- 패턴: `%s:%s:%s`\n" % (hour, minute, second)
-                + "- 내용 : `%s`" % msg,
+                ctx.creator_id,
+                "`%s` 알람이 `%s %s:%02d:%02d` 에 전달됩니다."
+                % (ctx.id, ctx.day, ctx.hour, int(ctx.minute), int(ctx.second))
             )
-
-            user_alarms = constants.MY_ALARMS.get(message.sender_name)
-
-            if user_alarms is not None:
-                constants.MY_ALARMS[message.sender_name].update({label: alarm_ctx})
-            else:
-                constants.MY_ALARMS.update({message.sender_name: {label: alarm_ctx}})
-
-            save_user_alarms_to_file_in_json()
-
-    @listen_to("^개인알람목록$")
-    def get_user_alarm(self, message: Message):
-        msg: str = ""
-
-        if constants.MY_ALARMS.get(message.sender_name) is not None:
-            user_alarms = constants.MY_ALARMS[message.sender_name]
-
-            for alarm in user_alarms.values():
-                msg += "[알람]\n" + alarm.get_info() + "\n"
-
-            self.driver.direct_message(
-                message.user_id, "등록된 알람 : %d 개\n" % (user_alarms.__len__()) + msg + "\n"
-            )
-        else:
-            self.driver.direct_message(message.user_id, "등록된 알람 : 0 개")
 
     @listen_to("^개인알람취소 (.+)$")
-    def cancel_user_alarm(self, message: Message, label: str):
-        job_id = message.sender_name + "_" + label
-        job = constants.MY_SCHEDULE.get_job(job_id)
+    def cancel_user_alarm(self, message: Message, alarm_id: str):
+        job_id = message.user_id + "_" + alarm_id
+        job = constants.USER_ALARM_SCHEDULE.get_job(job_id)
 
         if job is not None:
             # 알람 리스트 및 백그라운드 스케쥴에서 제거
-            del constants.MY_ALARMS[message.sender_name][label]
-            constants.MY_SCHEDULE.get_job(job_id).remove()
+            del constants.USER_ALARMS[message.user_id][alarm_id]
+            constants.USER_ALARM_SCHEDULE.remove_job(job_id)
 
-            self.driver.direct_message(message.user_id, "`" + label + "` 알람이 종료되었습니다.")
+            self.driver.direct_message(message.user_id, "`%s` 알람이 종료되었습니다." % alarm_id)
 
-            save_user_alarms_to_file_in_json()
+            save_alarms_to_file_in_json("user", constants.USER_ALARMS)
         else:
             self.driver.direct_message(message.user_id, "등록된 알람이 없습니다.")

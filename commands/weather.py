@@ -9,6 +9,7 @@ from mmpy_bot import listen_to
 
 from commons import constants
 from commons.alarm import Alarm
+from commons.alarm_context import AlarmContextBuilder
 
 urllib3.disable_warnings()
 
@@ -148,11 +149,7 @@ def extract_tomorrow(info: str):
 
 class WeatherAlarm(Alarm):
     name = "날씨"
-
-    def __init__(self):
-        self.id = "WeatherAlarm"
-        self.day = "mon-sun"
-        self.ch = constants.CH_NOTIFICATIONS_ID
+    id = "WeatherAlarm"
 
     def generate_msg(self, loc: str):
         info = get_info(loc)
@@ -161,20 +158,22 @@ class WeatherAlarm(Alarm):
         return msg
 
     # 나에게만
-    @listen_to("^%s(\s[가-힣]+)?$" % name)
+    @listen_to("^%s ([가-힣]+)$" % name)
     def direct(self, message: Message, location: str):
-        self.alarm(message.user_id, False, location.strip(' '))
-
-    # 전체알람
-    @listen_to("^%s알람(\s[가-힣]+)?$" % name)
-    def notify(self, message: Message, location: str):
-        self.alarm(self.ch, location.strip(' '))
+        self.alarm("to_user", message.user_id, location.strip(' '))
 
     # 날씨 알람 예약
-    @listen_to("^%s알람예약(\s[가-힣]+)? (.+) (.+)$" % name)
-    def add_alarm(self, message: Message, location: str, hour: str, minute: str):
-        self.schedule_alarm(message, self.name, hour, minute, location.strip(' '))
+    @listen_to("^%s알람예약 ([가-힣]+) (.+) (\\d+)$" % name)
+    def add_alarm(self, message: Message, location: str, hour: str, minute: str, post_to=constants.CH_NOTIFICATIONS_ID):
+        alarm_context = AlarmContextBuilder() \
+            .creator_name(message.sender_name).creator_id(message.user_id).post_to(post_to) \
+            .name(self.name).id(self.id) \
+            .day("mon-sun").hour(hour).minute(minute) \
+            .message_argument(location) \
+            .build()
 
-    @listen_to("^%s알람예약취소$" % name)
-    def cancel_alarm(self, message: Message):
-        self.unschedule_alarm(self.name, message)
+        self.schedule_alarm(alarm_context)
+
+    @listen_to("^%s알람예약취소 (.+)$" % name)
+    def cancel_alarm(self, message: Message, post_to=constants.CH_NOTIFICATIONS_ID):
+        self.unschedule_alarm(self.name, self.id, message, post_to)
