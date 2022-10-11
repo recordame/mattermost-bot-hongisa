@@ -13,20 +13,19 @@ def get_alarms(alarm_ctxs: dict, post_to: str = ""):
 
             for alarm in alarms:
                 cnt += 1
-                msg += "[알람%d]\n" % cnt + alarm.get_info() + "\n"
+                msg += "[알람%d]\n" % cnt + alarm.load_web_page() + "\n"
     else:
         if alarm_ctxs.get(post_to) is not None:
             alarms = alarm_ctxs[post_to].values()
 
             for alarm in alarms:
                 cnt += 1
-                msg += "[알람%d]\n" % cnt + alarm.get_info() + "\n"
+                msg += "[알람%d]\n" % cnt + alarm.load_web_page() + "\n"
 
     return "등록된 알람 : %d 개\n" % cnt + msg
 
 
 def save_alarms_to_file_in_json(alarm_type: str, alarm_ctxs: dict):
-    # 알람정보 파일 저장
     alarm_file = open("./%s_alarms.json" % alarm_type, "w", encoding="UTF-8")
 
     alarm_file.write("[")

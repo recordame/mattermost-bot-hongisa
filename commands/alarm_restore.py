@@ -25,7 +25,7 @@ def load_channel_alarms_from_file(message: Message):
         for alarm in channel["alarm"]:
             id = alarm.get("id")
 
-            if id == "WeatherAlarm":
+            if id == "weather":
                 weather_alarm.add_alarm(
                     message,
                     alarm["message_argument"],
@@ -33,21 +33,21 @@ def load_channel_alarms_from_file(message: Message):
                     alarm["minute"],
                     alarm["post_to"]
                 )
-            elif id == "KordleAlarm":
+            elif id == "kordle":
                 kordle_alarm.add_alarm(
                     message,
                     alarm["hour"],
                     alarm["minute"],
                     alarm["post_to"]
                 )
-            elif id == "MassAlarm":
+            elif id == "mass":
                 mass_alarm.add_alarm(
                     message,
                     alarm["hour"],
                     alarm["minute"],
                     alarm["post_to"]
                 )
-            elif id == "MedicineAlarm":
+            elif id == "medicine":
                 medicine_alarm.add_alarm(
                     message,
                     alarm["hour"],
@@ -86,11 +86,11 @@ def load_user_alarms_from_file(message: Message):
 
 
 class AlarmRestore(Plugin):
-    @listen_to("^알람복원$")
+    @listen_to("^채널알람복원$")
     def load_channel_alarms(self, message: Message):
         load_channel_alarms_from_file(message)
 
-    @listen_to("^알람저장$")
+    @listen_to("^채널알람저장$")
     def save_channel_alarms(self, message: Message):
         save_alarms_to_file_in_json("channel", constants.CHANNEL_ALARMS)
         self.driver.direct_message(message.user_id, "알람이 `channel_alarms.json`파일에 저장되었습니다.")

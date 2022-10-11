@@ -10,11 +10,11 @@ from commons.alarm_context import AlarmContextBuilder
 
 class KordleAlarm(Alarm):
     name = "꼬들"
-    id = "KordleAlarm"
+    id = "kordle"
     day = "mon-sun"
-    ch = constants.CH_KORDLE_ID
+    channel_id = constants.CH_KORDLE_ID
 
-    def generate_msg(self, option: str = ""):
+    def generate_message(self, option: str = ""):
         now = datetime.datetime.now()
 
         month = str(int(now.strftime("%m")))
@@ -26,12 +26,12 @@ class KordleAlarm(Alarm):
 
         return msg
 
-    @listen_to("^%s알람$" % name)
-    def notify(self, message: Message, post_to=ch):
+    @listen_to("^%s알림$" % name)
+    def notify(self, message: Message, post_to=channel_id):
         self.alarm("to_channel", post_to)
 
     @listen_to("^%s알람예약 (.+) (\\d+)$" % name)
-    def add_alarm(self, message: Message, hour: str, minute: str, post_to=ch):
+    def add_alarm(self, message: Message, hour: str, minute: str, post_to=channel_id):
         alarm_context = AlarmContextBuilder() \
             .creator_name(message.sender_name).creator_id(message.user_id).post_to(post_to) \
             .name(self.name).id(self.id) \
@@ -40,6 +40,6 @@ class KordleAlarm(Alarm):
 
         self.schedule_alarm(alarm_context)
 
-    @listen_to("^%s알람예약취소 (.+)$" % name)
-    def cancel_alarm(self, message: Message, post_to=ch):
+    @listen_to("^%s알람취소$" % name)
+    def cancel_alarm(self, message: Message, post_to=channel_id):
         self.unschedule_alarm(self.name, self.id, message, post_to)

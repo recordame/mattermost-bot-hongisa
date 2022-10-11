@@ -17,7 +17,7 @@ RUN pip install -r requirements.txt
 COPY lib-patch/usr/local/lib/python3.10/site-packages/mattermostdriver/websocket.py /usr/local/lib/python3.10/site-packages/mattermostdriver
 
 # 아래 명령어로 저장된 알람 복사 또는 docker -v HOST_파일경로:IMAGE_경로 명령어로 파일 연결
-# COPY channel_alarms.json /
-# COPY user_alarms.json /
+COPY channel_alarms.json /
+COPY user_alarms.json /
 
 ENTRYPOINT ["python","/app/main.py"]

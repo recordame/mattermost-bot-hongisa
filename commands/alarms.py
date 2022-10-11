@@ -6,7 +6,7 @@ from commons.utils import get_alarms
 
 class Alarms(Plugin):
     # 알람 정보 출력
-    @listen_to("^알람목록$")
+    @listen_to("^채널알람목록$")
     def get_channel_alarms(self, message: Message):
         msg = get_alarms(constants.CHANNEL_ALARMS)
 

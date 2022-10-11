@@ -16,7 +16,13 @@ class AlarmContext:
     message: str
     message_argument: str
 
-    def __init__(self, creator_name, creator_id, post_to, name, id, day, hour, minute="00", second="00", message="", message_argument=""):
+    def __init__(
+            self,
+            creator_name: str, creator_id: str, post_to: str,
+            name: str, id: str,
+            day: str, hour: str, minute="00", second="00",
+            message="", message_argument=""
+    ):
         self.creator_name = creator_name
         self.creator_id = creator_id
         self.post_to = post_to
@@ -102,7 +108,7 @@ class AlarmContextBuilder:
 
         return self
 
-    def day(self, day):
+    def day(self, day: str):
         self._day = day
 
         return self

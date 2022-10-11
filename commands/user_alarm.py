@@ -8,10 +8,10 @@ from commons.utils import save_alarms_to_file_in_json
 class UserAlarm(Plugin):
     @listen_to("^개인알람등록 (.+) (.+) (.+) (\\d+) (\\d+) (.+)$")
     def add_user_alarm(self, message: Message, alarm_id: str, day_of_week: str, hour: str, minute: str, second: str, alarm_message: str):
-        job_id = message.sender_name + "_" + alarm_id
+        job_id = message.user_id + "_" + alarm_id
 
         if constants.USER_ALARM_SCHEDULE.get_job(job_id) is not None:
-            self.driver.direct_message(message.user_id, "동일한 알람이 존재합니다. `내알람목록`으로 확인해주세요.")
+            self.driver.direct_message(message.user_id, "동일한 알람이 존재합니다. `개인알람목록`으로 확인해주세요.")
         else:
             ctx = AlarmContextBuilder() \
                 .creator_name(message.sender_name).creator_id(message.user_id).post_to(message.user_id) \
@@ -27,7 +27,6 @@ class UserAlarm(Plugin):
             else:
                 constants.USER_ALARMS.update({ctx.post_to: {ctx.id: ctx}})
 
-            # 기존에 등록된 작업이 없는 경우, 새로운 알람 등록 및 시작
             constants.USER_ALARM_SCHEDULE.add_job(
                 id=ctx.job_id,
                 func=lambda: self.driver.direct_message(ctx.post_to, ctx.message),
@@ -53,7 +52,6 @@ class UserAlarm(Plugin):
         job = constants.USER_ALARM_SCHEDULE.get_job(job_id)
 
         if job is not None:
-            # 알람 리스트 및 백그라운드 스케쥴에서 제거
             del constants.USER_ALARMS[message.user_id][alarm_id]
             constants.USER_ALARM_SCHEDULE.remove_job(job_id)
 

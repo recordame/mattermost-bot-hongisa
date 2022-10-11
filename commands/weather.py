@@ -14,13 +14,13 @@ from commons.alarm_context import AlarmContextBuilder
 urllib3.disable_warnings()
 
 
-# 네이버 날씨 페이지 로드
-def get_info(loc: str):
+def load_web_page(loc: str):
     if loc is None:
         loc = ""
 
     # 네이버 날씨
     url: str = "https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=1&ie=utf8&query="
+
     if loc == "":
         url += urllib.parse.quote("날씨")
     else:
@@ -34,7 +34,7 @@ def get_info(loc: str):
     return soup
 
 
-# 날씨정보에 아이콘 추가
+# 날씨 아이콘 설정
 def add_icon(status: str):
     if str(status).__contains__('맑음'):
         status += ':sunny:'
@@ -50,8 +50,7 @@ def add_icon(status: str):
     return status
 
 
-# 오늘 날씨 정보 추출
-def extract_today(info: str):
+def extract_today_weather_information(info: str):
     now = datetime.datetime.now()
 
     try:
@@ -107,8 +106,7 @@ def extract_today(info: str):
     return msg
 
 
-# 내일 날씨 정보 추출
-def extract_tomorrow(info: str):
+def extract_tomorrow_weather_information(info: str):
     status_am = info.find('div', class_="weather_info type_tomorrow").find('ul', class_="weather_info_list _tomorrow").find('div', class_="weather_main").text.strip(" ")
     temp_am = info.find('div', class_="weather_info type_tomorrow").find('ul', class_="weather_info_list _tomorrow").find('div', class_="temperature_text").text.replace("예측 온도", "").replace(" ", "")
     precipitation_am = info.find('div', class_="weather_info type_tomorrow").find('ul', class_="weather_info_list _tomorrow").find('dl', class_="summary_list").text.replace("강수확률", "").strip(" ")
@@ -149,31 +147,31 @@ def extract_tomorrow(info: str):
 
 class WeatherAlarm(Alarm):
     name = "날씨"
-    id = "WeatherAlarm"
+    id = "weather"
+    day = "mon-sun"
+    channel_id = constants.CH_NOTIFICATIONS_ID
 
-    def generate_msg(self, loc: str):
-        info = get_info(loc)
-        msg = extract_today(info) + "\n" + extract_tomorrow(info)
+    def generate_message(self, loc: str):
+        info = load_web_page(loc)
+        msg = extract_today_weather_information(info) + "\n" + extract_tomorrow_weather_information(info)
 
         return msg
 
-    # 나에게만
     @listen_to("^%s ([가-힣]+)$" % name)
     def direct(self, message: Message, location: str):
         self.alarm("to_user", message.user_id, location.strip(' '))
 
-    # 날씨 알람 예약
     @listen_to("^%s알람예약 ([가-힣]+) (.+) (\\d+)$" % name)
-    def add_alarm(self, message: Message, location: str, hour: str, minute: str, post_to=constants.CH_NOTIFICATIONS_ID):
+    def add_alarm(self, message: Message, location: str, hour: str, minute: str, post_to=channel_id):
         alarm_context = AlarmContextBuilder() \
             .creator_name(message.sender_name).creator_id(message.user_id).post_to(post_to) \
             .name(self.name).id(self.id) \
-            .day("mon-sun").hour(hour).minute(minute) \
+            .day(self.day).hour(hour).minute(minute) \
             .message_argument(location) \
             .build()
 
         self.schedule_alarm(alarm_context)
 
-    @listen_to("^%s알람예약취소 (.+)$" % name)
-    def cancel_alarm(self, message: Message, post_to=constants.CH_NOTIFICATIONS_ID):
+    @listen_to("^%s알람취소$" % name)
+    def cancel_alarm(self, message: Message, post_to=channel_id):
         self.unschedule_alarm(self.name, self.id, message, post_to)

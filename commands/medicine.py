@@ -8,18 +8,18 @@ from commons.alarm_context import AlarmContextBuilder
 
 class MedicineAlarm(Alarm):
     name = "복약"
-    id = "MedicineAlarm"
+    id = "medicine"
     day = "mon-sun"
-    ch = constants.CH_NOTIFICATIONS_ID
+    channel_id = constants.CH_NOTIFICATIONS_ID
 
-    def generate_msg(self, option: str = ""):
+    def generate_message(self, option: str = ""):
         msg = "@here 건강을 위해 **약** 먹을 시간 입니다! :pill::muscle:"
 
         return msg
 
     # 복약 알람 예약
     @listen_to("^%s알람예약 (.+) (\\d+)$" % name)
-    def add_alarm(self, message: Message, hour: str, minute: str, post_to=ch):
+    def add_alarm(self, message: Message, hour: str, minute: str, post_to=channel_id):
         alarm_context = AlarmContextBuilder() \
             .creator_name(message.sender_name).creator_id(message.user_id).post_to(post_to) \
             .name(self.name).id(self.id) \
@@ -28,6 +28,6 @@ class MedicineAlarm(Alarm):
 
         self.schedule_alarm(alarm_context)
 
-    @listen_to("^%s알람예약취소 (.+)$" % name)
-    def cancel_alarm(self, message: Message, post_to=constants.CH_KORDLE_ID):
+    @listen_to("^%s알람취소$" % name)
+    def cancel_alarm(self, message: Message, post_to=channel_id):
         self.unschedule_alarm(self.name, self.id, message, post_to)

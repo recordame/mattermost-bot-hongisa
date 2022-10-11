@@ -10,7 +10,7 @@ from commons.utils import save_alarms_to_file_in_json
 
 class Alarm(Plugin, metaclass=ABCMeta):
     @abstractmethod
-    def generate_msg(self, param: str = ""):
+    def generate_message(self, param: str = ""):
         pass
 
     @abstractmethod
@@ -23,12 +23,12 @@ class Alarm(Plugin, metaclass=ABCMeta):
 
     def alarm(self, alarm_type: str, post_to: str, message_argument: str = ""):
         if alarm_type == "to_channel":
-            self.driver.create_post(post_to, self.generate_msg(message_argument))
+            self.driver.create_post(post_to, self.generate_message(message_argument))
         elif alarm_type == "to_user":
-            self.driver.direct_message(post_to, self.generate_msg(message_argument))
+            self.driver.direct_message(post_to, self.generate_message(message_argument))
 
     def schedule_alarm(self, ctx: AlarmContext):
-        if self.is_already_scheduled(ctx) is False:
+        if self.is_alarm_already_scheduled(ctx) is False:
             channel_alarms = constants.CHANNEL_ALARMS.get(ctx.post_to)
 
             if channel_alarms is not None:
@@ -55,7 +55,7 @@ class Alarm(Plugin, metaclass=ABCMeta):
                 % (ctx.name, ctx.day, ctx.hour, int(ctx.minute), int(ctx.second))
             )
 
-    def is_already_scheduled(self, ctx: AlarmContext):
+    def is_alarm_already_scheduled(self, ctx: AlarmContext):
         job = constants.CHANNEL_ALARM_SCHEDULE.get_job(ctx.job_id)
 
         if job is not None:
