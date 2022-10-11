@@ -1,5 +1,7 @@
 import json
 
+from commons.alarm import Alarm
+
 
 def get_alarms(alarm_ctxs: dict, post_to: str = ""):
     msg: str = ""
@@ -13,14 +15,14 @@ def get_alarms(alarm_ctxs: dict, post_to: str = ""):
 
             for alarm in alarms:
                 cnt += 1
-                msg += "[알람%d]\n" % cnt + alarm.load_web_page() + "\n"
+                msg += "[알람%d]\n" % cnt + Alarm(alarm).get_info() + "\n"
     else:
         if alarm_ctxs.get(post_to) is not None:
             alarms = alarm_ctxs[post_to].values()
 
             for alarm in alarms:
                 cnt += 1
-                msg += "[알람%d]\n" % cnt + alarm.load_web_page() + "\n"
+                msg += "[알람%d]\n" % cnt + Alarm(alarm).get_info() + "\n"
 
     return "등록된 알람 : %d 개\n" % cnt + msg
 
