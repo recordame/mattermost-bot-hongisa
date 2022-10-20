@@ -30,25 +30,15 @@ def load_user_alarms_from_file(message: Message):
             second = alarm["second"]
             alarm_message = alarm["message"]
 
-            if alarm_message == "":
-                user_alarm.add_predefined_alarm(
-                    message,
-                    alarm_id,
-                    day,
-                    hour,
-                    minute,
-                    second
-                )
-            else:
-                user_alarm.add_user_alarm(
-                    message,
-                    alarm_id,
-                    day,
-                    hour,
-                    minute,
-                    second,
-                    alarm_message
-                )
+            user_alarm.add_user_alarm(
+                message,
+                alarm_id,
+                day,
+                hour,
+                minute,
+                second,
+                alarm_message
+            )
 
 
 def load_channel_alarms_from_file(message: Message):
