@@ -12,6 +12,10 @@ class MedicineAlarm(Alarm):
     day = "mon-sun"
     channel_id = constants.CH_NOTIFICATIONS_ID
 
+    def __init__(self):
+        super().__init__()
+        self.add_predefined_alarm(self.name, self)
+
     def generate_message(self, option: str = ""):
         msg = "@here 건강을 위해 **약** 먹을 시간 입니다! :pill::muscle:"
 

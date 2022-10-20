@@ -2,13 +2,23 @@ from mmpy_bot import Message, Plugin, listen_to
 
 from commons import constants
 from commons.alarm_context import AlarmContextBuilder
+from commons.constants import PREDEFINED_ALARMS
 from commons.utils import save_alarms_to_file_in_json
 
 
 class UserAlarm(Plugin):
-    @listen_to("^개인알람등록 (.+) (.+) (.+) (\\d+) (\\d+) (.+)$")
+    @listen_to("^개인알람등록 (.+) (.+) (.+) (\\d+) (\\d+)\\s?(.+)?$")
     def add_user_alarm(self, message: Message, alarm_id: str, day_of_week: str, hour: str, minute: str, second: str, alarm_message: str):
         job_id = message.user_id + "_" + alarm_id
+        message_function = None
+
+        if alarm_message is None:
+            alarm_message = ""
+
+            if alarm_id in PREDEFINED_ALARMS.keys():
+                message_function = lambda: self.driver.direct_message(ctx.post_to, str(PREDEFINED_ALARMS.get(alarm_id).generate_message()).removeprefix("@here").strip(" "))
+        else:
+            message_function = lambda: self.driver.direct_message(ctx.post_to, ctx.message)
 
         if constants.USER_ALARM_SCHEDULE.get_job(job_id) is not None:
             self.driver.direct_message(message.user_id, "동일한 알람이 존재합니다. `개인알람목록`으로 확인해주세요.")
@@ -23,7 +33,7 @@ class UserAlarm(Plugin):
             try:
                 constants.USER_ALARM_SCHEDULE.add_job(
                     id=ctx.job_id,
-                    func=lambda: self.driver.direct_message(ctx.post_to, ctx.message),
+                    func=message_function,
                     trigger="cron",
                     day_of_week=ctx.day,
                     hour=ctx.hour,

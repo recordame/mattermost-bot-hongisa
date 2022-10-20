@@ -40,6 +40,10 @@ class MassAlarm(Alarm):
     day = "sun"
     channel_id = constants.CH_NOTIFICATIONS_ID
 
+    def __init__(self):
+        super().__init__()
+        self.add_predefined_alarm(self.name, self)
+
     def generate_message(self, option: str = ""):
         web_page = load_web_page()
         mass_information = extract_mass_information(web_page)

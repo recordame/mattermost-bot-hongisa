@@ -14,6 +14,10 @@ class KordleAlarm(Alarm):
     day = "mon-sun"
     channel_id = constants.CH_KORDLE_ID
 
+    def __init__(self):
+        super().__init__()
+        self.add_predefined_alarm(self.name, self)
+
     def generate_message(self, option: str = ""):
         now = datetime.datetime.now()
 

@@ -151,7 +151,11 @@ class WeatherAlarm(Alarm):
     day = "mon-sun"
     channel_id = constants.CH_NOTIFICATIONS_ID
 
-    def generate_message(self, loc: str):
+    def __init__(self):
+        super().__init__()
+        self.add_predefined_alarm(self.name, self)
+
+    def generate_message(self, loc: str = "성남시 금광동"):
         info = load_web_page(loc)
         msg = extract_today_weather_information(info) + "\n" + extract_tomorrow_weather_information(info)
 
