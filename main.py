@@ -9,9 +9,9 @@ from commands.help import Help
 from commands.kordle import KordleAlarm
 from commands.mass import MassAlarm
 from commands.medicine import MedicineAlarm
-from commands.user_alarm import UserAlarm
 from commands.weather import WeatherAlarm
 from commons import constants
+from commons.user_alarm import UserAlarm
 
 # 로봇 설정
 bot = Bot(
@@ -33,7 +33,7 @@ bot = Bot(
         Alarms(),
         CurrencyAlarm(),
         UserAlarm(),
-        AlarmRestore(),
+        AlarmRestore()
     ],
 )
 

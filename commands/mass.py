@@ -52,7 +52,7 @@ class MassAlarm(Alarm):
 
     @listen_to("^%s$" % name)
     def direct(self, message: Message):
-        self.alarm("to_channel", message.user_id)
+        self.alarm("to_user", message.user_id)
 
     @listen_to("^%s알림$" % name)
     def notify(self, message: Message, post_to=channel_id):

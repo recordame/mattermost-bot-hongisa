@@ -20,23 +20,27 @@ class UserAlarm(Plugin):
                 .message(alarm_message) \
                 .build()
 
+            try:
+                constants.USER_ALARM_SCHEDULE.add_job(
+                    id=ctx.job_id,
+                    func=lambda: self.driver.direct_message(ctx.post_to, ctx.message),
+                    trigger="cron",
+                    day_of_week=ctx.day,
+                    hour=ctx.hour,
+                    minute=ctx.minute,
+                    second=ctx.second,
+                    misfire_grace_time=10
+                )
+            except:
+                self.driver.direct_message(ctx.creator_id, "인자가 잘못되어 등록할 수 없었어요 :crying_cat_face:")
+                return
+
             user_alarms = constants.USER_ALARMS.get(ctx.post_to)
 
             if user_alarms is not None:
                 constants.USER_ALARMS[ctx.post_to].update({ctx.id: ctx})
             else:
                 constants.USER_ALARMS.update({ctx.post_to: {ctx.id: ctx}})
-
-            constants.USER_ALARM_SCHEDULE.add_job(
-                id=ctx.job_id,
-                func=lambda: self.driver.direct_message(ctx.post_to, ctx.message),
-                trigger="cron",
-                day_of_week=ctx.day,
-                hour=ctx.hour,
-                minute=ctx.minute,
-                second=ctx.second,
-                misfire_grace_time=10
-            )
 
             save_alarms_to_file_in_json("user", constants.USER_ALARMS)
 

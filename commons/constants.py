@@ -3,6 +3,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 BOT_TOKEN: str = "dzme7z5wa38gmc8dswoupb55da"
 BOT_TEAM: str = "1404"
 MATTERMOST_URL = "https://recordame.cloud.mattermost.com"
+ADMINS: list = ["recordame"]
 
 # 채널 정보
 RECORDAME_ID: str = "gttq5ttmdtyaiyrs4bz46n6gmh"

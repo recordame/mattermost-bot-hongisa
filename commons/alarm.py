@@ -29,23 +29,27 @@ class Alarm(Plugin, metaclass=ABCMeta):
 
     def schedule_alarm(self, ctx: AlarmContext):
         if self.is_alarm_already_scheduled(ctx) is False:
+            try:
+                constants.CHANNEL_ALARM_SCHEDULE.add_job(
+                    id=ctx.job_id,
+                    func=lambda: self.alarm("to_channel", ctx.post_to, message_argument=ctx.message_argument),
+                    trigger='cron',
+                    day_of_week=ctx.day,
+                    hour=ctx.hour,
+                    minute=ctx.minute,
+                    second=ctx.second,
+                    misfire_grace_time=10
+                )
+            except:
+                self.driver.direct_message(ctx.creator_id, "인자가 잘못되어 등록할 수 없었어요 :crying_cat_face:")
+                return
+
             channel_alarms = constants.CHANNEL_ALARMS.get(ctx.post_to)
 
             if channel_alarms is not None:
                 constants.CHANNEL_ALARMS[ctx.post_to].update({ctx.id: ctx})
             else:
                 constants.CHANNEL_ALARMS.update({ctx.post_to: {ctx.id: ctx}})
-
-            constants.CHANNEL_ALARM_SCHEDULE.add_job(
-                id=ctx.job_id,
-                func=lambda: self.alarm("to_channel", ctx.post_to, message_argument=ctx.message_argument),
-                trigger='cron',
-                day_of_week=ctx.day,
-                hour=ctx.hour,
-                minute=ctx.minute,
-                second=ctx.second,
-                misfire_grace_time=10
-            )
 
             save_alarms_to_file_in_json("channel", constants.CHANNEL_ALARMS)
 
