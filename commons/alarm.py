@@ -5,16 +5,15 @@ from mmpy_bot import Plugin
 
 from commons import constants
 from commons.alarm_context import AlarmContext
-from commons.constants import PREDEFINED_ALARMS
 from commons.utils import save_alarms_to_file_in_json
 
 
 class Alarm(Plugin, metaclass=ABCMeta):
     def add_predefined_alarm(self, name, _class: object):
-        PREDEFINED_ALARMS.update({name: _class})
+        constants.PREDEFINED_ALARMS.update({name: _class})
 
     @abstractmethod
-    def generate_message(self, param: str = ""):
+    def generate_message(self, param: str = "") -> str:
         pass
 
     @abstractmethod
@@ -63,7 +62,7 @@ class Alarm(Plugin, metaclass=ABCMeta):
                 % (ctx.name, ctx.day, ctx.hour, int(ctx.minute), int(ctx.second))
             )
 
-    def is_alarm_already_scheduled(self, ctx: AlarmContext):
+    def is_alarm_already_scheduled(self, ctx: AlarmContext) -> bool:
         job = constants.CHANNEL_ALARM_SCHEDULE.get_job(ctx.job_id)
 
         if job is not None:

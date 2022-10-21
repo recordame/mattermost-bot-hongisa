@@ -2,7 +2,6 @@ from mmpy_bot import Message, Plugin, listen_to
 
 from commons import constants
 from commons.alarm_context import AlarmContextBuilder
-from commons.constants import PREDEFINED_ALARMS
 from commons.utils import save_alarms_to_file_in_json
 
 
@@ -15,8 +14,8 @@ class UserAlarm(Plugin):
         if alarm_message is None:
             alarm_message = ""
 
-            if alarm_id in PREDEFINED_ALARMS.keys():
-                message_function = lambda: self.driver.direct_message(ctx.post_to, str(PREDEFINED_ALARMS.get(alarm_id).generate_message()).removeprefix("@here").strip(" "))
+            if alarm_id in constants.PREDEFINED_ALARMS.keys():
+                message_function = lambda: self.driver.direct_message(ctx.post_to, constants.PREDEFINED_ALARMS.get(alarm_id).generate_message().removeprefix("@here").strip(" "))
         else:
             message_function = lambda: self.driver.direct_message(ctx.post_to, ctx.message)
 
