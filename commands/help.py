@@ -2,14 +2,8 @@ from mmpy_bot import Message, Plugin, listen_to
 
 
 class Help(Plugin):
-    @listen_to("테스트")
-    def hello_click(self, message: Message):
-        response = message.body.__str__()
-        self.driver.reply_to(message, response)
-        self.driver.reply_to()
-
     @listen_to("^명령어$")
-    async def help(self, message: Message):
+    def help(self, message: Message):
         self.driver.direct_message(
             message.user_id,
             "**채널알람**\n"
@@ -32,7 +26,9 @@ class Help(Plugin):
             "**개인알람**\n"
             "   - `개인알람등록` `{규칙명}` `{요일}` `{시}` `{분}` `{초}` `{출력 메시지}`\n"
             "     - 예)`개인알람등록` `rest` `mon-fri` `9-17` `50` `0` `지금부터 10분간 휴식!`\n"
-            "   - `개인알람취소 {규칙명}`\n"
+            "   - `개인알람정지 {규칙명}(Optional)`\n"
+            "   - `개인알람재개 {규칙명}(Optional)`\n"
+            "   - `개인알람취소 {규칙명}(Optional)`\n"
             "\n"
             "**부가기능**\n"
             "- `환율`\n"

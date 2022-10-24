@@ -12,28 +12,6 @@ from commons.alarm_context import AlarmContextBuilder
 urllib3.disable_warnings()
 
 
-def load_web_page():
-    # 서울대교구
-    url: str = "https://aos.catholic.or.kr/pro1021/everydayMass"
-
-    req = Request(url)
-    page = urlopen(req)
-    html = page.read().decode('utf-8')
-    soup = bs4.BeautifulSoup(html, "html.parser")
-
-    return soup
-
-
-def extract_mass_information(info: str):
-    today = info.find('p', class_="bibleBox").text.replace("  ", " ")
-    mass_day = info.find('em').text
-    mass_title = info.find('p', class_="bibleTit").text;
-
-    msg = "`" + today + "`" + "\n**" + mass_day + "**\n >" + mass_title + "\n"
-
-    return msg
-
-
 class MassAlarm(Alarm):
     name = "미사"
     id = "mass"
@@ -56,11 +34,11 @@ class MassAlarm(Alarm):
 
     @listen_to("^%s$" % name)
     def direct(self, message: Message):
-        self.alarm("to_user", message.user_id)
+        self.alarm(message.user_id)
 
     @listen_to("^%s알림$" % name)
     def notify(self, message: Message, post_to=channel_id):
-        self.alarm("to_channel", post_to)
+        self.alarm(post_to)
 
     @listen_to("^%s알람예약 (.+) (\\d+)$" % name)
     def add_alarm(self, message: Message, hour: str, minute: str, post_to=channel_id):
@@ -75,3 +53,27 @@ class MassAlarm(Alarm):
     @listen_to("^%s알람취소$" % name)
     def cancel_alarm(self, message: Message, post_to=channel_id):
         self.unschedule_alarm(self.name, self.id, message, post_to)
+
+
+##########################
+
+def load_web_page():
+    # 서울대교구
+    url: str = "https://aos.catholic.or.kr/pro1021/everydayMass"
+
+    req = Request(url)
+    page = urlopen(req)
+    html = page.read().decode('utf-8')
+    soup = bs4.BeautifulSoup(html, "html.parser")
+
+    return soup
+
+
+def extract_mass_information(info: str):
+    today = info.find('p', class_="bibleBox").text.replace("  ", " ")
+    mass_day = info.find('em').text
+    mass_title = info.find('p', class_="bibleTit").text;
+
+    msg = "`" + today + "`" + "\n**" + mass_day + "**\n >" + mass_title + "\n"
+
+    return msg

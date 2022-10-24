@@ -1,5 +1,6 @@
 from abc import ABCMeta, abstractmethod
 
+from mattermostdriver.exceptions import ResourceNotFound
 from mmpy_bot import Message
 from mmpy_bot import Plugin
 
@@ -9,7 +10,8 @@ from commons.utils import save_alarms_to_file_in_json
 
 
 class Alarm(Plugin, metaclass=ABCMeta):
-    def add_predefined_alarm(self, name, _class: object):
+    @staticmethod
+    def add_predefined_alarm(name, _class: object):
         constants.PREDEFINED_ALARMS.update({name: _class})
 
     @abstractmethod
@@ -24,10 +26,12 @@ class Alarm(Plugin, metaclass=ABCMeta):
     def cancel_alarm(self, message: Message):
         pass
 
-    def alarm(self, alarm_type: str, post_to: str, message_argument: str = ""):
-        if alarm_type == "to_channel":
+    def alarm(self, post_to: str, message_argument: str = ""):
+        try:
+            self.driver.channels.get_channel(post_to)
+
             self.driver.create_post(post_to, self.generate_message(message_argument))
-        elif alarm_type == "to_user":
+        except ResourceNotFound:
             self.driver.direct_message(post_to, self.generate_message(message_argument))
 
     def schedule_alarm(self, ctx: AlarmContext):
@@ -35,7 +39,7 @@ class Alarm(Plugin, metaclass=ABCMeta):
             try:
                 constants.CHANNEL_ALARM_SCHEDULE.add_job(
                     id=ctx.job_id,
-                    func=lambda: self.alarm("to_channel", ctx.post_to, message_argument=ctx.message_argument),
+                    func=lambda: self.alarm(ctx.post_to, message_argument=ctx.message_argument),
                     trigger='cron',
                     day_of_week=ctx.day,
                     hour=ctx.hour,
@@ -43,8 +47,11 @@ class Alarm(Plugin, metaclass=ABCMeta):
                     second=ctx.second,
                     misfire_grace_time=10
                 )
+
+                ctx.job_status = "실행"
             except:
                 self.driver.direct_message(ctx.creator_id, "인자가 잘못되어 등록할 수 없었어요 :crying_cat_face:")
+
                 return
 
             channel_alarms = constants.CHANNEL_ALARMS.get(ctx.post_to)
@@ -54,11 +61,11 @@ class Alarm(Plugin, metaclass=ABCMeta):
             else:
                 constants.CHANNEL_ALARMS.update({ctx.post_to: {ctx.id: ctx}})
 
-            save_alarms_to_file_in_json("channel", constants.CHANNEL_ALARMS)
+            save_alarms()
 
             self.driver.direct_message(
                 ctx.creator_id,
-                "`%s` 알람이 `%s %s:%02d:%02d` 에 전달됩니다."
+                "`%s` 채널알람을 `%s %s:%02d:%02d`에 전달해드릴게요 :fairy:"
                 % (ctx.name, ctx.day, ctx.hour, int(ctx.minute), int(ctx.second))
             )
 
@@ -70,7 +77,7 @@ class Alarm(Plugin, metaclass=ABCMeta):
             existing_ctx: AlarmContext = constants.CHANNEL_ALARMS[ctx.post_to][ctx.id]
 
             self.driver.direct_message(
-                ctx.creator_id, "이미 등록된 알람이 있습니다. `%s알람예약취소` 후 재등록 해주세요.\n"
+                ctx.creator_id, "이미 등록된 채널알람이 있어요! `%s알람예약취소` 후 재등록해주세요.\n"
                                 "**알람정보**\n"
                                 "%s\n"
                                 % (existing_ctx.name, existing_ctx.get_info()))
@@ -87,7 +94,7 @@ class Alarm(Plugin, metaclass=ABCMeta):
 
             self.driver.direct_message(
                 alarm_ctx.creator_id,
-                "등록하신 `%s` 알람이 %s님에 의해 삭제되었습니다.\n\n"
+                "등록하신 `%s` 채널알람이 %s님에 의해 삭제되었어요 :skull_and_crossbones:\n\n"
                 "**알람정보**\n"
                 "%s\n"
                 % (alarm_ctx.name, message.sender_name, alarm_ctx.get_info())
@@ -96,8 +103,14 @@ class Alarm(Plugin, metaclass=ABCMeta):
             del constants.CHANNEL_ALARMS[post_to][alarm_id]
             constants.CHANNEL_ALARM_SCHEDULE.remove_job(job_id)
 
-            self.driver.direct_message(message.user_id, "`%s` 알람이 종료되었습니다." % alarm_name)
+            self.driver.direct_message(message.user_id, "`%s` 채널알람이 삭제되었어요 :skull_and_crossbones:" % alarm_name)
 
-            save_alarms_to_file_in_json("channel", constants.CHANNEL_ALARMS)
+            save_alarms()
         else:
-            self.driver.direct_message(message.user_id, "등록된 알람이 없습니다.")
+            self.driver.direct_message(message.user_id, "등록된 채널알람이 없어요 :crying_cat_face:")
+
+
+###################
+
+def save_alarms():
+    save_alarms_to_file_in_json("channel", constants.CHANNEL_ALARMS)

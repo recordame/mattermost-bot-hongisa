@@ -32,7 +32,7 @@ class KordleAlarm(Alarm):
 
     @listen_to("^%s알림$" % name)
     def notify(self, message: Message, post_to=channel_id):
-        self.alarm("to_channel", post_to)
+        self.alarm(post_to)
 
     @listen_to("^%s알람예약 (.+) (\\d+)$" % name)
     def add_alarm(self, message: Message, hour: str, minute: str, post_to=channel_id):

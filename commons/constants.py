@@ -18,11 +18,11 @@ CH_NOTIFICATIONS_ID: str = "9doiodruepdwmnbx8ejg395u7o"
 PREDEFINED_ALARMS: dict[str, Alarm] = {}
 
 # 채널 알람 목록 저장용 변수
-CHANNEL_ALARMS: dict[str, list[AlarmContext]] = {}
+CHANNEL_ALARMS: dict[str, dict[str, AlarmContext]] = {}
 # 채널 알람 백그라운드 JOB
 CHANNEL_ALARM_SCHEDULE = BackgroundScheduler()
 
 # 개인 알람 목록 저장용 변수
-USER_ALARMS: dict[str, list[AlarmContext]] = {}
+USER_ALARMS: dict[str, dict[str, AlarmContext]] = {}
 # 개인 알람 백그라운드 JOB
 USER_ALARM_SCHEDULE = BackgroundScheduler()

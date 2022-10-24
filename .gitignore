@@ -3,5 +3,5 @@ __pycache__
 *.pyc
 *.log
 .vscode
-channel_alarms.json
-user_alarms.json
+/alarms/
+/Dockerfile-python-chrome/

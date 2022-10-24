@@ -14,6 +14,46 @@ from commons.alarm_context import AlarmContextBuilder
 urllib3.disable_warnings()
 
 
+class WeatherAlarm(Alarm):
+    name = "날씨"
+    id = "weather"
+    day = "mon-sun"
+    channel_id = constants.CH_NOTIFICATIONS_ID
+
+    def __init__(self):
+        super().__init__()
+        self.add_predefined_alarm(self.name, self)
+
+    def generate_message(self, loc: str = "성남시 금광동"):
+        info = load_web_page(loc)
+        msg = extract_today_weather_information(info) + \
+              "\n" + \
+              extract_tomorrow_weather_information(info)
+
+        return msg
+
+    @listen_to("^%s ([가-힣]+)$" % name)
+    def direct(self, message: Message, location: str):
+        self.alarm(message.user_id, location.strip(' '))
+
+    @listen_to("^%s알람예약 ([가-힣]+) (.+) (\\d+)$" % name)
+    def add_alarm(self, message: Message, location: str, hour: str, minute: str, post_to=channel_id):
+        alarm_context = AlarmContextBuilder() \
+            .creator_name(message.sender_name).creator_id(message.user_id).post_to(post_to) \
+            .name(self.name).id(self.id) \
+            .day(self.day).hour(hour).minute(minute) \
+            .message_argument(location) \
+            .build()
+
+        self.schedule_alarm(alarm_context)
+
+    @listen_to("^%s알람취소$" % name)
+    def cancel_alarm(self, message: Message, post_to=channel_id):
+        self.unschedule_alarm(self.name, self.id, message, post_to)
+
+
+##################################
+
 def load_web_page(loc: str):
     if loc is None:
         loc = ""
@@ -32,22 +72,6 @@ def load_web_page(loc: str):
     soup = bs4.BeautifulSoup(html, "html.parser")
 
     return soup
-
-
-# 날씨 아이콘 설정
-def add_icon(status: str):
-    if str(status).__contains__('맑음'):
-        status += ':sunny:'
-    elif str(status).__contains__('구름'):
-        status += ':partly_sunny: '
-    elif str(status).__contains__('흐림'):
-        status += ':cloud:'
-    elif str(status).__contains__('비'):
-        status += ':umbrella_with_rain_drops:'
-    elif str(status).__contains__('눈'):
-        status += ':snowflake:'
-
-    return status
 
 
 def extract_today_weather_information(info: str):
@@ -145,37 +169,17 @@ def extract_tomorrow_weather_information(info: str):
     return msg
 
 
-class WeatherAlarm(Alarm):
-    name = "날씨"
-    id = "weather"
-    day = "mon-sun"
-    channel_id = constants.CH_NOTIFICATIONS_ID
+# 날씨 아이콘 설정
+def add_icon(status: str):
+    if str(status).__contains__('맑음'):
+        status += ':sunny:'
+    elif str(status).__contains__('구름'):
+        status += ':partly_sunny: '
+    elif str(status).__contains__('흐림'):
+        status += ':cloud:'
+    elif str(status).__contains__('비'):
+        status += ':umbrella_with_rain_drops:'
+    elif str(status).__contains__('눈'):
+        status += ':snowflake:'
 
-    def __init__(self):
-        super().__init__()
-        self.add_predefined_alarm(self.name, self)
-
-    def generate_message(self, loc: str = "성남시 금광동"):
-        info = load_web_page(loc)
-        msg = extract_today_weather_information(info) + "\n" + extract_tomorrow_weather_information(info)
-
-        return msg
-
-    @listen_to("^%s ([가-힣]+)$" % name)
-    def direct(self, message: Message, location: str):
-        self.alarm("to_user", message.user_id, location.strip(' '))
-
-    @listen_to("^%s알람예약 ([가-힣]+) (.+) (\\d+)$" % name)
-    def add_alarm(self, message: Message, location: str, hour: str, minute: str, post_to=channel_id):
-        alarm_context = AlarmContextBuilder() \
-            .creator_name(message.sender_name).creator_id(message.user_id).post_to(post_to) \
-            .name(self.name).id(self.id) \
-            .day(self.day).hour(hour).minute(minute) \
-            .message_argument(location) \
-            .build()
-
-        self.schedule_alarm(alarm_context)
-
-    @listen_to("^%s알람취소$" % name)
-    def cancel_alarm(self, message: Message, post_to=channel_id):
-        self.unschedule_alarm(self.name, self.id, message, post_to)
+    return status

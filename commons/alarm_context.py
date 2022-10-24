@@ -7,6 +7,7 @@ class AlarmContext:
     id: str
 
     job_id: str
+    job_status: str
 
     day: str
     hour: str
@@ -31,6 +32,7 @@ class AlarmContext:
         self.id = id
 
         self.job_id = post_to + "_" + id
+        self.job_status = "실행"
 
         self.day = day
         self.hour = hour
@@ -53,7 +55,9 @@ class AlarmContext:
         msg += "   - 주기 : `%s %s:%s:%s`\n" % (self.day, self.hour, self.minute, self.second)
 
         if str(self.message).__len__() != 0:
-            msg += "   - 내용 : `%s`" % self.message
+            msg += "   - 내용 : `%s`\n" % self.message
+
+        msg += "   - 상태 : `%s` :%s:" % (self.job_status, "large_green_circle" if self.job_status == "실행" else "stop_sign")
 
         return msg
 

@@ -8,6 +8,21 @@ from mmpy_bot import Message, Plugin, listen_to
 urllib3.disable_warnings()
 
 
+def generate_msg():
+    info = get_info()
+    msg = '**오늘의 환율** :dollar:\n%s' % extract_currency(info)
+
+    return msg
+
+
+class CurrencyAlarm(Plugin):
+    @listen_to("^환율$")
+    def direct(self, message: Message):
+        self.driver.direct_message(message.user_id, generate_msg())
+
+
+########################
+
 # 네이버 환율
 def get_info():
     url: str = "https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=1&ie=utf8&query=" + urllib.parse.quote("환율")
@@ -46,17 +61,3 @@ def extract_currency(info: str):
         won_dollar = won_dollar[:(index + '전일대비상승'.__len__())] + ': ' + won_dollar[(index + '전일대비상승'.__len__()):]
 
     return won_dollar + '`'
-
-
-def generate_msg():
-    info = get_info()
-
-    msg = '**오늘의 환율** :dollar:\n%s' % extract_currency(info)
-
-    return msg
-
-
-class CurrencyAlarm(Plugin):
-    @listen_to("^환율$")
-    def direct(self, message: Message):
-        self.driver.direct_message(message.user_id, generate_msg())
