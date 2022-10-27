@@ -3,27 +3,27 @@ import sys
 
 from mmpy_bot import Message, Plugin, listen_to
 
-from commands.kordle import KordleAlarm
-from commands.mass import MassAlarm
-from commands.medicine import MedicineAlarm
-from commands.weather import WeatherAlarm
-from commons import constants
-from commons.user_alarm import UserAlarm
-from commons.utils import save_alarms_to_file_in_json
+from alarm.builtin.kordle import KordleAlarm
+from alarm.builtin.mass import MassAlarm
+from alarm.builtin.medicine import MedicineAlarm
+from alarm.builtin.weather import WeatherAlarm
+from alarm.custom.user_alarm import UserAlarm
+from common import constant
+from common.utils import save_alarms_to_file_in_json
 
 
 class AlarmRestore(Plugin):
-    @listen_to("^알람복원$", allowed_users=constants.ADMINS)
+    @listen_to("^알람복원$", allowed_users=constant.ADMINS)
     def load_alarms(self, message: Message):
         load_user_alarms_from_file(message)
         load_channel_alarms_from_file(message)
 
-    @listen_to("^알람저장$", allowed_users=constants.ADMINS)
+    @listen_to("^알람저장$", allowed_users=constant.ADMINS)
     def save_alarms(self, message: Message):
-        save_alarms_to_file_in_json("user", constants.USER_ALARMS)
+        save_alarms_to_file_in_json("user", constant.USER_ALARMS)
         self.driver.direct_message(message.user_id, "알람이 `user_alarms.json`파일에 저장되었어요 :floppy_disk: ")
 
-        save_alarms_to_file_in_json("channel", constants.CHANNEL_ALARMS)
+        save_alarms_to_file_in_json("channel", constant.CHANNEL_ALARMS)
         self.driver.direct_message(message.user_id, "알람이 `channel_alarms.json`파일에 저장되었어요 :floppy_disk: ")
 
 

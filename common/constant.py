@@ -1,7 +1,7 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 
-from commons.alarm import Alarm
-from commons.alarm_context import AlarmContext
+from alarm.alarm_context import AlarmContext
+from alarm.builtin.abstract_alarm import AbstractAlarm
 
 BOT_TOKEN: str = "dzme7z5wa38gmc8dswoupb55da"
 BOT_TEAM: str = "1404"
@@ -15,7 +15,7 @@ CH_KORDLE_ID: str = "9aic13fzstdgmxro1c9f9i7yho"
 CH_TOWN_SQUARE_ID: str = "7oc3baakktfxudigcjjdhmh4my"
 CH_NOTIFICATIONS_ID: str = "9doiodruepdwmnbx8ejg395u7o"
 
-PREDEFINED_ALARMS: dict[str, Alarm] = {}
+BUILTIN_ALARM_INSTANCE: dict[str, AbstractAlarm] = {}
 
 # 채널 알람 목록 저장용 변수
 CHANNEL_ALARMS: dict[str, dict[str, AlarmContext]] = {}

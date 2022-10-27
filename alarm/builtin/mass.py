@@ -5,18 +5,18 @@ import urllib3
 from mmpy_bot import Message
 from mmpy_bot import listen_to
 
-from commons import constants
-from commons.alarm import Alarm
-from commons.alarm_context import AlarmContextBuilder
+from alarm.alarm_context import AlarmContextBuilder
+from alarm.builtin.abstract_alarm import AbstractAlarm
+from common import constant
 
 urllib3.disable_warnings()
 
 
-class MassAlarm(Alarm):
+class MassAlarm(AbstractAlarm):
     name = "미사"
     id = "mass"
     day = "sun"
-    channel_id = constants.CH_NOTIFICATIONS_ID
+    channel_id = constant.CH_NOTIFICATIONS_ID
 
     def __init__(self):
         super().__init__()

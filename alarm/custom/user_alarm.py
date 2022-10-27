@@ -1,45 +1,68 @@
+import re
+
 from mmpy_bot import Message, Plugin, listen_to
 
-from commons import constants
-from commons.alarm_context import AlarmContextBuilder
-from commons.utils import save_alarms_to_file_in_json
+from alarm.alarm_context import AlarmContextBuilder
+from common import constant
+from common.utils import save_alarms_to_file_in_json
 
 
 class UserAlarm(Plugin):
-    @listen_to("^개인알람등록 (.+) (.+) (.+) (\\d+) (\\d+)\\s?(.+)?$")
+    @listen_to(
+        "^개인알람등록"
+        "\\s([가-힣a-zA-Z\\-_\\d]+)"  # 알람명
+        "\\s([(last\\s|\\dth\\s)?sun|mon|tue|wed|thu|fri|sat|,|-|\\d]+)"  # 일
+        "\\s(\\*|\\d+)"  # 시
+        "\\s(\\*|\\d+)"  # 분
+        "\\s(\\*|\\d+)"  # 초
+        "\\s(.+)$"  # 메시지
+    )
     def add_user_alarm(self, message: Message, alarm_id: str, day_of_week: str, hour: str, minute: str, second: str, alarm_message: str, job_status: str = "실행"):
         job_id = message.user_id + "_" + alarm_id
-        message_function = None
 
-        if alarm_message is None:
-            alarm_message = ""
-
-            if alarm_id in constants.PREDEFINED_ALARMS.keys():
-                message_function = lambda: self.driver.direct_message(ctx.post_to, constants.PREDEFINED_ALARMS.get(alarm_id).generate_message().removeprefix("@here").strip(" "))
-        else:
-            message_function = lambda: self.driver.direct_message(ctx.post_to, ctx.message)
-
-        if constants.USER_ALARM_SCHEDULE.get_job(job_id) is not None:
+        if constant.USER_ALARM_SCHEDULE.get_job(job_id) is not None:
             self.driver.direct_message(message.user_id, "이미 등록된 개인알람이 있어요! `개인알람취소` `%s` 후 재등록해주세요." % alarm_id)
         else:
             ctx = AlarmContextBuilder() \
                 .creator_name(message.sender_name).creator_id(message.user_id).post_to(message.user_id) \
                 .id(alarm_id) \
-                .day(day_of_week).hour(hour).minute(minute).second(second) \
+                .day(day_of_week.strip(" ")).hour(hour).minute(minute).second(second) \
                 .message(alarm_message) \
                 .build()
 
+            regenerated_alarm_message: str = ""
+            if "$치환변수" in alarm_message:
+                regenerated_alarm_message += alarm_message.split("$치환변수")[0]
+                regenerated_alarm_message += constant.BUILTIN_ALARM_INSTANCE.get("알람명").generate_message()
+                regenerated_alarm_message += alarm_message.split("$치환변수")[1]
+            else:
+                regenerated_alarm_message = alarm_message
+
+            regenerated_alarm_message = regenerated_alarm_message.replace("\\n", "\n")
+
             try:
-                job = constants.USER_ALARM_SCHEDULE.add_job(
-                    id=ctx.job_id,
-                    func=message_function,
-                    trigger="cron",
-                    day_of_week=ctx.day,
-                    hour=ctx.hour,
-                    minute=ctx.minute,
-                    second=ctx.second,
-                    misfire_grace_time=10
-                )
+                if re.match("^\\dth|last|\\d.+", ctx.day):
+                    job = constant.USER_ALARM_SCHEDULE.add_job(
+                        id=ctx.job_id,
+                        func=lambda: self.driver.direct_message(ctx.post_to, regenerated_alarm_message),
+                        trigger="cron",
+                        day=ctx.day,
+                        hour=ctx.hour,
+                        minute=ctx.minute,
+                        second=ctx.second,
+                        misfire_grace_time=10
+                    )
+                else:
+                    job = constant.USER_ALARM_SCHEDULE.add_job(
+                        id=ctx.job_id,
+                        func=lambda: self.driver.direct_message(ctx.post_to, regenerated_alarm_message),
+                        trigger="cron",
+                        day_of_week=ctx.day,
+                        hour=ctx.hour,
+                        minute=ctx.minute,
+                        second=ctx.second,
+                        misfire_grace_time=10
+                    )
 
                 ctx.job_status = job_status
 
@@ -50,12 +73,12 @@ class UserAlarm(Plugin):
 
                 return
 
-            user_alarms = constants.USER_ALARMS.get(ctx.post_to)
+            user_alarms = constant.USER_ALARMS.get(ctx.post_to)
 
             if user_alarms is not None:
-                constants.USER_ALARMS[ctx.post_to].update({ctx.id: ctx})
+                constant.USER_ALARMS[ctx.post_to].update({ctx.id: ctx})
             else:
-                constants.USER_ALARMS.update({ctx.post_to: {ctx.id: ctx}})
+                constant.USER_ALARMS.update({ctx.post_to: {ctx.id: ctx}})
 
             save_alarms()
 
@@ -65,18 +88,21 @@ class UserAlarm(Plugin):
                 % (ctx.id, ctx.day, ctx.hour, int(ctx.minute), int(ctx.second))
             )
 
-    @listen_to("^개인알람정지\\s?(.+)?$")
+    @listen_to(
+        "^개인알람정지"
+        "\\s?([가-힣a-zA-Z\\-_\\d]+)?$"  # 알람명
+    )
     def pause_user_alarm(self, message: Message, alarm_id: str):
         if alarm_id is None:
             try:
-                alarms: dict = constants.USER_ALARMS[message.user_id]
+                alarms: dict = constant.USER_ALARMS[message.user_id]
                 dirty: bool = False
 
                 for alarm in alarms.values():
                     if alarm.job_status == "실행":
                         dirty = True
 
-                        constants.USER_ALARM_SCHEDULE.get_job(alarm.job_id).pause()
+                        constant.USER_ALARM_SCHEDULE.get_job(alarm.job_id).pause()
                         alarm.job_status = "정지"
 
                         self.send_alarm_status(message.user_id, alarm.id, "정지", "stop_sign")
@@ -91,32 +117,35 @@ class UserAlarm(Plugin):
 
         else:
             job_id = message.user_id + "_" + alarm_id
-            job = constants.USER_ALARM_SCHEDULE.get_job(job_id)
+            job = constant.USER_ALARM_SCHEDULE.get_job(job_id)
 
             if job is None:
                 self.driver.direct_message(message.user_id, "등록된 개인알람이 없어요 :crying_cat_face:")
             else:
                 job.pause()
 
-                ctx = constants.USER_ALARMS[message.user_id][alarm_id]
+                ctx = constant.USER_ALARMS[message.user_id][alarm_id]
                 ctx.job_status = "정지"
 
                 save_alarms()
 
                 self.send_alarm_status(message.user_id, alarm_id, "정지", "stop_sign")
 
-    @listen_to("^개인알람재개\\s?(.+)?$")
+    @listen_to(
+        "^개인알람재개"
+        "\\s?([가-힣a-zA-Z\\-_\\d]+)?$"  # 알람명
+    )
     def resume_user_alarm(self, message: Message, alarm_id: str):
         if alarm_id is None:
             try:
-                alarms: dict = constants.USER_ALARMS[message.user_id]
+                alarms: dict = constant.USER_ALARMS[message.user_id]
                 dirty: bool = False
 
                 for alarm in alarms.values():
                     if alarm.job_status == "정지":
                         dirty = True
 
-                        constants.USER_ALARM_SCHEDULE.get_job(alarm.job_id).resume()
+                        constant.USER_ALARM_SCHEDULE.get_job(alarm.job_id).resume()
                         alarm.job_status = "실행"
 
                         self.send_alarm_status(message.user_id, alarm.id, "재개", "large_green_circle")
@@ -131,29 +160,32 @@ class UserAlarm(Plugin):
 
         else:
             job_id = message.user_id + "_" + alarm_id
-            job = constants.USER_ALARM_SCHEDULE.get_job(job_id)
+            job = constant.USER_ALARM_SCHEDULE.get_job(job_id)
 
             if job is None:
                 self.driver.direct_message(message.user_id, "등록된 개인알람이 없어요 :crying_cat_face:")
             else:
                 job.resume()
 
-                ctx = constants.USER_ALARMS[message.user_id][alarm_id]
+                ctx = constant.USER_ALARMS[message.user_id][alarm_id]
                 ctx.job_status = "실행"
 
                 save_alarms()
 
                 self.send_alarm_status(message.user_id, alarm_id, "재개", "large_green_circle")
 
-    @listen_to("^개인알람취소\\s?(.+)?$")
+    @listen_to(
+        "^개인알람취소"
+        "\\s?([가-힣a-zA-Z\\-_\\d]+)?$"  # 알람명
+    )
     def cancel_user_alarm(self, message: Message, alarm_id: str):
         if alarm_id is None:
             try:
-                alarms: dict = constants.USER_ALARMS[message.user_id]
+                alarms: dict = constant.USER_ALARMS[message.user_id]
 
                 for alarm in alarms.values():
-                    del constants.USER_ALARMS[message.user_id][alarm.id]
-                    constants.USER_ALARM_SCHEDULE.remove_job(alarm.job_id)
+                    del constant.USER_ALARMS[message.user_id][alarm.id]
+                    constant.USER_ALARM_SCHEDULE.remove_job(alarm.job_id)
 
                     save_alarms()
 
@@ -164,13 +196,13 @@ class UserAlarm(Plugin):
 
         else:
             job_id = message.user_id + "_" + alarm_id
-            job = constants.USER_ALARM_SCHEDULE.get_job(job_id)
+            job = constant.USER_ALARM_SCHEDULE.get_job(job_id)
 
             if job is None:
                 self.driver.direct_message(message.user_id, "등록된 개인알람이 없어요 :crying_cat_face:")
             else:
-                del constants.USER_ALARMS[message.user_id][alarm_id]
-                constants.USER_ALARM_SCHEDULE.remove_job(job_id)
+                del constant.USER_ALARMS[message.user_id][alarm_id]
+                constant.USER_ALARM_SCHEDULE.remove_job(job_id)
 
                 save_alarms()
 
@@ -183,4 +215,4 @@ class UserAlarm(Plugin):
 ###################
 
 def save_alarms():
-    save_alarms_to_file_in_json("user", constants.USER_ALARMS)
+    save_alarms_to_file_in_json("user", constant.USER_ALARMS)

@@ -1,39 +1,27 @@
-import datetime
-
 from mmpy_bot import Message
 from mmpy_bot import listen_to
 
-from commons import constants
-from commons.alarm import Alarm
-from commons.alarm_context import AlarmContextBuilder
+from alarm.alarm_context import AlarmContextBuilder
+from alarm.builtin.abstract_alarm import AbstractAlarm
+from common import constant
 
 
-class KordleAlarm(Alarm):
-    name = "꼬들"
-    id = "kordle"
+class MedicineAlarm(AbstractAlarm):
+    name = "복약"
+    id = "medicine"
     day = "mon-sun"
-    channel_id = constants.CH_KORDLE_ID
+    channel_id = constant.CH_NOTIFICATIONS_ID
 
     def __init__(self):
         super().__init__()
         self.add_predefined_alarm(self.name, self)
 
     def generate_message(self, option: str = ""):
-        now = datetime.datetime.now()
-
-        month = str(int(now.strftime("%m")))
-        day = str(int(now.strftime("%d")))
-
-        msg = "@here `" + now.strftime(month + "월 " + day + "일") + "`\n" \
-              + "꼬들 한 번 풀어볼까요?!:zany_face:\n" \
-              + "https://kordle.kr/"
+        msg = "@here 건강을 위해 **약** 먹을 시간 입니다! :pill::muscle:"
 
         return msg
 
-    @listen_to("^%s알림$" % name)
-    def notify(self, message: Message, post_to=channel_id):
-        self.alarm(post_to)
-
+    # 복약 알람 예약
     @listen_to("^%s알람예약 (.+) (\\d+)$" % name)
     def add_alarm(self, message: Message, hour: str, minute: str, post_to=channel_id):
         alarm_context = AlarmContextBuilder() \

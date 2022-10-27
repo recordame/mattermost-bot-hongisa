@@ -2,25 +2,25 @@
 
 from mmpy_bot import Bot, Settings
 
-from commands.alarm_restore import AlarmRestore
-from commands.alarms import Alarms
-from commands.currency import CurrencyAlarm
-from commands.help import Help
-from commands.kordle import KordleAlarm
-from commands.mass import MassAlarm
-from commands.medicine import MedicineAlarm
-from commands.weather import WeatherAlarm
-from commons import constants
-from commons.user_alarm import UserAlarm
+from common import constant
+from alarm.builtin.kordle import KordleAlarm
+from alarm.builtin.mass import MassAlarm
+from alarm.builtin.medicine import MedicineAlarm
+from alarm.builtin.weather import WeatherAlarm
+from alarm.custom.user_alarm import UserAlarm
+from alarm.management.alarm_restore import AlarmRestore
+from alarm.management.alarms import Alarms
+from command.currency import CurrencyAlarm
+from command.help import Help
 
 # 로봇 설정
 bot = Bot(
     settings=Settings(
-        MATTERMOST_URL=constants.MATTERMOST_URL,
+        MATTERMOST_URL=constant.MATTERMOST_URL,
         MATTERMOST_PORT=443,
         MATTERMOST_API_PATH="/api/v4",
-        BOT_TOKEN=constants.BOT_TOKEN,
-        BOT_TEAM=constants.BOT_TEAM,
+        BOT_TOKEN=constant.BOT_TOKEN,
+        BOT_TEAM=constant.BOT_TEAM,
         SSL_VERIFY=False,
         LOG_FILE="./bot.log",
     ),
@@ -38,10 +38,10 @@ bot = Bot(
 )
 
 # 알람을 위한 백그라운드 스케쥴 시작
-constants.CHANNEL_ALARM_SCHEDULE.start()
+constant.CHANNEL_ALARM_SCHEDULE.start()
 
 # 사용자 정의 알람을 위한 백그라운드 스케쥴 시작
-constants.USER_ALARM_SCHEDULE.start()
+constant.USER_ALARM_SCHEDULE.start()
 
 # 로봇 서비스 시작
 bot.run()

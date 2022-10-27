@@ -38,7 +38,7 @@ def get_alarms(alarm_ctxs: dict, post_to: str = ""):
 
 
 def save_alarms_to_file_in_json(alarm_type: str, alarm_ctxs: dict):
-    alarm_file = open("./alarms/%s_alarms.json" % alarm_type, "w", encoding="UTF-8")
+    alarm_file = open("./alarms/%s_alarms.json" % alarm_type, "w+", encoding="UTF-8")
 
     alarm_file.write("[")
     ctx_cnt = alarm_ctxs.values().__len__()
