@@ -11,7 +11,7 @@ class UserAlarm(Plugin):
     @listen_to(
         "^개인알람등록"
         "\\s([가-힣a-zA-Z\\-_\\d]+)"  # 알람명
-        "\\s([(last\\s|\\dth\\s)?sun|mon|tue|wed|thu|fri|sat|,|-|\\d]+)"  # 일
+        "\\s([(last\\s|\\dth\\s)?sun|mon|tue|wed|thu|fri|sat|,|\\-|\\d]+)"  # 일
         "\\s(\\*|\\d+)"  # 시
         "\\s(\\*|\\d+)"  # 분
         "\\s(\\*|\\d+)"  # 초
