@@ -5,3 +5,4 @@ __pycache__
 .vscode
 /alarms/
 /Dockerfile-python-chrome/
+/alarms/
