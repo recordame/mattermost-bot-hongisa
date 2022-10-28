@@ -22,15 +22,20 @@ class MedicineAlarm(AbstractAlarm):
         return msg
 
     # 복약 알람 예약
-    @listen_to("^%s알람예약 (.+) (\\d+)$" % name)
-    def add_alarm(self, message: Message, hour: str, minute: str, post_to=channel_id):
+    @listen_to(
+        "^%s알람등록"
+        "\\s([\\*|\\*/\\d|\\d|\\-|\\,]+)"
+        "\\s([\\*|\\*/\\d|\\d|\\-|\\,]+)$"
+        % name
+    )
+    def add_alarm(self, message: Message, hour: str, minute: str, recovery_mode: bool = False):
         alarm_context = AlarmContextBuilder() \
-            .creator_name(message.sender_name).creator_id(message.user_id).post_to(post_to) \
+            .creator_name(message.sender_name).creator_id(message.user_id).post_to(self.channel_id) \
             .name(self.name).id(self.id) \
             .day(self.day).hour(hour).minute(minute) \
             .build()
 
-        self.schedule_alarm(alarm_context)
+        self.schedule_alarm(alarm_context, recovery_mode)
 
     @listen_to("^%s알람취소$" % name)
     def cancel_alarm(self, message: Message, post_to=channel_id):

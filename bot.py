@@ -1,0 +1,51 @@
+# !/usr/bin/env python
+
+from mmpy_bot import Bot, Settings
+
+from alarm.alarm_util import load_user_alarms_from_file, load_channel_alarms_from_file
+from alarm.builtin.kordle import KordleAlarm
+from alarm.builtin.mass import MassAlarm
+from alarm.builtin.medicine import MedicineAlarm
+from alarm.builtin.weather import WeatherAlarm
+from alarm.command.alarm_list import Alarms
+from alarm.custom.channel_alarm import ChannelAlarm
+from alarm.custom.user_alarm import UserAlarm
+from command.currency import CurrencyAlarm
+from command.help import Help
+from common import constant
+
+# 로봇 설정
+bot = Bot(
+    settings=Settings(
+        MATTERMOST_URL=constant.MATTERMOST_URL,
+        MATTERMOST_PORT=443,
+        MATTERMOST_API_PATH="/api/v4",
+        BOT_TOKEN=constant.BOT_TOKEN,
+        BOT_TEAM=constant.BOT_TEAM,
+        SSL_VERIFY=False,
+        LOG_FILE="./bot.log",
+    ),
+    plugins=[
+        KordleAlarm(),
+        MedicineAlarm(),
+        WeatherAlarm(),
+        MassAlarm(),
+        Help(),
+        Alarms(),
+        CurrencyAlarm(),
+        UserAlarm(),
+        ChannelAlarm()
+    ],
+)
+
+# 알람을 위한 백그라운드 스케쥴 시작
+constant.CHANNEL_ALARM_SCHEDULE.start()
+
+# 사용자 정의 알람을 위한 백그라운드 스케쥴 시작
+constant.USER_ALARM_SCHEDULE.start()
+
+load_user_alarms_from_file()
+load_channel_alarms_from_file()
+
+# 로봇 서비스 시작
+bot.run()

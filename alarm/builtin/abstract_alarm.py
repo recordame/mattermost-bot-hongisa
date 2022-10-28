@@ -1,12 +1,12 @@
 from abc import ABCMeta, abstractmethod
-from common import constant
 
 from mattermostdriver.exceptions import ResourceNotFound
 from mmpy_bot import Message
 from mmpy_bot import Plugin
 
 from alarm.alarm_context import AlarmContext
-from common.utils import save_alarms_to_file_in_json
+from alarm.alarm_util import save_alarms_to_file_in_json
+from common import constant
 
 
 class AbstractAlarm(Plugin, metaclass=ABCMeta):
@@ -34,7 +34,7 @@ class AbstractAlarm(Plugin, metaclass=ABCMeta):
         except ResourceNotFound:
             self.driver.direct_message(post_to, self.generate_message(message_argument))
 
-    def schedule_alarm(self, ctx: AlarmContext):
+    def schedule_alarm(self, ctx: AlarmContext, recovery_mode: bool = False):
         if self.is_alarm_already_scheduled(ctx) is False:
             try:
                 constant.CHANNEL_ALARM_SCHEDULE.add_job(
@@ -63,11 +63,12 @@ class AbstractAlarm(Plugin, metaclass=ABCMeta):
 
             save_alarms()
 
-            self.driver.direct_message(
-                ctx.creator_id,
-                "`%s` 채널알람을 `%s %s:%02d:%02d`에 전달해드릴게요 :fairy:"
-                % (ctx.name, ctx.day, ctx.hour, int(ctx.minute), int(ctx.second))
-            )
+            if not recovery_mode:
+                self.driver.direct_message(
+                    ctx.creator_id,
+                    "`%s` 채널알람을 `%s %s:%02d:%02d`에 전달해드릴게요 :fairy:"
+                    % (ctx.name, ctx.day, ctx.hour, int(ctx.minute), int(ctx.second))
+                )
 
     def is_alarm_already_scheduled(self, ctx: AlarmContext) -> bool:
         job = constant.CHANNEL_ALARM_SCHEDULE.get_job(ctx.job_id)

@@ -32,20 +32,26 @@ class WeatherAlarm(AbstractAlarm):
 
         return msg
 
-    @listen_to("^%s ([가-힣]+)$" % name)
+    @listen_to("^%s\\s([가-힣]+)$" % name)
     def direct(self, message: Message, location: str):
         self.alarm(message.user_id, location.strip(' '))
 
-    @listen_to("^%s알람예약 ([가-힣]+) (.+) (\\d+)$" % name)
-    def add_alarm(self, message: Message, location: str, hour: str, minute: str, post_to=channel_id):
+    @listen_to(
+        "^%s알람등록"
+        "\\s([가-힣]+)"  # 지역
+        "\\s([\\*|\\*/\\d|\\d|\\-|\\,]+)"  # 시
+        "\\s([\\*|\\*/\\d|\\d|\\-|\\,]+)$"  # 분
+        % name
+    )
+    def add_alarm(self, message: Message, location: str, hour: str, minute: str, recovery_mode: bool = False):
         alarm_context = AlarmContextBuilder() \
-            .creator_name(message.sender_name).creator_id(message.user_id).post_to(post_to) \
+            .creator_name(message.sender_name).creator_id(message.user_id).post_to(self.channel_id) \
             .name(self.name).id(self.id) \
             .day(self.day).hour(hour).minute(minute) \
             .message_argument(location) \
             .build()
 
-        self.schedule_alarm(alarm_context)
+        self.schedule_alarm(alarm_context, recovery_mode)
 
     @listen_to("^%s알람취소$" % name)
     def cancel_alarm(self, message: Message, post_to=channel_id):

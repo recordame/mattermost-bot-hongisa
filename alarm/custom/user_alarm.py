@@ -3,21 +3,21 @@ import re
 from mmpy_bot import Message, Plugin, listen_to
 
 from alarm.alarm_context import AlarmContextBuilder
+from alarm.alarm_util import save_alarms_to_file_in_json
 from common import constant
-from common.utils import save_alarms_to_file_in_json
 
 
 class UserAlarm(Plugin):
     @listen_to(
         "^개인알람등록"
         "\\s([가-힣a-zA-Z\\-_\\d]+)"  # 알람명
-        "\\s([(last\\s|\\dth\\s)?sun|mon|tue|wed|thu|fri|sat|,|\\-|\\d]+)"  # 일
-        "\\s(\\*|\\d+)"  # 시
-        "\\s(\\*|\\d+)"  # 분
-        "\\s(\\*|\\d+)"  # 초
+        "\\s([last|last\\s|\\dth\\s|sun|mon|tue|wed|thu|fri|sat|\\,|\\-|\\d|\\*]+)"  # 일
+        "\\s([\\*|\\*/\\d|\\d|\\-|\\,]+)"  # 시
+        "\\s([\\*|\\*/\\d|\\d|\\-|\\,]+)"  # 분
+        "\\s([\\*|\\*/\\d|\\d|\\-|\\,]+)"  # 초
         "\\s(.+)$"  # 메시지
     )
-    def add_user_alarm(self, message: Message, alarm_id: str, day_of_week: str, hour: str, minute: str, second: str, alarm_message: str, job_status: str = "실행"):
+    def add_user_alarm(self, message: Message, alarm_id: str, day_of_week: str, hour: str, minute: str, second: str, alarm_message: str, recovery_mode: bool = False, job_status: str = "실행"):
         job_id = message.user_id + "_" + alarm_id
 
         if constant.USER_ALARM_SCHEDULE.get_job(job_id) is not None:
@@ -30,21 +30,27 @@ class UserAlarm(Plugin):
                 .message(alarm_message) \
                 .build()
 
-            regenerated_alarm_message: str = ""
-            if "$치환변수" in alarm_message:
-                regenerated_alarm_message += alarm_message.split("$치환변수")[0]
-                regenerated_alarm_message += constant.BUILTIN_ALARM_INSTANCE.get("알람명").generate_message()
-                regenerated_alarm_message += alarm_message.split("$치환변수")[1]
-            else:
-                regenerated_alarm_message = alarm_message
+            if "$미사" in alarm_message:
+                before_insertion = alarm_message.split("$미사")[0].replace("\\n", "\n")
+                after_insertion = alarm_message.split("$미사")[1].replace("\\n", "\n")
 
-            regenerated_alarm_message = regenerated_alarm_message.replace("\\n", "\n")
+                message_function = lambda: self.driver.direct_message(
+                    ctx.post_to,
+                    before_insertion +
+                    str(constant.BUILTIN_ALARM_INSTANCE.get("미사").generate_message()).removeprefix("@here").strip(" ") +
+                    after_insertion
+                )
+            else:
+                message_function = lambda: self.driver.direct_message(
+                    ctx.post_to,
+                    alarm_message.replace("\\n", "\n")
+                )
 
             try:
-                if re.match("^\\dth|last|\\d.+", ctx.day):
+                if re.match("^\\dth\\s|last|\\d.+", ctx.day):
                     job = constant.USER_ALARM_SCHEDULE.add_job(
                         id=ctx.job_id,
-                        func=lambda: self.driver.direct_message(ctx.post_to, regenerated_alarm_message),
+                        func=message_function,
                         trigger="cron",
                         day=ctx.day,
                         hour=ctx.hour,
@@ -55,7 +61,7 @@ class UserAlarm(Plugin):
                 else:
                     job = constant.USER_ALARM_SCHEDULE.add_job(
                         id=ctx.job_id,
-                        func=lambda: self.driver.direct_message(ctx.post_to, regenerated_alarm_message),
+                        func=message_function,
                         trigger="cron",
                         day_of_week=ctx.day,
                         hour=ctx.hour,
@@ -82,11 +88,12 @@ class UserAlarm(Plugin):
 
             save_alarms()
 
-            self.driver.direct_message(
-                ctx.creator_id,
-                "`%s` 개인알람을 `%s %s:%02d:%02d`에 전달해드릴게요 :fairy:"
-                % (ctx.id, ctx.day, ctx.hour, int(ctx.minute), int(ctx.second))
-            )
+            if not recovery_mode:
+                self.driver.direct_message(
+                    ctx.creator_id,
+                    "`%s` 개인알람을 `%s %s:%02d:%02d`에 전달해드릴게요 :fairy:"
+                    % (ctx.id, ctx.day, ctx.hour, int(ctx.minute), int(ctx.second))
+                )
 
     @listen_to(
         "^개인알람정지"

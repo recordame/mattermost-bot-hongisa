@@ -6,9 +6,10 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Install pip requirements
 RUN mkdir /app
-ADD commands /app/commands
-ADD commons /app/commons
-ADD main.py /app
+ADD alarm /app/alarm
+ADD common /app/common
+ADD command /app/command
+ADD bot.py /app
 
 RUN mkdir /alarms
 
@@ -22,4 +23,4 @@ COPY lib-patch/usr/local/lib/python/site-packages/mattermostdriver/websocket.py 
 #COPY alarms/channel_alarms.json /alarms/
 #COPY alarms/user_alarms.json /alarms/
 
-ENTRYPOINT ["python","/app/main.py"]
+ENTRYPOINT ["python","/app/bot.py"]

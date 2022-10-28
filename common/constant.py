@@ -1,8 +1,5 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 
-from alarm.alarm_context import AlarmContext
-from alarm.builtin.abstract_alarm import AbstractAlarm
-
 BOT_TOKEN: str = "dzme7z5wa38gmc8dswoupb55da"
 BOT_TEAM: str = "1404"
 MATTERMOST_URL = "https://recordame.cloud.mattermost.com"
@@ -15,14 +12,14 @@ CH_KORDLE_ID: str = "9aic13fzstdgmxro1c9f9i7yho"
 CH_TOWN_SQUARE_ID: str = "7oc3baakktfxudigcjjdhmh4my"
 CH_NOTIFICATIONS_ID: str = "9doiodruepdwmnbx8ejg395u7o"
 
-BUILTIN_ALARM_INSTANCE: dict[str, AbstractAlarm] = {}
+BUILTIN_ALARM_INSTANCE: dict[str, object] = {}
 
 # 채널 알람 목록 저장용 변수
-CHANNEL_ALARMS: dict[str, dict[str, AlarmContext]] = {}
+CHANNEL_ALARMS: dict[str, dict[str, object]] = {}
 # 채널 알람 백그라운드 JOB
 CHANNEL_ALARM_SCHEDULE = BackgroundScheduler()
 
 # 개인 알람 목록 저장용 변수
-USER_ALARMS: dict[str, dict[str, AlarmContext]] = {}
+USER_ALARMS: dict[str, dict[str, object]] = {}
 # 개인 알람 백그라운드 JOB
 USER_ALARM_SCHEDULE = BackgroundScheduler()

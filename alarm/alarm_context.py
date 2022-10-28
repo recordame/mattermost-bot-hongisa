@@ -55,7 +55,7 @@ class AlarmContext:
         msg += "   - 주기 : `%s %s:%s:%s`\n" % (self.day, self.hour, self.minute, self.second)
 
         if str(self.message).__len__() != 0:
-            msg += "   - 내용 : `%s`\n" % self.message
+            msg += "   - 내용 : %s\n" % self.message
 
         msg += "   - 상태 : `%s` :%s:" % (self.job_status, "large_green_circle" if self.job_status == "실행" else "stop_sign")
 
