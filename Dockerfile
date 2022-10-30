@@ -19,8 +19,12 @@ RUN pip install -r requirements.txt
 # 메터모스트 웹소켓 SSL 연결 실패 패치
 COPY lib-patch/usr/local/lib/python/site-packages/mattermostdriver/websocket.py /usr/local/lib/python3.10/site-packages/mattermostdriver
 
-# 아래 명령어로 저장된 알람 복사 또는 docker -v HOST_파일경로:IMAGE_경로 명령어로 파일 연결
-#COPY alarms/channel_alarms.json /alarms/
-#COPY alarms/user_alarms.json /alarms/
+# 아래 명령어로 저장된 알람 복사
+# COPY alarms/channel_alarms.json /alarms/
+# COPY alarms/user_alarms.json /alarms/
+
+# 또는 docker -v HOST_파일경로:IMAGE_경로 명령어로 파일 연결
+# docker run -v alarms:/alarms --name bot -d bot
+
 
 ENTRYPOINT ["python","/app/bot.py"]
