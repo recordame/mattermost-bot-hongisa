@@ -58,7 +58,7 @@ class AbstractCustomAlarm(Plugin, metaclass=ABCMeta):
             if not recovery_mode:
                 self.driver.direct_message(
                     ctx.creator_id,
-                    "`%s` %s알람을 `%s %s:%02d:%02d`에 전달해드릴게요 :fairy:"
+                    "`%s` %s알람을 `%s %s:%02d:%02d`에 전달해드릴게요 :dizzy:"
                     % (ctx.id, alarm_type, ctx.day, ctx.hour, int(ctx.minute), int(ctx.second))
                 )
 
@@ -83,7 +83,7 @@ class AbstractCustomAlarm(Plugin, metaclass=ABCMeta):
                         alarm_scheduler.get_job(alarm.job_id).pause()
                         alarm.job_status = "정지"
 
-                        self.send_alarm_status(message.user_id, alarm.id, alarm_type, "정지", "stop_sign")
+                        self.send_alarm_status(message.user_id, alarm.id, alarm_type, "정지", "red_circle")
 
                 if dirty:
                     save_alarms_to_file_in_json(alarm_type, alarm_contexts)
@@ -107,7 +107,7 @@ class AbstractCustomAlarm(Plugin, metaclass=ABCMeta):
 
                 save_alarms_to_file_in_json(alarm_type, alarm_contexts)
 
-                self.send_alarm_status(message.user_id, alarm_id, alarm_type, "정지", "stop_sign")
+                self.send_alarm_status(message.user_id, alarm_id, alarm_type, "정지", "red_circle")
 
     def continue_alarm(
             self,
@@ -130,7 +130,7 @@ class AbstractCustomAlarm(Plugin, metaclass=ABCMeta):
                         alarm_scheduler.get_job(alarm.job_id).resume()
                         alarm.job_status = "실행"
 
-                        self.send_alarm_status(message.user_id, alarm.id, alarm_type, "재개", "large_green_circle")
+                        self.send_alarm_status(message.user_id, alarm.id, alarm_type, "재개", "recycle")
 
                 if dirty:
                     save_alarms_to_file_in_json(alarm_type, alarm_contexts)
@@ -154,7 +154,7 @@ class AbstractCustomAlarm(Plugin, metaclass=ABCMeta):
 
                 save_alarms_to_file_in_json(alarm_type, alarm_contexts)
 
-                self.send_alarm_status(message.user_id, alarm_id, alarm_type, "재개", "large_green_circle")
+                self.send_alarm_status(message.user_id, alarm_id, alarm_type, "재개", "recycle")
 
     def unschedule_alarm(
             self, message: Message,
