@@ -58,7 +58,7 @@ class AlarmContext:
         if str(self.message).__len__() != 0:
             msg += "   - 내용 : %s\n" % self.message
 
-        msg += "   - 상태 : `%s` :%s:" % (self.job_status, "large_green_circle" if self.job_status == "실행" else "stop_sign")
+        msg += "   - 상태 : `%s` :%s:" % (self.job_status, "recycle" if self.job_status == "실행" else "red_circle")
 
         return msg
 
