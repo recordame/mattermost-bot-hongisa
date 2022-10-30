@@ -6,9 +6,6 @@ class AlarmContext:
     name: str
     id: str
 
-    job_id: str
-    job_status: str
-
     day: str
     hour: str
     minute: str
@@ -17,12 +14,16 @@ class AlarmContext:
     message: str
     message_argument: str
 
+    job_id: str
+    job_status: str
+
     def __init__(
             self,
             creator_name: str, creator_id: str, post_to: str,
             name: str, id: str,
             day: str, hour: str, minute="00", second="00",
-            message="", message_argument=""
+            message="", message_argument="",
+            job_status="실행"
     ):
         self.creator_name = creator_name
         self.creator_id = creator_id
@@ -31,9 +32,6 @@ class AlarmContext:
         self.name = name
         self.id = id
 
-        self.job_id = post_to + "_" + id
-        self.job_status = "실행"
-
         self.day = day
         self.hour = hour
         self.minute = minute
@@ -41,6 +39,9 @@ class AlarmContext:
 
         self.message = message
         self.message_argument = message_argument
+
+        self.job_id = post_to + "_" + id
+        self.job_status = job_status
 
     def get_info(self):
         msg: str = ""
@@ -77,6 +78,8 @@ class AlarmContextBuilder:
 
     _message: str
     _message_argument: str
+
+    _job_status: str
 
     def __init__(self):
         self._name = ""
@@ -139,6 +142,11 @@ class AlarmContextBuilder:
 
     def message_argument(self, message_argument: str):
         self._message_argument = message_argument
+
+        return self
+
+    def job_status(self, job_status: str):
+        self._job_status = job_status
 
         return self
 

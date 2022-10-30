@@ -41,7 +41,7 @@ def load_user_alarms_from_file():
             alarm_message = alarm["message"]
             job_status = alarm["job_status"]
 
-            user_alarm.add_user_alarm(
+            user_alarm.add_alarm(
                 message,
                 alarm_id,
                 day,
@@ -105,7 +105,7 @@ def load_channel_alarms_from_file():
                     recovery_mode
                 )
             else:
-                channel_alarm.add_channel_alarm(
+                channel_alarm.add_alarm(
                     message,
                     alarm["post_to"],
                     alarm["id"],
@@ -118,36 +118,41 @@ def load_channel_alarms_from_file():
                 )
 
 
-def save_alarms_to_file_in_json(alarm_type: str, alarm_ctxs: dict):
+def save_alarms_to_file_in_json(alarm_type_user_or_channel: str, alarm_contexts_for_user_or_channel: dict):
+    if alarm_type_user_or_channel == "개인":
+        alarm_type = "user"
+    else:
+        alarm_type = "channel"
+
     alarm_file = open("./alarms/%s_alarms.json" % alarm_type, "w+", encoding="UTF-8")
 
     alarm_file.write("[")
-    ctx_cnt = alarm_ctxs.values().__len__()
-    ctx_keys = list(alarm_ctxs.keys())
+    user_or_channel_cnt = alarm_contexts_for_user_or_channel.values().__len__()
+    user_or_channel_ids = list(alarm_contexts_for_user_or_channel.keys())
 
-    for i in range(0, ctx_cnt):
-        alarms: dict = alarm_ctxs.get(ctx_keys[i])
-        alarm_cnt = dict(alarms).values().__len__()
+    for i in range(0, user_or_channel_cnt):
+        alarm_contexts: dict = alarm_contexts_for_user_or_channel.get(user_or_channel_ids[i])
+        alarm_context_cnt = dict(alarm_contexts).values().__len__()
 
-        if alarm_cnt > 0:
-            alarm_file.write('{"%s":"%s", "alarm":[' % (alarm_type, ctx_keys[i]))
+        if alarm_context_cnt > 0:
+            alarm_file.write('{"%s":"%s", "alarm":[' % (alarm_type, user_or_channel_ids[i]))
 
-            alarm_ids = list(dict(alarms).keys())
+            alarm_ids = list(dict(alarm_contexts).keys())
 
-            for j in range(0, alarm_cnt):
+            for j in range(0, alarm_context_cnt):
                 json.dump(
-                    alarms.get(alarm_ids[j]).__dict__,
+                    alarm_contexts.get(alarm_ids[j]).__dict__,
                     alarm_file,
                     indent=4,
                     ensure_ascii=False
                 )
 
-                if j < alarm_cnt - 1:
+                if j < alarm_context_cnt - 1:
                     alarm_file.write(",\n")
 
             alarm_file.write("]}")
 
-            if i < ctx_cnt - 1:
+            if i < user_or_channel_cnt - 1:
                 alarm_file.write(",\n")
 
     alarm_file.write("]")

@@ -9,9 +9,9 @@ from alarm.alarm_util import save_alarms_to_file_in_json
 from common import constant
 
 
-class AbstractAlarm(Plugin, metaclass=ABCMeta):
+class AbstractBuiltinAlarm(Plugin, metaclass=ABCMeta):
     @staticmethod
-    def add_predefined_alarm(name, _class: object):
+    def add_builtin_alarm(name, _class: object):
         constant.BUILTIN_ALARM_INSTANCE.update({name: _class})
 
     @abstractmethod
@@ -37,7 +37,7 @@ class AbstractAlarm(Plugin, metaclass=ABCMeta):
     def schedule_alarm(self, ctx: AlarmContext, recovery_mode: bool = False):
         if self.is_alarm_already_scheduled(ctx) is False:
             try:
-                constant.CHANNEL_ALARM_SCHEDULE.add_job(
+                constant.CHANNEL_ALARM_SCHEDULER.add_job(
                     id=ctx.job_id,
                     func=lambda: self.alarm(ctx.post_to, message_argument=ctx.message_argument),
                     trigger='cron',
@@ -71,14 +71,14 @@ class AbstractAlarm(Plugin, metaclass=ABCMeta):
                 )
 
     def is_alarm_already_scheduled(self, ctx: AlarmContext) -> bool:
-        job = constant.CHANNEL_ALARM_SCHEDULE.get_job(ctx.job_id)
+        job = constant.CHANNEL_ALARM_SCHEDULER.get_job(ctx.job_id)
 
         if job is not None:
             # 기존에 등록된 알람이 있는 경우, 기존 알람 정보 출력
             existing_ctx: AlarmContext = constant.CHANNEL_ALARMS[ctx.post_to][ctx.id]
 
             self.driver.direct_message(
-                ctx.creator_id, "이미 등록된 채널알람이 있어요! `%s알람예약취소` 후 재등록해주세요.\n"
+                ctx.creator_id, "이미 등록된 채널알람이 있어요! `%s알람취소` 후 재등록해주세요.\n"
                                 "**알람정보**\n"
                                 "%s\n"
                                 % (existing_ctx.name, existing_ctx.get_info()))
@@ -88,7 +88,7 @@ class AbstractAlarm(Plugin, metaclass=ABCMeta):
 
     def unschedule_alarm(self, alarm_name: str, alarm_id: str, message: Message, post_to: str):
         job_id = post_to + "_" + alarm_id
-        job = constant.CHANNEL_ALARM_SCHEDULE.get_job(job_id)
+        job = constant.CHANNEL_ALARM_SCHEDULER.get_job(job_id)
 
         if job is not None:
             alarm_ctx: AlarmContext = constant.CHANNEL_ALARMS[post_to][alarm_id]
@@ -102,7 +102,7 @@ class AbstractAlarm(Plugin, metaclass=ABCMeta):
             )
 
             del constant.CHANNEL_ALARMS[post_to][alarm_id]
-            constant.CHANNEL_ALARM_SCHEDULE.remove_job(job_id)
+            constant.CHANNEL_ALARM_SCHEDULER.remove_job(job_id)
 
             self.driver.direct_message(message.user_id, "`%s` 채널알람이 삭제되었어요 :skull_and_crossbones:" % alarm_name)
 

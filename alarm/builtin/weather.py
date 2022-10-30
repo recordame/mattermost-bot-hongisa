@@ -8,13 +8,13 @@ from mmpy_bot import Message
 from mmpy_bot import listen_to
 
 from alarm.alarm_context import AlarmContextBuilder
-from alarm.builtin.abstract_alarm import AbstractAlarm
+from alarm.builtin.abstract_builtin_alarm import AbstractBuiltinAlarm
 from common import constant
 
 urllib3.disable_warnings()
 
 
-class WeatherAlarm(AbstractAlarm):
+class WeatherAlarm(AbstractBuiltinAlarm):
     name = "날씨"
     id = "weather"
     day = "mon-sun"
@@ -22,7 +22,7 @@ class WeatherAlarm(AbstractAlarm):
 
     def __init__(self):
         super().__init__()
-        self.add_predefined_alarm(self.name, self)
+        self.add_builtin_alarm(self.name, self)
 
     def generate_message(self, loc: str = "성남시 금광동"):
         info = load_web_page(loc)
