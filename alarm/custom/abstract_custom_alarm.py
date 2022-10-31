@@ -31,10 +31,7 @@ class AbstractCustomAlarm(Plugin, metaclass=ABCMeta):
         if alarm_scheduler.get_job(ctx.job_id) is not None:
             self.driver.direct_message(message.user_id, "이미 등록된 %s알람이 있어요! `%s알람취소` 후 재등록해주세요." % (alarm_type, alarm_type))
         else:
-            message_function = lambda: self.driver.create_post(
-                ctx.post_to,
-                ctx.message.replace("\\n", "\n")
-            )
+            message_function = self.get_message_function(alarm_type, ctx.message, ctx.post_to)
 
             try:
                 alarm_job = self.create_alarm_job(ctx, alarm_scheduler, message_function)
@@ -196,22 +193,36 @@ class AbstractCustomAlarm(Plugin, metaclass=ABCMeta):
     def send_alarm_status(self, user_id: str, alarm_id: str, alarm_type: str, status: str, icon: str):
         self.driver.direct_message(user_id, "`%s` %s알람이 %s되었어요 :%s:" % (alarm_id, alarm_type, status, icon))
 
-    def get_message_function(self, alarm_message: str, post_to: str):
+    def get_message_function(self, alarm_type: str, alarm_message: str, post_to: str):
         if "$미사" in alarm_message:
             before_insertion = alarm_message.split("$미사")[0].replace("\\n", "\n")
             after_insertion = alarm_message.split("$미사")[1].replace("\\n", "\n")
 
-            message_function = lambda: self.driver.create_post(
-                post_to,
-                before_insertion +
-                str(constant.BUILTIN_ALARM_INSTANCE.get("미사").generate_message()).removeprefix("@here").strip(" ") +
-                after_insertion
-            )
+            if alarm_type == "채널":
+                message_function = lambda: self.driver.create_post(
+                    post_to,
+                    before_insertion +
+                    str(constant.BUILTIN_ALARM_INSTANCE.get("미사").generate_message()).removeprefix("@here").strip(" ") +
+                    after_insertion
+                )
+            else:
+                message_function = lambda: self.driver.direct_message(
+                    post_to,
+                    before_insertion +
+                    str(constant.BUILTIN_ALARM_INSTANCE.get("미사").generate_message()).removeprefix("@here").strip(" ") +
+                    after_insertion
+                )
         else:
-            message_function = lambda: self.driver.create_post(
-                post_to,
-                alarm_message.replace("\\n", "\n")
-            )
+            if alarm_type == "채널":
+                message_function = lambda: self.driver.create_post(
+                    post_to,
+                    alarm_message.replace("\\n", "\n")
+                )
+            else:
+                message_function = lambda: self.driver.direct_message(
+                    post_to,
+                    alarm_message.replace("\\n", "\n")
+                )
 
         return message_function
 
