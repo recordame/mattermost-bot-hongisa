@@ -250,4 +250,10 @@ class AbstractCustomAlarm(Plugin, metaclass=ABCMeta):
                 misfire_grace_time=10
             )
 
+        alarm_job = alarm_scheduler.add_job(
+            id=ctx.job_id,
+            func=message_function,
+            trigger="interval",
+        )
+
         return alarm_job

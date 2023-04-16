@@ -11,6 +11,7 @@ LOVELYLCM_ID: str = "npry7rpunpg3xes81os14gqbje"
 CH_KORDLE_ID: str = "9aic13fzstdgmxro1c9f9i7yho"
 CH_TOWN_SQUARE_ID: str = "7oc3baakktfxudigcjjdhmh4my"
 CH_NOTIFICATIONS_ID: str = "9doiodruepdwmnbx8ejg395u7o"
+CH_JINHA_ID: str = "o5zk5j3q8ir8zprjr4jrzk5xmh"
 
 BUILTIN_ALARM_INSTANCE: dict[str, object] = {}
 

@@ -27,8 +27,8 @@ class WeatherAlarm(AbstractBuiltinAlarm):
     def generate_message(self, loc: str = "성남시 금광동"):
         info = load_web_page(loc)
         msg = extract_today_weather_information(info) + \
-              "\n" + \
-              extract_tomorrow_weather_information(info)
+              "\n-----------------------------\n" \
+              + extract_tomorrow_weather_information(info)
 
         return msg
 
@@ -84,93 +84,137 @@ def extract_today_weather_information(info: str):
     now = datetime.datetime.now()
 
     try:
-        location = info.find('div', class_="title_area").find('h2').text
+        location = info \
+            .find('div', class_="title_area") \
+            .find('h2') \
+            .text
     except:
         return "지역설정이 잘못 되었습니다."
 
-    today = info.find('div', class_="weather_info").find('div', class_="status_wrap").find('div', class_="_today")
-    status = today.find('div', class_="weather_main").find('span', class_="blind").text
-    temp = today.find('div', class_="temperature_text").text.replace("현재 온도", "").replace(" ", "")
-    temp_yesterday = today.find('div', class_="temperature_info").find('span', class_="temperature").text.removesuffix(" ")
-    feel_humidity_wind = today.find('dl', class_="summary_list").text.strip(" ").split(" ")
-    particle_uv_sunset = info.find('div', class_="report_card_wrap").text.strip(" ").split(" ")
+    today = info \
+        .find('div', class_="weather_info") \
+        .find('div', class_="status_wrap") \
+        .find('div', class_="_today")
 
-    # 현재 날씨
-    month = str(int(now.strftime("%m")))
-    day = str(int(now.strftime("%d")))
-    hour = str(int(now.strftime("%H")))
+    status = today \
+        .find('div', class_="weather_main") \
+        .find('span', class_="blind") \
+        .text
+
+    temp = today \
+        .find('div', class_="temperature_text") \
+        .text \
+        .replace("현재 온도", "") \
+        .replace(" ", "")
+
+    temp_yesterday = today \
+        .find('div', class_="temperature_info") \
+        .find('span', class_="temperature") \
+        .text \
+        .removesuffix(" ")
+
+    temp_lowest = info \
+        .find('div', class_="list_box _weekly_weather") \
+        .find('li', class_="week_item today") \
+        .find('div', class_="cell_temperature") \
+        .find('span', class_="lowest") \
+        .text \
+        .replace("최저기온", "")
+
+    temp_highest = info \
+        .find('div', class_="list_box _weekly_weather") \
+        .find('li', class_="week_item today") \
+        .find('div', class_="cell_temperature") \
+        .find('span', class_="highest") \
+        .text \
+        .replace("최고기온", "")
+
+    fine_particle = info \
+        .find('div', class_="report_card_wrap") \
+        .find('li', class_="item_today level3") \
+        .text \
+        .replace("미세먼지", "") \
+        .replace(" ", "")
+
+    ultra_fine_particle = info \
+        .find('div', class_="report_card_wrap") \
+        .find('li', class_="item_today level1") \
+        .text \
+        .replace("초미세먼지", "") \
+        .replace(" ", "")
 
     status = add_icon(str(status))
 
-    msg = "`" + now.strftime(month + "월 " + day + "일 " + hour + "시") + "`\n" \
-          + "현재 `" + location + "` 날씨\n" \
-          + "- 현재 : " + status + "\n" \
-          + "- 기온 : " + temp + "(어제보다 " + temp_yesterday + ")" + "\n"
-
-    # 체감, 습도, 바람 상태
-    tmp: str = ""
-    i: int = 0
-
-    while i < len(feel_humidity_wind):
-        if i % 2 == 0:
-            tmp += "- " + feel_humidity_wind[i] + " : "
-        else:
-            tmp += feel_humidity_wind[i] + "\n"
-        i += 1
-
-    # 미세먼지, 초미세먼지, 자외선, 일몰
-    i = 0
-    while i < len(particle_uv_sunset):
-        if particle_uv_sunset[i] != "":
-            if i % 2 == 0:
-                tmp += "- " + particle_uv_sunset[i] + " : "
-            elif i == len(particle_uv_sunset) - 1:
-                tmp += particle_uv_sunset[i]
-            else:
-                tmp += particle_uv_sunset[i] + "\n"
-
-        i += 1
-
-    msg += tmp
+    msg = "**`%s`** 날씨정보" % location + \
+          "\n\n-----------------------------\n" + \
+          "**현재 날씨**는 %s이고,\n**기온**은 `%s`로 어제보다 %s.\n오늘 **최저** `%s`, **최고** `%s`로 예상돼요.\n* 미세먼지 %s\n* 초미세먼지 %s" \
+          % (status, temp, temp_yesterday, temp_lowest, temp_highest, add_icon(fine_particle), add_icon(ultra_fine_particle))
 
     return msg
 
 
 def extract_tomorrow_weather_information(info: str):
-    status_am = info.find('div', class_="weather_info type_tomorrow").find('ul', class_="weather_info_list _tomorrow").find('div', class_="weather_main").text.strip(" ")
-    temp_am = info.find('div', class_="weather_info type_tomorrow").find('ul', class_="weather_info_list _tomorrow").find('div', class_="temperature_text").text.replace("예측 온도", "").replace(" ", "")
-    precipitation_am = info.find('div', class_="weather_info type_tomorrow").find('ul', class_="weather_info_list _tomorrow").find('dl', class_="summary_list").text.replace("강수확률", "").strip(" ")
-    particle = info.find('div', class_="weather_info type_tomorrow").find('ul', class_="weather_info_list _tomorrow").find('div', class_="report_card_wrap").text.strip(" ").split(" ")
-    status_pm = info.find('div', class_="weather_info type_tomorrow").find('div', class_="_pm").find('div', class_="weather_main").text.strip(" ")
-    temp_pm = info.find('div', class_="weather_info type_tomorrow").find('div', class_="_pm").find('div', class_="temperature_text").text.replace("예측 온도", "").replace(" ", "")
-    precipitation_pm = info.find('div', class_="weather_info type_tomorrow").find('div', class_="_pm").find('dd', class_="desc").text
+    status_am = info \
+        .find('div', class_="weather_info type_tomorrow") \
+        .find('ul', class_="weather_info_list _tomorrow") \
+        .find('div', class_="weather_main") \
+        .text \
+        .strip(" ")
 
-    status_am = add_icon(str(status_am))
-    status_pm = add_icon(str(status_pm))
+    temp_am = info \
+        .find('div', class_="weather_info type_tomorrow") \
+        .find('ul', class_="weather_info_list _tomorrow") \
+        .find('div', class_="temperature_text") \
+        .text \
+        .replace("예측 온도", "") \
+        .replace(" ", "")
 
-    msg = "내일 예상 날씨\n" \
-          + "- 오전: " + status_am + "\n" \
-          + "   - 예상기온 : " + temp_am + "\n" \
-          + "   - 강수확률 : " + precipitation_am + "\n" \
-          + "- 오후 : " + status_pm + "\n" \
-          + "   - 예상기온 : " + temp_pm + "\n" \
-          + "   - 강수확률 : " + precipitation_pm + "\n"
+    precipitation_am = info \
+        .find('div', class_="weather_info type_tomorrow") \
+        .find('ul', class_="weather_info_list _tomorrow") \
+        .find('dl', class_="summary_list") \
+        .text \
+        .replace("강수확률", "") \
+        .strip(" ")
 
-    # 미세먼지, 초미세먼지
-    tmp: str = ""
-    i = 0
-    while i < len(particle):
-        if particle[i] != "":
-            if i % 2 == 0:
-                tmp += "- " + particle[i] + " : "
-            elif i == len(particle) - 1:
-                tmp += particle[i]
-            else:
-                tmp += particle[i] + "\n"
+    status_pm = info \
+        .find('div', class_="weather_info type_tomorrow") \
+        .find('div', class_="_pm") \
+        .find('div', class_="weather_main") \
+        .text \
+        .strip(" ")
 
-        i += 1
+    temp_pm = info \
+        .find('div', class_="weather_info type_tomorrow") \
+        .find('div', class_="_pm") \
+        .find('div', class_="temperature_text") \
+        .text \
+        .replace("예측 온도", "") \
+        .replace(" ", "")
 
-    msg += tmp
+    precipitation_pm = info \
+        .find('div', class_="weather_info type_tomorrow") \
+        .find('div', class_="_pm").find('dd', class_="desc") \
+        .text
+
+    fine_particle = info \
+        .find('div', class_="weather_info type_tomorrow") \
+        .find('ul', class_="weather_info_list _tomorrow") \
+        .find('div', class_="report_card_wrap") \
+        .text \
+        .replace("미세먼지", "") \
+        .replace(" ", "")
+
+    ultra_fine_particle = info \
+        .find('div', class_="weather_info type_tomorrow") \
+        .find('ul', class_="weather_info_list _tomorrow") \
+        .find('div', class_="report_card_wrap") \
+        .text \
+        .replace("초미세먼지", "") \
+        .replace(" ", "")
+
+    msg = "**내일요약**\n**오전**: %s, **기온**: `%s`, **강수**: `%s`\n**오후**: %s, **기온**: `%s`, **강수**: `%s`\n* 미세먼지 %s\n* 초미세먼지 %s" \
+          % (add_icon(str(status_am)), temp_am, precipitation_am, add_icon(str(status_pm)), temp_pm, precipitation_pm, add_icon(fine_particle), add_icon(ultra_fine_particle))
 
     return msg
 
@@ -178,14 +222,20 @@ def extract_tomorrow_weather_information(info: str):
 # 날씨 아이콘 설정
 def add_icon(status: str):
     if str(status).__contains__('맑음'):
-        status += ':sunny:'
+        status += ' :sunny: '
     elif str(status).__contains__('구름'):
-        status += ':partly_sunny: '
+        status += ' :partly_sunny: '
     elif str(status).__contains__('흐림'):
-        status += ':cloud:'
+        status += ' :cloud: '
     elif str(status).__contains__('비'):
-        status += ':umbrella_with_rain_drops:'
+        status += ':umbrella_with_rain_drops: '
     elif str(status).__contains__('눈'):
-        status += ':snowflake:'
+        status += ' :snowflake: '
+    elif str(status).__contains__('나쁨'):
+        status = ' :red_circle:'
+    elif str(status).__contains__('보통'):
+        status = ' :large_green_circle: '
+    elif str(status).__contains__('좋음'):
+        status = ' :large_blue_circle: '
 
     return status
