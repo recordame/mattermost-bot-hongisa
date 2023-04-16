@@ -28,7 +28,7 @@ class Jinha(AbstractBuiltinAlarm):
 
         days_after_birth = (now - jinha_birth_day).days + 1
 
-        msg = "@here `%s`\n오늘은 **진하* :baby: 가 태어난지 %s일째 되는 날!" \
+        msg = "@here `%s`\n오늘은 **진하**:baby:가 태어난지 %s일째 되는 날!" \
               % (now.strftime(year + "년 " + month + "월 " + day + "일"), days_after_birth)
 
         age_year = days_after_birth / 365
