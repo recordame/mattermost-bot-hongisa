@@ -24,13 +24,17 @@ class WeatherAlarm(AbstractBuiltinAlarm):
         super().__init__()
         self.add_builtin_alarm(self.name, self)
 
-    def generate_message(self, loc: str = "성남시 금광동"):
+    def generate_message(self, loc: str = "성남시금광동"):
         info = load_web_page(loc)
         msg = extract_today_weather_information(info) + \
               "\n-----------------------------\n" \
               + extract_tomorrow_weather_information(info)
 
         return msg
+
+    @listen_to("^%s$" % name)
+    def default_location(self, message: Message):
+        self.alarm(message.user_id, '성남시금광동')
 
     @listen_to("^%s\\s([가-힣]+)$" % name)
     def direct(self, message: Message, location: str):

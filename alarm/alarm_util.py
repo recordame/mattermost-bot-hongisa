@@ -64,6 +64,7 @@ def load_channel_alarms_from_file():
     kordle_alarm = getattr(sys.modules["alarm.builtin.kordle"], "KordleAlarm")
     mass_alarm = getattr(sys.modules["alarm.builtin.mass"], "MassAlarm")
     medicine_alarm = getattr(sys.modules["alarm.builtin.medicine"], "MedicineAlarm")
+    jinha_alarm = getattr(sys.modules["alarm.builtin.jinha"], "JinhaAlarm")
     channel_alarm = getattr(sys.modules["alarm.custom.channel_alarm"], "ChannelAlarm")
 
     for channel in alarm_json:
@@ -99,6 +100,13 @@ def load_channel_alarms_from_file():
                 )
             elif alarm_id == "medicine":
                 medicine_alarm.add_alarm(
+                    message,
+                    alarm["hour"],
+                    alarm["minute"],
+                    recovery_mode
+                )
+            elif alarm_id == "jinha":
+                jinha_alarm.add_alarm(
                     message,
                     alarm["hour"],
                     alarm["minute"],

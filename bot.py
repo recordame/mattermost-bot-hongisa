@@ -3,7 +3,7 @@
 from mmpy_bot import Bot, Settings
 
 from alarm.alarm_util import load_user_alarms_from_file, load_channel_alarms_from_file
-from alarm.builtin.jinha import Jinha
+from alarm.builtin.jinha import JinhaAlarm
 from alarm.builtin.kordle import KordleAlarm
 from alarm.builtin.mass import MassAlarm
 from alarm.builtin.medicine import MedicineAlarm
@@ -36,7 +36,7 @@ bot = Bot(
         CurrencyAlarm(),
         UserAlarm(),
         ChannelAlarm(),
-        Jinha()
+        JinhaAlarm()
     ],
 )
 
