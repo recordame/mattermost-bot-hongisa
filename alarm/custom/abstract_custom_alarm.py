@@ -227,7 +227,8 @@ class AbstractCustomAlarm(Plugin, metaclass=ABCMeta):
         return message_function
 
     def create_alarm_job(self, ctx: AlarmContext, alarm_scheduler: BackgroundScheduler, message_function) -> Job:
-        if re.match("^\\dth\\s|last|\\d.+", ctx.day):
+        if re.match("^(((1st|2nd|3rd|\\dth|last)\\s.+)|last)", ctx.day) \
+                or re.match("^([1-9]|[12]\\d|3[01])(-([1-9]|[12]\\d|3[01]))?", ctx.day):
             alarm_job = alarm_scheduler.add_job(
                 id=ctx.job_id,
                 func=message_function,
@@ -249,11 +250,5 @@ class AbstractCustomAlarm(Plugin, metaclass=ABCMeta):
                 second=ctx.second,
                 misfire_grace_time=10
             )
-
-        alarm_job = alarm_scheduler.add_job(
-            id=ctx.job_id,
-            func=message_function,
-            trigger="interval",
-        )
 
         return alarm_job

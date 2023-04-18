@@ -12,7 +12,7 @@ class ChannelAlarm(AbstractCustomAlarm):
         "^%s알람등록"
         "\\s([a-zA-Z\\d]+)"  # 채널 아이디 
         "\\s([가-힣a-zA-Z\\-_\\d]+)"  # 알람명
-        "\\s([last|last\\s|\\dth\\s|sun|mon|tue|wed|thu|fri|sat|\\,|\\-|\\d|\\*]+)"  # 일
+        "\\s([last|last\\s|1st\\s|2nd\\s|3rd\\s|\\dth\\s|sun|mon|tue|wed|thu|fri|sat|\\,|\\-|\\d|\\*]+)"  # 일
         "\\s([\\*|\\*/\\d|\\d|\\-|\\,]+)"  # 시
         "\\s([\\*|\\*/\\d|\\d|\\-|\\,]+)"  # 분
         "\\s([\\*|\\*/\\d|\\d|\\-|\\,]+)"  # 초

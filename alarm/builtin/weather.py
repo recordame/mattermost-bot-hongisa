@@ -1,4 +1,3 @@
-import datetime
 import urllib
 from urllib.request import urlopen, Request
 
@@ -85,8 +84,6 @@ def load_web_page(loc: str):
 
 
 def extract_today_weather_information(info: str):
-    now = datetime.datetime.now()
-
     try:
         location = info \
             .find('div', class_="title_area") \
@@ -133,19 +130,18 @@ def extract_today_weather_information(info: str):
         .text \
         .replace("최고기온", "")
 
-    fine_particle = info \
+    particle_info = info \
         .find('div', class_="report_card_wrap") \
-        .find('li', class_="item_today level3") \
-        .text \
-        .replace("미세먼지", "") \
-        .replace(" ", "")
+        .find('ul', class_='today_chart_list')
 
-    ultra_fine_particle = info \
-        .find('div', class_="report_card_wrap") \
-        .find('li', class_="item_today level1") \
-        .text \
-        .replace("초미세먼지", "") \
-        .replace(" ", "")
+    fine_particle = ""
+    ultra_fine_particle = ""
+
+    for pm in particle_info:
+        if pm.text.strip().startswith("미세"):
+            fine_particle = pm.text.replace("미세먼지", "").strip()
+        elif pm.text.strip().startswith("초미세"):
+            ultra_fine_particle = pm.text.replace("초미세먼지", "").strip()
 
     status = add_icon(str(status))
 
@@ -201,21 +197,20 @@ def extract_tomorrow_weather_information(info: str):
         .find('div', class_="_pm").find('dd', class_="desc") \
         .text
 
-    fine_particle = info \
+    particle_info = info \
         .find('div', class_="weather_info type_tomorrow") \
         .find('ul', class_="weather_info_list _tomorrow") \
         .find('div', class_="report_card_wrap") \
-        .text \
-        .replace("미세먼지", "") \
-        .replace(" ", "")
+        .find('ul', class_="today_chart_list")
 
-    ultra_fine_particle = info \
-        .find('div', class_="weather_info type_tomorrow") \
-        .find('ul', class_="weather_info_list _tomorrow") \
-        .find('div', class_="report_card_wrap") \
-        .text \
-        .replace("초미세먼지", "") \
-        .replace(" ", "")
+    fine_particle = ''
+    ultra_fine_particle = ''
+
+    for pm in particle_info:
+        if pm.text.strip().startswith("미세"):
+            fine_particle = pm.text.replace("미세먼지", "").strip()
+        elif pm.text.strip().startswith("초미세"):
+            ultra_fine_particle = pm.text.replace("초미세먼지", "").strip()
 
     msg = "**내일요약**\n**오전**: %s, **기온**: `%s`, **강수**: `%s`\n**오후**: %s, **기온**: `%s`, **강수**: `%s`\n* 미세먼지 %s\n* 초미세먼지 %s" \
           % (add_icon(str(status_am)), temp_am, precipitation_am, add_icon(str(status_pm)), temp_pm, precipitation_pm, add_icon(fine_particle), add_icon(ultra_fine_particle))
