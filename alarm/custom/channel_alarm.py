@@ -12,7 +12,7 @@ class ChannelAlarm(AbstractCustomAlarm):
         "^%s알람등록"
         "\\s([a-zA-Z\\d]+)"  # 채널 아이디 
         "\\s([가-힣a-zA-Z\\-_\\d]+)"  # 알람명
-        "\\s([last|last\\s|1st\\s|2nd\\s|3rd\\s|\\dth\\s|sun|mon|tue|wed|thu|fri|sat|\\,|\\-|\\d|\\*]+)"  # 일
+        "\\s([((last|1st|2nd|3rd|\\dth)\\s)|(sun|mon|tue|wed|thu|fri|sat|last|\\*)|\\d*|\\,|\\-]+)"  # 일
         "\\s([\\*|\\*/\\d|\\d|\\-|\\,]+)"  # 시
         "\\s([\\*|\\*/\\d|\\d|\\-|\\,]+)"  # 분
         "\\s([\\*|\\*/\\d|\\d|\\-|\\,]+)"  # 초
@@ -45,6 +45,43 @@ class ChannelAlarm(AbstractCustomAlarm):
             recovery_mode
         )
 
+     @listen_to(
+        "^%s알람등록"
+        "\\s([a-zA-Z\\d]+)"  # 채널 아이디 
+        "\\s([가-힣a-zA-Z\\-_\\d]+)"  # 알람명
+        "\\s(\\d*seconds|\\d*minutes|\\d*hours|\\d*days|\\d*weeks)"  # 주기
+        "\\s(.+)"  # 시작일
+        "\\s(.+)$"  # 메시지
+        % name
+    )
+    def add_alarm_interval(
+            self, message: Message,
+            channel_id: str,
+            alarm_id: str,
+            interval: str,
+            interval_from: str,
+            alarm_message: str,
+            recovery_mode: bool = False,
+            job_status: str = "실행"
+    ):
+        ctx = AlarmContextBuilder() \
+            .creator_name(message.sender_name).creator_id(message.user_id).post_to(channel_id) \
+            .id(alarm_id) \
+            .interval(interval) \
+            .interval_from(interval_from) \
+            .message(alarm_message) \
+            .job_status(job_status) \
+            .build()
+
+        self.schedule_alarm(
+            message,
+            self.name,
+            ctx,
+            constant.CHANNEL_ALARMS,
+            constant.CHANNEL_ALARM_SCHEDULER,
+            recovery_mode
+        )
+        
     @listen_to(
         "^%s알람취소"
         "\\s([a-zA-Z\\d]+)"  # 채널 ID
