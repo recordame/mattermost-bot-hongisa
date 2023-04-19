@@ -47,7 +47,7 @@ class UserAlarm(AbstractCustomAlarm):
         "^%s알람등록"
         "\\s([가-힣a-zA-Z\\-_\\d]+)"  # 알람명
         "\\s(\\d*seconds|\\d*minutes|\\d*hours|\\d*days|\\d*weeks)"  # 주기
-        "\\s(.+)"  # 시작일
+        "\\s(\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2})?)"  # 시작일
         "\\s(.+)$"  # 메시지
         % name
     )
@@ -56,6 +56,7 @@ class UserAlarm(AbstractCustomAlarm):
             alarm_id: str,
             interval: str,
             interval_from: str,
+            interval_time: str,
             alarm_message: str,
             recovery_mode: bool = False,
             job_status: str = "실행"
