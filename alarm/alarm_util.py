@@ -29,29 +29,32 @@ def load_user_alarms_from_file():
     for user in alarm_json:
         for alarm in user["alarm"]:
             message_body: dict = {}
-
-            message_body.update({"data": {"sender_name": alarm["creator_name"], "post": {"user_id": alarm["creator_id"]}}})
+            message_body.update({"data": "post": {"user_id": alarm["creator_id"]}, {"sender_name": alarm["creator_name"]}})
+            
             message = Message(message_body)
 
-            alarm_id = alarm["id"]
-            day = alarm["day"]
-            hour = alarm["hour"]
-            minute = alarm["minute"]
-            second = alarm["second"]
-            alarm_message = alarm["message"]
-            job_status = alarm["job_status"]
-
-            user_alarm.add_alarm(
-                message,
-                alarm_id,
-                day,
-                hour,
-                minute,
-                second,
-                alarm_message,
-                recovery_mode,
-                job_status
-            )
+           if alarm["interval"] == "":
+                user_alarm.add_alarm(
+                    message,
+                    alarm["id"],
+                    alarm["day"],
+                    alarm["hour"],
+                    alarm["minute"],
+                    alarm["second"],
+                    alarm["message"],
+                    alarm["job_status"],
+                    recovery_mode
+                )
+            else:
+                user_alarm.add_alarm_interval(
+                    message,
+                    alarm["id"],
+                    alarm["interval"],
+                    alarm["interval_from"],
+                    alarm["message"],
+                    alarm["job_status"],
+                    recovery_mode
+                )
 
 
 def load_channel_alarms_from_file():
@@ -113,17 +116,28 @@ def load_channel_alarms_from_file():
                     recovery_mode
                 )
             else:
-                channel_alarm.add_alarm(
-                    message,
-                    alarm["post_to"],
-                    alarm["id"],
-                    alarm["day"],
-                    alarm["hour"],
-                    alarm["minute"],
-                    alarm["second"],
-                    alarm["message"],
-                    recovery_mode
-                )
+                if alarm["interval"] == "":
+                    channel_alarm.add_alarm(
+                        message,
+                        alarm["post_to"],
+                        alarm["id"],
+                        alarm["day"],
+                        alarm["hour"],
+                        alarm["minute"],
+                        alarm["second"],
+                        alarm["message"],
+                        recovery_mode
+                    )
+                else:
+                    channel_alarm.add_alarm_interval(
+                        message,
+                        alarm["post_to"],
+                        alarm["id"],
+                        alarm["interval"],
+                        alarm["interval_from"],
+                        alarm["message"],
+                        recovery_mode
+                    )
 
 
 def save_alarms_to_file_in_json(alarm_type_user_or_channel: str, alarm_contexts_for_user_or_channel: dict):
