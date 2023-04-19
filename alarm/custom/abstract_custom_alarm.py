@@ -235,9 +235,9 @@ class AbstractCustomAlarm(Plugin, metaclass=ABCMeta):
 
     def create_alarm_job(self, ctx: AlarmContext, alarm_scheduler: BackgroundScheduler, message_function) -> Job:
         if ctx.interval == "":
-            if re.match("^(((1st|2nd|3rd|\\dth|last)\\s(sun|mon|tue|wed|thu|fri|sat))|last", ctx.day) \
-                   or re.match("^\\d*(-\\d*)?", ctx.day) \
-                   or re.match("^\\d*(,\\d*)?", ctx.day):
+            if re.match("^(((1st|2nd|3rd|\\dth|last)\\s(sun|mon|tue|wed|thu|fri|sat))|last$", ctx.day) \
+                   or re.match("^\\d+(-\\d+)?$", ctx.day) \
+                   or re.match("^\\d+(,\\d+)?$", ctx.day):
                 alarm_job = alarm_scheduler.add_job(
                     id=ctx.job_id,
                     func=message_function,
@@ -248,7 +248,7 @@ class AbstractCustomAlarm(Plugin, metaclass=ABCMeta):
                     second=ctx.second,
                     misfire_grace_time=10
                 )
-            elif re.match("^(sun|mon|tue|wed|thu|fri|sat|\\*|,|-)+", ctx.day):
+            elif re.match("^(sun|mon|tue|wed|thu|fri|sat|\\*|,|-)+$", ctx.day):
                 alarm_job = alarm_scheduler.add_job(
                     id=ctx.job_id,
                     func=message_function,
@@ -260,50 +260,51 @@ class AbstractCustomAlarm(Plugin, metaclass=ABCMeta):
                     misfire_grace_time=10
                 )
         else:
-            if re.match("^\\d*seconds", ctx.interval):
-                alarm_job = alarm_scheduler.add_job(
-                    id=ctx.job_id,
-                    func=message_function,
-                    trigger="interval",
-                    seconds=int(ctx.interval.replace("seconds", "")),
-                    start_date=ctx.interval_from,
-                    misfire_grace_time=10
-                )
-            elif re.match("^\\d*minutes", ctx.interval):
-                alarm_job = alarm_scheduler.add_job(
-                    id=ctx.job_id,
-                    func=message_function,
-                    trigger="interval",
-                    minutes=int(ctx.interval.replace("minutes", "")),
-                    start_date=ctx.interval_from,
-                    misfire_grace_time=10
-                )
-            elif re.match("^\\d*hours", ctx.interval):
-                alarm_job = alarm_scheduler.add_job(
-                    id=ctx.job_id,
-                    func=message_function,
-                    trigger="interval",
-                    hours=int(ctx.interval.replace("minutes", "")),
-                    start_date=ctx.interval_from,
-                    misfire_grace_time=10
-                )
-            elif re.match("^\\d*days", ctx.interval):
-                alarm_job = alarm_scheduler.add_job(
-                    id=ctx.job_id,
-                    func=message_function,
-                    trigger="interval",
-                    days=int(ctx.interval.replace("minutes", "")),
-                    start_date=ctx.interval_from,
-                    misfire_grace_time=10
-                )
-            elif re.match("^\\d*week", ctx.interval):
-                alarm_job = alarm_scheduler.add_job(
-                    id=ctx.job_id,
-                    func=message_function,
-                    trigger="interval",
-                    week=int(ctx.interval.replace("minutes", "")),
-                    start_date=ctx.interval_from,
-                    misfire_grace_time=10
-                )
+            if re.match("^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2})?$
+                if re.match("^\\d+seconds$", ctx.interval):
+                    alarm_job = alarm_scheduler.add_job(
+                        id=ctx.job_id,
+                        func=message_function,
+                        trigger="interval",
+                        seconds=int(ctx.interval.replace("seconds", "")),
+                        start_date=ctx.interval_from,
+                        misfire_grace_time=10
+                    )
+                elif re.match("^\\d+minutes$", ctx.interval):
+                    alarm_job = alarm_scheduler.add_job(
+                        id=ctx.job_id,
+                        func=message_function,
+                        trigger="interval",
+                        minutes=int(ctx.interval.replace("minutes", "")),
+                        start_date=ctx.interval_from,
+                        misfire_grace_time=10
+                    )
+                elif re.match("^\\d+hours$", ctx.interval):
+                    alarm_job = alarm_scheduler.add_job(
+                        id=ctx.job_id,
+                        func=message_function,
+                        trigger="interval",
+                        hours=int(ctx.interval.replace("minutes", "")),
+                        start_date=ctx.interval_from,
+                        misfire_grace_time=10
+                    )
+                elif re.match("^\\d+days$", ctx.interval):
+                    alarm_job = alarm_scheduler.add_job(
+                        id=ctx.job_id,
+                        func=message_function,
+                        trigger="interval",
+                        days=int(ctx.interval.replace("minutes", "")),
+                        start_date=ctx.interval_from,
+                        misfire_grace_time=10
+                    )
+                elif re.match("^\\d+week$", ctx.interval):
+                    alarm_job = alarm_scheduler.add_job(
+                        id=ctx.job_id,
+                        func=message_function,
+                        trigger="interval",
+                        week=int(ctx.interval.replace("minutes", "")),
+                        start_date=ctx.interval_from,
+                        misfire_grace_time=10
+                    )
 
         return alarm_job
