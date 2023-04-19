@@ -51,6 +51,7 @@ def load_user_alarms_from_file():
                     alarm["id"],
                     alarm["interval"],
                     alarm["interval_from"],
+                    "",
                     alarm["message"],
                     alarm["job_status"],
                     recovery_mode
@@ -135,6 +136,7 @@ def load_channel_alarms_from_file():
                         alarm["id"],
                         alarm["interval"],
                         alarm["interval_from"],
+                        "",
                         alarm["message"],
                         recovery_mode
                     )
