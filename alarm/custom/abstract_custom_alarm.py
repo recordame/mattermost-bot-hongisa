@@ -12,7 +12,11 @@ from common import constant
 
 class AbstractCustomAlarm(Plugin, metaclass=ABCMeta):
     @abstractmethod
-    def add_alarm(self):
+    def add_alarm_cron(self):
+        pass
+
+    @abstractmethod
+    def add_alarm_interval(self):
         pass
 
     @abstractmethod
@@ -62,7 +66,7 @@ class AbstractCustomAlarm(Plugin, metaclass=ABCMeta):
                 else:
                     self.driver.direct_message(
                         ctx.creator_id,
-                        "`%s` %s알람을 `%s`부터 매 `%s` akek 전달해드릴게요 :dizzy:"
+                        "`%s` %s알람을 `%s`부터 매 `%s` 마다 전달해드릴게요 :dizzy:"
                         % (ctx.id, alarm_type, ctx.interval_from, ctx.interval)
                     )
 
@@ -161,7 +165,8 @@ class AbstractCustomAlarm(Plugin, metaclass=ABCMeta):
                 self.send_alarm_status(message.user_id, alarm_id, alarm_type, "재개", "recycle")
 
     def unschedule_alarm(
-            self, message: Message,
+            self,
+            message: Message,
             alarm_type: str,
             user_or_channel_id: str,
             alarm_id: str,
@@ -234,10 +239,12 @@ class AbstractCustomAlarm(Plugin, metaclass=ABCMeta):
         return message_function
 
     def create_alarm_job(self, ctx: AlarmContext, alarm_scheduler: BackgroundScheduler, message_function) -> Job:
+        alarm_job = None
+
         if ctx.interval == "":
-            if re.match("^(((1st|2nd|3rd|\\dth|last)\\s(sun|mon|tue|wed|thu|fri|sat))|last$", ctx.day) \
-                   or re.match("^\\d+(-\\d+)?$", ctx.day) \
-                   or re.match("^\\d+(,\\d+)?$", ctx.day):
+            if re.match("^(((1st|2nd|3rd|\\dth|last)\\s(sun|mon|tue|wed|thu|fri|sat))|last)$", ctx.day) \
+                    or re.match("^\\d+(-\\d+)?$", ctx.day) \
+                    or re.match("^\\d+(,\\d+)?$", ctx.day):
                 alarm_job = alarm_scheduler.add_job(
                     id=ctx.job_id,
                     func=message_function,
@@ -260,7 +267,7 @@ class AbstractCustomAlarm(Plugin, metaclass=ABCMeta):
                     misfire_grace_time=10
                 )
         else:
-            if re.match("^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2})?$
+            if re.match("^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2})?$", ctx.interval_from):
                 if re.match("^\\d+seconds$", ctx.interval):
                     alarm_job = alarm_scheduler.add_job(
                         id=ctx.job_id,

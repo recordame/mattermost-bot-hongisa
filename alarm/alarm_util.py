@@ -18,46 +18,6 @@ def get_alarms(alarm_type: str, alarm_contexts: dict):
     return "등록된 **%s**알람 : %d 개\n" % (alarm_type, cnt) + msg
 
 
-def load_user_alarms_from_file():
-    recovery_mode: bool = True
-
-    alarm_file = open("./alarms/user_alarms.json", "r", encoding="UTF-8")
-    alarm_json = json.load(alarm_file)
-
-    user_alarm = getattr(sys.modules["alarm.custom.user_alarm"], "UserAlarm")
-
-    for user in alarm_json:
-        for alarm in user["alarm"]:
-            message_body: dict = {}
-            message_body.update({"data": "post": {"user_id": alarm["creator_id"]}, {"sender_name": alarm["creator_name"]}})
-            
-            message = Message(message_body)
-
-           if alarm["interval"] == "":
-                user_alarm.add_alarm(
-                    message,
-                    alarm["id"],
-                    alarm["day"],
-                    alarm["hour"],
-                    alarm["minute"],
-                    alarm["second"],
-                    alarm["message"],
-                    alarm["job_status"],
-                    recovery_mode
-                )
-            else:
-                user_alarm.add_alarm_interval(
-                    message,
-                    alarm["id"],
-                    alarm["interval"],
-                    alarm["interval_from"],
-                    "",
-                    alarm["message"],
-                    alarm["job_status"],
-                    recovery_mode
-                )
-
-
 def load_channel_alarms_from_file():
     recovery_mode: bool = True
 
@@ -75,7 +35,7 @@ def load_channel_alarms_from_file():
         for alarm in channel["alarm"]:
             message_body: dict = {}
 
-            message_body.update({"data": {"sender_name": alarm["creator_name"], "post": {"user_id": alarm["creator_id"]}}})
+            message_body.update({"data": {"post": {"user_id": alarm["creator_id"]}, "sender_name": alarm["creator_name"], }})
             message = Message(message_body)
 
             alarm_id = alarm.get("id")
@@ -117,8 +77,20 @@ def load_channel_alarms_from_file():
                     recovery_mode
                 )
             else:
-                if alarm["interval"] == "":
-                    channel_alarm.add_alarm(
+                if alarm["interval"] != "":
+                    channel_alarm.add_alarm_interval(
+                        message,
+                        alarm["post_to"],
+                        alarm["id"],
+                        alarm["interval"],
+                        alarm["interval_from"],
+                        None,
+                        alarm["message"],
+                        recovery_mode,
+                        alarm["job_status"]
+                    )
+                else:
+                    channel_alarm.add_alarm_cron(
                         message,
                         alarm["post_to"],
                         alarm["id"],
@@ -127,19 +99,49 @@ def load_channel_alarms_from_file():
                         alarm["minute"],
                         alarm["second"],
                         alarm["message"],
-                        recovery_mode
+                        recovery_mode,
+                        alarm["job_status"]
                     )
-                else:
-                    channel_alarm.add_alarm_interval(
-                        message,
-                        alarm["post_to"],
-                        alarm["id"],
-                        alarm["interval"],
-                        alarm["interval_from"],
-                        "",
-                        alarm["message"],
-                        recovery_mode
-                    )
+
+
+def load_user_alarms_from_file():
+    recovery_mode: bool = True
+
+    alarm_file = open("./alarms/user_alarms.json", "r", encoding="UTF-8")
+    alarm_json = json.load(alarm_file)
+
+    user_alarm = getattr(sys.modules["alarm.custom.user_alarm"], "UserAlarm")
+
+    for user in alarm_json:
+        for alarm in user["alarm"]:
+            message_body: dict = {}
+
+            message_body.update({"data": {"post": {"user_id": alarm["creator_id"]}, "sender_name": alarm["creator_name"]}})
+            message = Message(message_body)
+
+            if alarm["interval"] != "":
+                user_alarm.add_alarm_interval(
+                    message,
+                    alarm["id"],
+                    alarm["interval"],
+                    alarm["interval_from"],
+                    None,
+                    alarm["message"],
+                    recovery_mode,
+                    alarm["job_status"]
+                )
+            else:
+                user_alarm.add_alarm_cron(
+                    message,
+                    alarm["id"],
+                    alarm["day"],
+                    alarm["hour"],
+                    alarm["minute"],
+                    alarm["second"],
+                    alarm["message"],
+                    recovery_mode,
+                    alarm["job_status"]
+                )
 
 
 def save_alarms_to_file_in_json(alarm_type_user_or_channel: str, alarm_contexts_for_user_or_channel: dict):
@@ -150,7 +152,8 @@ def save_alarms_to_file_in_json(alarm_type_user_or_channel: str, alarm_contexts_
 
     alarm_file = open("./alarms/%s_alarms.json" % alarm_type, "w+", encoding="UTF-8")
 
-    alarm_file.write("[")
+    backup: list = []
+
     user_or_channel_cnt = alarm_contexts_for_user_or_channel.values().__len__()
     user_or_channel_ids = list(alarm_contexts_for_user_or_channel.keys())
 
@@ -159,26 +162,15 @@ def save_alarms_to_file_in_json(alarm_type_user_or_channel: str, alarm_contexts_
         alarm_context_cnt = dict(alarm_contexts).values().__len__()
 
         if alarm_context_cnt > 0:
-            alarm_file.write('{"%s":"%s", "alarm":[' % (alarm_type, user_or_channel_ids[i]))
-
             alarm_ids = list(dict(alarm_contexts).keys())
 
+            alarms: list = []
+
             for j in range(0, alarm_context_cnt):
-                json.dump(
-                    alarm_contexts.get(alarm_ids[j]).__dict__,
-                    alarm_file,
-                    indent=4,
-                    ensure_ascii=False
-                )
+                alarms.append((alarm_contexts.get(alarm_ids[j])).get_dict())
 
-                if j < alarm_context_cnt - 1:
-                    alarm_file.write(",\n")
+            backup.append({alarm_type: user_or_channel_ids[i], "alarm": alarms})
 
-            alarm_file.write("]}")
-
-            if i < user_or_channel_cnt - 1:
-                alarm_file.write(",\n")
-
-    alarm_file.write("]")
+    json.dump(backup, alarm_file, indent=2, ensure_ascii=False)
 
     alarm_file.close()

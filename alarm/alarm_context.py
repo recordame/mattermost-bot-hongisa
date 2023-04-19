@@ -1,3 +1,6 @@
+import json
+
+
 class AlarmContext:
     creator_name: str
     creator_id: str
@@ -10,7 +13,7 @@ class AlarmContext:
     hour: str
     minute: str
     second: str
-        
+
     interval: str
     interval_from: str
 
@@ -40,7 +43,7 @@ class AlarmContext:
         self.hour = hour
         self.minute = minute
         self.second = second
-        
+
         self.interval = interval
         self.interval_from = interval_from
 
@@ -49,6 +52,9 @@ class AlarmContext:
 
         self.job_id = post_to + "_" + id
         self.job_status = job_status
+
+    def get_dict(self):
+        return self.__dict__
 
     def get_info(self):
         msg: str = ""
@@ -60,13 +66,12 @@ class AlarmContext:
             msg += "   - 알람 : `%s`\n" % self.id
 
         msg += "   - 대상 : `%s`\n" % self.post_to
-        
+
         if self.interval == "":
-            msg += "   - 주기 : `%s`\n" % self.interval
+            msg += "   - 주기 : `%s %s:%s:%s`\n" % (self.day, self.hour, self.minute, self.second)
         else:
             msg += "   - 주기 : `%s`\n" % self.interval
             msg += "   - 시작 : `%s`\n" % self.interval_from
-           
 
         if str(self.message).__len__() != 0:
             msg += "   - 내용 : %s\n" % self.message
@@ -104,7 +109,7 @@ class AlarmContextBuilder:
 
         self._interval = ""
         self._interval_from = ""
-        
+
         self._message = ""
         self._message_argument = ""
 
@@ -155,14 +160,14 @@ class AlarmContextBuilder:
 
     def interval(self, interval: str):
         self._interval = interval
-        
+
         return self
-    
+
     def interval_from(self, interval_from: str):
         self._interval_from = interval_from
-        
+
         return self
-    
+
     def message(self, message: str):
         self._message = message
 
@@ -191,7 +196,7 @@ class AlarmContextBuilder:
             self._hour,
             self._minute,
             self._second,
-            
+
             self._interval,
             self._interval_from,
 

@@ -19,11 +19,15 @@ class ChannelAlarm(AbstractCustomAlarm):
         "\\s(.+)$"  # 메시지
         % name
     )
-    def add_alarm(
-            self, message: Message,
+    def add_alarm_cron(
+            self,
+            message: Message,
             channel_id: str,
             alarm_id: str,
-            day_of_week: str, hour: str, minute: str, second: str,
+            day_of_week: str,
+            hour: str,
+            minute: str,
+            second: str,
             alarm_message: str,
             recovery_mode: bool = False,
             job_status: str = "실행"
@@ -45,7 +49,7 @@ class ChannelAlarm(AbstractCustomAlarm):
             recovery_mode
         )
 
-     @listen_to(
+    @listen_to(
         "^%s알람등록"
         "\\s([a-zA-Z\\d]+)"  # 채널 아이디 
         "\\s([가-힣a-zA-Z\\-_\\d]+)"  # 알람명
@@ -55,7 +59,8 @@ class ChannelAlarm(AbstractCustomAlarm):
         % name
     )
     def add_alarm_interval(
-            self, message: Message,
+            self,
+            message: Message,
             channel_id: str,
             alarm_id: str,
             interval: str,
@@ -82,7 +87,7 @@ class ChannelAlarm(AbstractCustomAlarm):
             constant.CHANNEL_ALARM_SCHEDULER,
             recovery_mode
         )
-        
+
     @listen_to(
         "^%s알람취소"
         "\\s([a-zA-Z\\d]+)"  # 채널 ID

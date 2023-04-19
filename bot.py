@@ -34,8 +34,8 @@ bot = Bot(
         Help(),
         Alarms(),
         CurrencyAlarm(),
-        UserAlarm(),
         ChannelAlarm(),
+        UserAlarm(),
         JinhaAlarm()
     ],
 )
@@ -46,8 +46,8 @@ constant.CHANNEL_ALARM_SCHEDULER.start()
 # 사용자 정의 알람을 위한 백그라운드 스케쥴 시작
 constant.USER_ALARM_SCHEDULER.start()
 
-load_user_alarms_from_file()
 load_channel_alarms_from_file()
+load_user_alarms_from_file()
 
 # 로봇 서비스 시작
 bot.run()

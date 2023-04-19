@@ -11,17 +11,21 @@ class UserAlarm(AbstractCustomAlarm):
     @listen_to(
         "^%s알람등록"
         "\\s([가-힣a-zA-Z\\-_\\d]+)"  # 알람명
-        "\\s([last|last\\s|1st\\s|2nd\\s|3rd\\s|\\dth\\s|sun|mon|tue|wed|thu|fri|sat|\\,|\\-|\\d|\\*]+)"  # 일
+        "\\s([((last|1st|2nd|3rd|\\dth)\\s)|(sun|mon|tue|wed|thu|fri|sat|last|\\*)|\\d*|\\,|\\-]+)"  # 일
         "\\s([\\*|\\*/\\d|\\d|\\-|\\,]+)"  # 시
         "\\s([\\*|\\*/\\d|\\d|\\-|\\,]+)"  # 분
         "\\s([\\*|\\*/\\d|\\d|\\-|\\,]+)"  # 초
         "\\s(.+)$"  # 메시지
         % name
     )
-    def add_alarm(
-            self, message: Message,
+    def add_alarm_cron(
+            self,
+            message: Message,
             alarm_id: str,
-            day_of_week: str, hour: str, minute: str, second: str,
+            day_of_week: str,
+            hour: str,
+            minute: str,
+            second: str,
             alarm_message: str,
             recovery_mode: bool = False,
             job_status: str = "실행"
@@ -52,7 +56,8 @@ class UserAlarm(AbstractCustomAlarm):
         % name
     )
     def add_alarm_interval(
-            self, message: Message,
+            self,
+            message: Message,
             alarm_id: str,
             interval: str,
             interval_from: str,
@@ -78,7 +83,7 @@ class UserAlarm(AbstractCustomAlarm):
             constant.USER_ALARM_SCHEDULER,
             recovery_mode
         )
-        
+
     @listen_to(
         "^%s알람정지"
         "\\s?([가-힣a-zA-Z\\-_\\d]+)?$"  # 알람명
