@@ -53,11 +53,18 @@ class AbstractCustomAlarm(Plugin, metaclass=ABCMeta):
             save_alarms_to_file_in_json(alarm_type, alarm_contexts)
 
             if not recovery_mode:
-                self.driver.direct_message(
-                    ctx.creator_id,
-                    "`%s` %s알람을 `%s %s:%02d:%02d`에 전달해드릴게요 :dizzy:"
-                    % (ctx.id, alarm_type, ctx.day, ctx.hour, int(ctx.minute), int(ctx.second))
-                )
+                if ctx.interval == "":
+                    self.driver.direct_message(
+                        ctx.creator_id,
+                        "`%s` %s알람을 `%s %s:%02d:%02d`에 전달해드릴게요 :dizzy:"
+                        % (ctx.id, alarm_type, ctx.day, ctx.hour, int(ctx.minute), int(ctx.second))
+                    )
+                else:
+                    self.driver.direct_message(
+                        ctx.creator_id,
+                        "`%s` %s알람을 `%s`부터 매 `%s` akek 전달해드릴게요 :dizzy:"
+                        % (ctx.id, alarm_type, ctx.interval_from, ctx.interval)
+                    )
 
     def suspend_alarm(
             self,
@@ -227,28 +234,76 @@ class AbstractCustomAlarm(Plugin, metaclass=ABCMeta):
         return message_function
 
     def create_alarm_job(self, ctx: AlarmContext, alarm_scheduler: BackgroundScheduler, message_function) -> Job:
-        if re.match("^(((1st|2nd|3rd|\\dth|last)\\s.+)|last)", ctx.day) \
-                or re.match("^([1-9]|[12]\\d|3[01])(-([1-9]|[12]\\d|3[01]))?", ctx.day):
-            alarm_job = alarm_scheduler.add_job(
-                id=ctx.job_id,
-                func=message_function,
-                trigger="cron",
-                day=ctx.day,
-                hour=ctx.hour,
-                minute=ctx.minute,
-                second=ctx.second,
-                misfire_grace_time=10
-            )
+        if ctx.interval == "":
+            if re.match("^(((1st|2nd|3rd|\\dth|last)\\s(sun|mon|tue|wed|thu|fri|sat))|last", ctx.day) \
+                   or re.match("^\\d*(-\\d*)?", ctx.day) \
+                   or re.match("^\\d*(,\\d*)?", ctx.day):
+                alarm_job = alarm_scheduler.add_job(
+                    id=ctx.job_id,
+                    func=message_function,
+                    trigger="cron",
+                    day=ctx.day,
+                    hour=ctx.hour,
+                    minute=ctx.minute,
+                    second=ctx.second,
+                    misfire_grace_time=10
+                )
+            elif re.match("^(sun|mon|tue|wed|thu|fri|sat|\\*|,|-)+", ctx.day):
+                alarm_job = alarm_scheduler.add_job(
+                    id=ctx.job_id,
+                    func=message_function,
+                    trigger="cron",
+                    day_of_week=ctx.day,
+                    hour=ctx.hour,
+                    minute=ctx.minute,
+                    second=ctx.second,
+                    misfire_grace_time=10
+                )
         else:
-            alarm_job = alarm_scheduler.add_job(
-                id=ctx.job_id,
-                func=message_function,
-                trigger="cron",
-                day_of_week=ctx.day,
-                hour=ctx.hour,
-                minute=ctx.minute,
-                second=ctx.second,
-                misfire_grace_time=10
-            )
+            if re.match("^\\d*seconds", ctx.interval):
+                alarm_job = alarm_scheduler.add_job(
+                    id=ctx.job_id,
+                    func=message_function,
+                    trigger="interval",
+                    seconds=int(ctx.interval.replace("seconds", "")),
+                    start_date=ctx.interval_from,
+                    misfire_grace_time=10
+                )
+            elif re.match("^\\d*minutes", ctx.interval):
+                alarm_job = alarm_scheduler.add_job(
+                    id=ctx.job_id,
+                    func=message_function,
+                    trigger="interval",
+                    minutes=int(ctx.interval.replace("minutes", "")),
+                    start_date=ctx.interval_from,
+                    misfire_grace_time=10
+                )
+            elif re.match("^\\d*hours", ctx.interval):
+                alarm_job = alarm_scheduler.add_job(
+                    id=ctx.job_id,
+                    func=message_function,
+                    trigger="interval",
+                    hours=int(ctx.interval.replace("minutes", "")),
+                    start_date=ctx.interval_from,
+                    misfire_grace_time=10
+                )
+            elif re.match("^\\d*days", ctx.interval):
+                alarm_job = alarm_scheduler.add_job(
+                    id=ctx.job_id,
+                    func=message_function,
+                    trigger="interval",
+                    days=int(ctx.interval.replace("minutes", "")),
+                    start_date=ctx.interval_from,
+                    misfire_grace_time=10
+                )
+            elif re.match("^\\d*week", ctx.interval):
+                alarm_job = alarm_scheduler.add_job(
+                    id=ctx.job_id,
+                    func=message_function,
+                    trigger="interval",
+                    week=int(ctx.interval.replace("minutes", "")),
+                    start_date=ctx.interval_from,
+                    misfire_grace_time=10
+                )
 
         return alarm_job
