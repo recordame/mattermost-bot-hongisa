@@ -53,7 +53,7 @@ class ChannelAlarm(AbstractCustomAlarm):
         "^%s알람등록"
         "\\s([a-zA-Z\\d]+)"  # 채널 아이디 
         "\\s([가-힣a-zA-Z\\-_\\d]+)"  # 알람명
-        "\\s(\\d*seconds|\\d*minutes|\\d*hours|\\d*days|\\d*weeks)"  # 주기
+        "\\s(\\d+초|\\d+분|\\d+시간|\\d+일|\\d+주)"  # 주기
         "\\s(\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2})?)"  # 시작일
         "\\s(.+)$"  # 메시지
         % name

@@ -268,48 +268,48 @@ class AbstractCustomAlarm(Plugin, metaclass=ABCMeta):
                 )
         else:
             if re.match("^\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2})?$", ctx.interval_from):
-                if re.match("^\\d+seconds$", ctx.interval):
+                if re.match("^\\d+초$", ctx.interval):
                     alarm_job = alarm_scheduler.add_job(
                         id=ctx.job_id,
                         func=message_function,
                         trigger="interval",
-                        seconds=int(ctx.interval.replace("seconds", "")),
+                        seconds=int(ctx.interval.replace("초", "")),
                         start_date=ctx.interval_from,
                         misfire_grace_time=10
                     )
-                elif re.match("^\\d+minutes$", ctx.interval):
+                elif re.match("^\\d+분$", ctx.interval):
                     alarm_job = alarm_scheduler.add_job(
                         id=ctx.job_id,
                         func=message_function,
                         trigger="interval",
-                        minutes=int(ctx.interval.replace("minutes", "")),
+                        minutes=int(ctx.interval.replace("분", "")),
                         start_date=ctx.interval_from,
                         misfire_grace_time=10
                     )
-                elif re.match("^\\d+hours$", ctx.interval):
+                elif re.match("^\\d+시간$", ctx.interval):
                     alarm_job = alarm_scheduler.add_job(
                         id=ctx.job_id,
                         func=message_function,
                         trigger="interval",
-                        hours=int(ctx.interval.replace("minutes", "")),
+                        hours=int(ctx.interval.replace("시간", "")),
                         start_date=ctx.interval_from,
                         misfire_grace_time=10
                     )
-                elif re.match("^\\d+days$", ctx.interval):
+                elif re.match("^\\d+일$", ctx.interval):
                     alarm_job = alarm_scheduler.add_job(
                         id=ctx.job_id,
                         func=message_function,
                         trigger="interval",
-                        days=int(ctx.interval.replace("minutes", "")),
+                        days=int(ctx.interval.replace("일", "")),
                         start_date=ctx.interval_from,
                         misfire_grace_time=10
                     )
-                elif re.match("^\\d+week$", ctx.interval):
+                elif re.match("^\\d+주$", ctx.interval):
                     alarm_job = alarm_scheduler.add_job(
                         id=ctx.job_id,
                         func=message_function,
                         trigger="interval",
-                        week=int(ctx.interval.replace("minutes", "")),
+                        weeks=int(ctx.interval.replace("주", "")),
                         start_date=ctx.interval_from,
                         misfire_grace_time=10
                     )

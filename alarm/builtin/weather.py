@@ -1,4 +1,5 @@
 import urllib
+from datetime import datetime
 from urllib.request import urlopen, Request
 
 import bs4
@@ -145,7 +146,9 @@ def extract_today_weather_information(info: str):
 
     status = add_icon(str(status))
 
-    msg = "**`%s`** 날씨정보" % location + \
+    today = datetime.now()
+
+    msg = "%s **`%s`** 날씨정보" % (today.strftime("%Y년 %m월 %d일 %H시"), location) + \
           "\n\n-----------------------------\n" + \
           "**현재 날씨**는 %s이고,\n**기온**은 `%s`로 어제보다 %s.\n오늘 **최저** `%s`, **최고** `%s`로 예상돼요.\n* 미세먼지 %s\n* 초미세먼지 %s" \
           % (status, temp, temp_yesterday, temp_lowest, temp_highest, add_icon(fine_particle), add_icon(ultra_fine_particle))

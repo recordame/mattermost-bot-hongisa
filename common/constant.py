@@ -1,17 +1,14 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 
-BOT_TOKEN: str = "dzme7z5wa38gmc8dswoupb55da"
-BOT_TEAM: str = "1404"
-MATTERMOST_URL = "https://recordame.cloud.mattermost.com"
+BOT_TOKEN: str = "fj6kf9txdiygu8ga8ca7oth1qr"
+BOT_TEAM: str = "hongeejanggun"
+MATTERMOST_URL = "http://recordame.synology.me"
 ADMINS: list = ["recordame"]
 
 # 채널 정보
-RECORDAME_ID: str = "gttq5ttmdtyaiyrs4bz46n6gmh"
-LOVELYLCM_ID: str = "npry7rpunpg3xes81os14gqbje"
-CH_KORDLE_ID: str = "9aic13fzstdgmxro1c9f9i7yho"
-CH_TOWN_SQUARE_ID: str = "7oc3baakktfxudigcjjdhmh4my"
-CH_NOTIFICATIONS_ID: str = "9doiodruepdwmnbx8ejg395u7o"
-CH_JINHA_ID: str = "o5zk5j3q8ir8zprjr4jrzk5xmh"
+CH_KORDLE_ID: str = "b9j1mpuxdjbxdkjr4tdzht9uey"
+CH_NOTIFICATIONS_ID: str = "np83b9aggif98j1omio1m3zozo"
+CH_JINHA_ID: str = "wske4xkn3tn7br5t1h3f4czx4o"
 
 BUILTIN_ALARM_INSTANCE: dict[str, object] = {}
 
