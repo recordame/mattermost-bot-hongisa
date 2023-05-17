@@ -9,3 +9,6 @@
 
 <import old to new>
     docker exec -i <postgres_container_id> /bin/bash -c "PGPASSWORD=mmuser_password psql --username mmuser mattermost" < ./dump_mattermost.sql
+
+<resstart option>
+    docker update --restart=always docker-postgre
