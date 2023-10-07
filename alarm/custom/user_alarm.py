@@ -6,16 +6,16 @@ from common import constant
 
 
 class UserAlarm(AbstractCustomAlarm):
-    name = "개인"
+    name = '개인'
 
     @listen_to(
-        "^%s알람등록"
-        "\\s([가-힣a-zA-Z\\-_\\d]+)"  # 알람명
-        "\\s([((last|1st|2nd|3rd|\\dth)\\s)|(sun|mon|tue|wed|thu|fri|sat|last|\\*)|\\d*|\\,|\\-]+)"  # 일
-        "\\s([\\*|\\*/\\d|\\d|\\-|\\,]+)"  # 시
-        "\\s([\\*|\\*/\\d|\\d|\\-|\\,]+)"  # 분
-        "\\s([\\*|\\*/\\d|\\d|\\-|\\,]+)"  # 초
-        "\\s(.+)$"  # 메시지
+        '^%s알람등록'
+        '\\s([가-힣a-zA-Z\\-_\\d]+)'  # 알람명
+        '\\s([((last|1st|2nd|3rd|\\dth)\\s)|(sun|mon|tue|wed|thu|fri|sat|last|\\*)|\\d*|\\,|\\-]+)'  # 일
+        '\\s([\\*|\\*/\\d|\\d|\\-|\\,]+)'  # 시
+        '\\s([\\*|\\*/\\d|\\d|\\-|\\,]+)'  # 분
+        '\\s([\\*|\\*/\\d|\\d|\\-|\\,]+)'  # 초
+        '\\s(.+)$'  # 메시지
         % name
     )
     def add_alarm_cron(
@@ -28,12 +28,12 @@ class UserAlarm(AbstractCustomAlarm):
             second: str,
             alarm_message: str,
             recovery_mode: bool = False,
-            job_status: str = "실행"
+            job_status: str = '실행'
     ):
         ctx = AlarmContextBuilder() \
             .creator_name(message.sender_name).creator_id(message.user_id).post_to(message.user_id) \
             .id(alarm_id) \
-            .day(day_of_week.strip(" ")).hour(hour).minute(minute).second(second) \
+            .day(day_of_week.strip(' ')).hour(hour).minute(minute).second(second) \
             .message(alarm_message) \
             .job_status(job_status) \
             .build()
@@ -48,11 +48,11 @@ class UserAlarm(AbstractCustomAlarm):
         )
 
     @listen_to(
-        "^%s알람등록"
-        "\\s([가-힣a-zA-Z\\-_\\d]+)"  # 알람명
-        "\\s(\\d+초|\\d+분|\\d+시간|\\d+일|\\d+주)"  # 주기
-        "\\s(\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2})?)"  # 시작일
-        "\\s(.+)$"  # 메시지
+        '^%s알람등록'
+        '\\s([가-힣a-zA-Z\\-_\\d]+)'  # 알람명
+        '\\s(\\d+초|\\d+분|\\d+시간|\\d+일|\\d+주)'  # 주기
+        '\\s(\\d{4}-\\d{2}-\\d{2}(T\\d{2}:\\d{2}:\\d{2})?)'  # 시작일
+        '\\s(.+)$'  # 메시지
         % name
     )
     def add_alarm_interval(
@@ -64,7 +64,7 @@ class UserAlarm(AbstractCustomAlarm):
             interval_time: str,
             alarm_message: str,
             recovery_mode: bool = False,
-            job_status: str = "실행"
+            job_status: str = '실행'
     ):
         ctx = AlarmContextBuilder() \
             .creator_name(message.sender_name).creator_id(message.user_id).post_to(message.user_id) \
@@ -85,8 +85,8 @@ class UserAlarm(AbstractCustomAlarm):
         )
 
     @listen_to(
-        "^%s알람정지"
-        "\\s?([가-힣a-zA-Z\\-_\\d]+)?$"  # 알람명
+        '^%s알람정지'
+        '\\s?([가-힣a-zA-Z\\-_\\d]+)?$'  # 알람명
         % name
     )
     def pause_alarm(self, message: Message, alarm_id: str):
@@ -100,8 +100,8 @@ class UserAlarm(AbstractCustomAlarm):
         )
 
     @listen_to(
-        "^%s알람재개"
-        "\\s?([가-힣a-zA-Z\\-_\\d]+)?$"  # 알람명
+        '^%s알람재개'
+        '\\s?([가-힣a-zA-Z\\-_\\d]+)?$'  # 알람명
         % name
     )
     def resume_alarm(self, message: Message, alarm_id: str):
@@ -115,8 +115,8 @@ class UserAlarm(AbstractCustomAlarm):
         )
 
     @listen_to(
-        "^%s알람취소"
-        "\\s?([가-힣a-zA-Z\\-_\\d]+)?$"  # 알람명
+        '^%s알람취소'
+        '\\s?([가-힣a-zA-Z\\-_\\d]+)?$'  # 알람명
         % name
     )
     def cancel_alarm(self, message: Message, alarm_id: str):

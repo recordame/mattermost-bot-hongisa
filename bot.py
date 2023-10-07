@@ -1,4 +1,5 @@
 # !/usr/bin/env python
+import ssl
 
 from mmpy_bot import Bot, Settings
 
@@ -7,6 +8,7 @@ from alarm.builtin.jinha import JinhaAlarm
 from alarm.builtin.kordle import KordleAlarm
 from alarm.builtin.mass import MassAlarm
 from alarm.builtin.medicine import MedicineAlarm
+from alarm.builtin.random import RandomAlarm
 from alarm.builtin.weather import WeatherAlarm
 from alarm.command.alarm_list import Alarms
 from alarm.custom.channel_alarm import ChannelAlarm
@@ -15,16 +17,18 @@ from command.currency import CurrencyAlarm
 from command.help import Help
 from common import constant
 
+ssl._create_default_https_context = ssl._create_unverified_context
+
 # 로봇 설정
 bot = Bot(
     settings=Settings(
         MATTERMOST_URL=constant.MATTERMOST_URL,
-        MATTERMOST_PORT=443,
-        MATTERMOST_API_PATH="/api/v4",
+        MATTERMOST_PORT=8065,
+        MATTERMOST_API_PATH='/api/v4',
         BOT_TOKEN=constant.BOT_TOKEN,
         BOT_TEAM=constant.BOT_TEAM,
         SSL_VERIFY=False,
-        LOG_FILE="./bot.log",
+        LOG_FILE='./bot.log',
     ),
     plugins=[
         KordleAlarm(),
@@ -36,7 +40,8 @@ bot = Bot(
         CurrencyAlarm(),
         ChannelAlarm(),
         UserAlarm(),
-        JinhaAlarm()
+        JinhaAlarm(),
+        RandomAlarm()
     ],
 )
 

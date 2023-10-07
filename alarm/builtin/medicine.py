@@ -1,5 +1,4 @@
-from mmpy_bot import Message
-from mmpy_bot import listen_to
+from mmpy_bot import listen_to, Message
 
 from alarm.alarm_context import AlarmContextBuilder
 from alarm.builtin.abstract_builtin_alarm import AbstractBuiltinAlarm
@@ -7,25 +6,25 @@ from common import constant
 
 
 class MedicineAlarm(AbstractBuiltinAlarm):
-    name = "복약"
-    id = "medicine"
-    day = "mon-sun"
+    name = '복약'
+    id = 'medicine'
+    day = 'mon-sun'
     channel_id = constant.CH_NOTIFICATIONS_ID
 
     def __init__(self):
         super().__init__()
         self.add_builtin_alarm(self.name, self)
 
-    def generate_message(self, option: str = ""):
-        msg = "@here 건강을 위해 **약** 먹을 시간 입니다! :pill::muscle:"
+    def generate_message(self, option: str = ''):
+        msg = '@here 건강을 위해 **약** 먹을 시간 입니다! :pill::muscle:'
 
         return msg
 
     # 복약 알람 예약
     @listen_to(
-        "^%s알람등록"
-        "\\s([\\*|\\*/\\d|\\d|\\-|\\,]+)"
-        "\\s([\\*|\\*/\\d|\\d|\\-|\\,]+)$"
+        '^%s알람등록'
+        '\\s([\\*|\\*/\\d|\\d|\\-|\\,]+)'
+        '\\s([\\*|\\*/\\d|\\d|\\-|\\,]+)$'
         % name
     )
     def add_alarm(self, message: Message, hour: str, minute: str, recovery_mode: bool = False):
@@ -37,6 +36,6 @@ class MedicineAlarm(AbstractBuiltinAlarm):
 
         self.schedule_alarm(alarm_context, recovery_mode)
 
-    @listen_to("^%s알람취소$" % name)
+    @listen_to('^%s알람취소$' % name)
     def cancel_alarm(self, message: Message, post_to=channel_id):
         self.unschedule_alarm(self.name, self.id, message, post_to)

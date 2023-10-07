@@ -15,7 +15,7 @@ class AbstractBuiltinAlarm(Plugin, metaclass=ABCMeta):
         constant.BUILTIN_ALARM_INSTANCE.update({name: _class})
 
     @abstractmethod
-    def generate_message(self, param: str = "") -> str:
+    def generate_message(self, param: str = '') -> str:
         pass
 
     @abstractmethod
@@ -26,7 +26,7 @@ class AbstractBuiltinAlarm(Plugin, metaclass=ABCMeta):
     def cancel_alarm(self, message: Message):
         pass
 
-    def alarm(self, post_to: str, message_argument: str = ""):
+    def alarm(self, post_to: str, message_argument: str = ''):
         try:
             self.driver.channels.get_channel(post_to)
 
@@ -48,9 +48,9 @@ class AbstractBuiltinAlarm(Plugin, metaclass=ABCMeta):
                     misfire_grace_time=10
                 )
 
-                ctx.job_status = "실행"
+                ctx.job_status = '실행'
             except:
-                self.driver.direct_message(ctx.creator_id, "인자가 잘못되어 등록할 수 없었어요 :crying_cat_face:")
+                self.driver.direct_message(ctx.creator_id, '인자가 잘못되어 등록할 수 없었어요 :crying_cat_face:')
 
                 return
 
@@ -66,7 +66,7 @@ class AbstractBuiltinAlarm(Plugin, metaclass=ABCMeta):
             if not recovery_mode:
                 self.driver.direct_message(
                     ctx.creator_id,
-                    "`%s` 채널알람을 `%s %s:%02d:%02d`에 전달해드릴게요 :fairy:"
+                    '`%s` 채널알람을 `%s %s:%02d:%02d`에 전달해드릴게요 :fairy:'
                     % (ctx.name, ctx.day, ctx.hour, int(ctx.minute), int(ctx.second))
                 )
 
@@ -78,16 +78,16 @@ class AbstractBuiltinAlarm(Plugin, metaclass=ABCMeta):
             existing_ctx: AlarmContext = constant.CHANNEL_ALARMS[ctx.post_to][ctx.id]
 
             self.driver.direct_message(
-                ctx.creator_id, "이미 등록된 채널알람이 있어요! `%s알람취소` 후 재등록해주세요.\n"
-                                "**알람정보**\n"
-                                "%s\n"
+                ctx.creator_id, '이미 등록된 채널알람이 있어요! `%s알람취소` 후 재등록해주세요.\n'
+                                '**알람정보**\n'
+                                '%s\n'
                                 % (existing_ctx.name, existing_ctx.get_info()))
             return True
         else:
             return False
 
     def unschedule_alarm(self, alarm_name: str, alarm_id: str, message: Message, post_to: str):
-        job_id = post_to + "_" + alarm_id
+        job_id = post_to + '_' + alarm_id
         job = constant.CHANNEL_ALARM_SCHEDULER.get_job(job_id)
 
         if job is not None:
@@ -95,23 +95,23 @@ class AbstractBuiltinAlarm(Plugin, metaclass=ABCMeta):
 
             self.driver.direct_message(
                 alarm_ctx.creator_id,
-                "등록하신 `%s` 채널알람이 %s님에 의해 삭제되었어요 :skull_and_crossbones:\n\n"
-                "**알람정보**\n"
-                "%s\n"
+                '등록하신 `%s` 채널알람이 %s님에 의해 삭제되었어요 :skull_and_crossbones:\n\n'
+                '**알람정보**\n'
+                '%s\n'
                 % (alarm_ctx.name, message.sender_name, alarm_ctx.get_info())
             )
 
             del constant.CHANNEL_ALARMS[post_to][alarm_id]
             constant.CHANNEL_ALARM_SCHEDULER.remove_job(job_id)
 
-            self.driver.direct_message(message.user_id, "`%s` 채널알람이 삭제되었어요 :skull_and_crossbones:" % alarm_name)
+            self.driver.direct_message(message.user_id, '`%s` 채널알람이 삭제되었어요 :skull_and_crossbones:' % alarm_name)
 
             save_alarms()
         else:
-            self.driver.direct_message(message.user_id, "등록된 채널알람이 없어요 :crying_cat_face:")
+            self.driver.direct_message(message.user_id, '등록된 채널알람이 없어요 :crying_cat_face:')
 
 
 ###################
 
 def save_alarms():
-    save_alarms_to_file_in_json("channel", constant.CHANNEL_ALARMS)
+    save_alarms_to_file_in_json('channel', constant.CHANNEL_ALARMS)
