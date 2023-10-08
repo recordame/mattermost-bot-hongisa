@@ -27,4 +27,4 @@ COPY lib-patch/usr/local/lib/python/site-packages/mattermostdriver/websocket.py 
 # docker run -v alarms:/alarms --name bot -d bot
 
 
-ENTRYPOINT ["python","/app/bot.py"]
+ENTRYPOINT ['python','/app/bot.py']

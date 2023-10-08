@@ -1,6 +1,3 @@
-import json
-
-
 class AlarmContext:
     creator_name: str
     creator_id: str
@@ -27,10 +24,10 @@ class AlarmContext:
             self,
             creator_name: str, creator_id: str, post_to: str,
             name: str, id: str,
-            day="", hour="00", minute="00", second="00",
-            interval="", interval_from="",
-            message="", message_argument="",
-            job_status="실행"
+            day='', hour='00', minute='00', second='00',
+            interval='', interval_from='',
+            message='', message_argument='',
+            job_status='실행'
     ):
         self.creator_name = creator_name
         self.creator_id = creator_id
@@ -50,33 +47,33 @@ class AlarmContext:
         self.message = message
         self.message_argument = message_argument
 
-        self.job_id = post_to + "_" + id
+        self.job_id = post_to + '_' + id
         self.job_status = job_status
 
     def get_dict(self):
         return self.__dict__
 
     def get_info(self):
-        msg: str = ""
-        msg += "   - 등록 : `%s`\n" % self.creator_name
+        msg: str = ''
+        msg += '   - 등록 : `%s`\n' % self.creator_name
 
         if str(self.name).__len__() != 0:
-            msg += "   - 알람 : `%s`\n" % self.name
+            msg += '   - 알람 : `%s`\n' % self.name
         else:
-            msg += "   - 알람 : `%s`\n" % self.id
+            msg += '   - 알람 : `%s`\n' % self.id
 
-        msg += "   - 대상 : `%s`\n" % self.post_to
+        msg += '   - 대상 : `%s`\n' % self.post_to
 
-        if self.interval == "":
-            msg += "   - 주기 : `%s %s:%s:%s`\n" % (self.day, self.hour, self.minute, self.second)
+        if self.interval == '':
+            msg += '   - 주기 : `%s %s:%s:%s`\n' % (self.day, self.hour, self.minute, self.second)
         else:
-            msg += "   - 주기 : `%s`\n" % self.interval
-            msg += "   - 시작 : `%s`\n" % self.interval_from
+            msg += '   - 주기 : `%s`\n' % self.interval
+            msg += '   - 시작 : `%s`\n' % self.interval_from
 
         if str(self.message).__len__() != 0:
-            msg += "   - 내용 : %s\n" % self.message
+            msg += '   - 내용 : %s\n' % self.message
 
-        msg += "   - 상태 : `%s` :%s:" % (self.job_status, "recycle" if self.job_status == "실행" else "red_circle")
+        msg += '   - 상태 : `%s` :%s:' % (self.job_status, 'recycle' if self.job_status == '실행' else 'red_circle')
 
         return msg
 
@@ -100,18 +97,20 @@ class AlarmContextBuilder:
     _job_status: str
 
     def __init__(self):
-        self._name = ""
+        self._name = ''
 
-        self._day = ""
-        self._hour = "00"
-        self._minute = "00"
-        self._second = "00"
+        self._day = ''
+        self._hour = '00'
+        self._minute = '00'
+        self._second = '00'
 
-        self._interval = ""
-        self._interval_from = ""
+        self._interval = ''
+        self._interval_from = ''
 
-        self._message = ""
-        self._message_argument = ""
+        self._message = ''
+        self._message_argument = ''
+
+        self._job_status = '실행'
 
     def creator_name(self, creator_name: str):
         self._creator_name = creator_name
@@ -201,7 +200,9 @@ class AlarmContextBuilder:
             self._interval_from,
 
             self._message,
-            self._message_argument
+            self._message_argument,
+
+            self._job_status
         )
 
         return alarm_context

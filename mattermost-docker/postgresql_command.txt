@@ -1,14 +1,14 @@
 <dump old>
-    docker exec -i <postgres_container_id> /bin/bash -c "PGPASSWORD=mmuser_password pg_dump --username mmuser mattermost" > dump_mattermost.sql
+    docker exec -i <postgres_container_id> /bin/bash -c 'PGPASSWORD=mmuser_password pg_dump --username mmuser mattermost' > dump_mattermost.sql
 
 <drop new>
-    docker exec -i <postgres_container_id> psql -U mmuser -d postgres -c "DROP DATABASE mattermost;"
+    docker exec -i <postgres_container_id> psql -U mmuser -d postgres -c 'DROP DATABASE mattermost;'
 
 <create new>
-    docker exec -i <postgres_container_id> psql -U mmuser -d postgres -c "CREATE DATABASE mattermost;"
+    docker exec -i <postgres_container_id> psql -U mmuser -d postgres -c 'CREATE DATABASE mattermost;'
 
 <import old to new>
-    docker exec -i <postgres_container_id> /bin/bash -c "PGPASSWORD=mmuser_password psql --username mmuser mattermost" < ./dump_mattermost.sql
+    docker exec -i <postgres_container_id> /bin/bash -c 'PGPASSWORD=mmuser_password psql --username mmuser mattermost' < ./dump_mattermost.sql
 
 <resstart option>
     docker update --restart=always docker-postgre

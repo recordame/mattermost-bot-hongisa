@@ -1,7 +1,7 @@
 # docker-compose run -p 8065:8065 mattermost mattermost
 # docker-compose run postgres postgres
 
-version: "2.4"
+version: '2.4'
 
 services:
   postgres:
@@ -26,6 +26,8 @@ services:
       - POSTGRES_DB
 
   mattermost:
+    ports:
+      - ${APP_PORT}:${APP_PORT}
     depends_on:
       - postgres
     image: ${MATTERMOST_IMAGE}:${MATTERMOST_IMAGE_TAG}
@@ -60,3 +62,4 @@ services:
 
       # additional settings
       - MM_SERVICESETTINGS_SITEURL
+      - MM_SERVICESETTINGS_ALLOWCORSFROM
