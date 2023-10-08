@@ -15,7 +15,7 @@ class AbstractBuiltinAlarm(Plugin, metaclass=ABCMeta):
         constant.BUILTIN_ALARM_INSTANCE.update({name: _class})
 
     @abstractmethod
-    def generate_message(self, param: str = "") -> str:
+    def generate_message(self, *args) -> str:
         pass
 
     @abstractmethod
@@ -26,20 +26,20 @@ class AbstractBuiltinAlarm(Plugin, metaclass=ABCMeta):
     def cancel_alarm(self, message: Message):
         pass
 
-    def alarm(self, post_to: str, message_argument: str = ""):
+    def alarm(self, post_to: str, *args):
         try:
             self.driver.channels.get_channel(post_to)
 
-            self.driver.create_post(post_to, self.generate_message(message_argument))
+            self.driver.create_post(post_to, self.generate_message(args))
         except ResourceNotFound:
-            self.driver.direct_message(post_to, self.generate_message(message_argument))
+            self.driver.direct_message(post_to, self.generate_message(args))
 
-    def schedule_alarm(self, ctx: AlarmContext, recovery_mode: bool = False):
+    def schedule_alarm(self, ctx: AlarmContext, recovery_mode: bool = False, *args):
         if self.is_alarm_already_scheduled(ctx) is False:
             try:
                 constant.CHANNEL_ALARM_SCHEDULER.add_job(
                     id=ctx.job_id,
-                    func=lambda: self.alarm(ctx.post_to, message_argument=ctx.message_argument),
+                    func=lambda: self.alarm(ctx.post_to, args),
                     trigger='cron',
                     day_of_week=ctx.day,
                     hour=ctx.hour,

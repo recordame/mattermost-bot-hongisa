@@ -24,7 +24,12 @@ class WeatherAlarm(AbstractBuiltinAlarm):
         super().__init__()
         self.add_builtin_alarm(self.name, self)
 
-    def generate_message(self, loc: str = "성남시금광동"):
+    def generate_message(self, *args):
+        loc: str = args[0][0][0]
+
+        if loc is None:
+            loc = "성남시금광동"
+
         info = load_web_page(loc)
         msg = extract_today_weather_information(info) + \
               "\n-----------------------------\n" \
@@ -148,7 +153,8 @@ def extract_today_weather_information(info: str):
 
     today = datetime.now()
 
-    msg = "%s **`%s`** 날씨정보" % (today.strftime("%Y년 %m월 %d일 %H시"), location) + \
+    msg = "@here `%s`\n" % today.strftime("%Y년 %m월 %d일 %H시") + \
+          "**`%s`** 날씨정보" % location + \
           "\n\n-----------------------------\n" + \
           "**현재 날씨**는 %s이고,\n**기온**은 `%s`로 어제보다 %s.\n오늘 **최저** `%s`, **최고** `%s`로 예상돼요.\n* 미세먼지 %s\n* 초미세먼지 %s" \
           % (status, temp, temp_yesterday, temp_lowest, temp_highest, add_icon(fine_particle), add_icon(ultra_fine_particle))
