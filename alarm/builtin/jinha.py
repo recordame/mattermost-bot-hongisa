@@ -18,18 +18,27 @@ class JinhaAlarm(AbstractBuiltinAlarm):
         self.add_builtin_alarm(self.name, self)
 
     def generate_message(self, option: str = ''):
-        jinha_birth_day = datetime.strptime('2022-12-19', '%Y-%m-%d')
+        jinha_birth_day = datetime(2022, 12, 19)
         today = datetime.now()
-
         days_after_birth = (today - jinha_birth_day).days + 1
 
-        age_year = days_after_birth / 365
-        age_month = ((days_after_birth % 365) / 30).__str__()[:3]
+        month_count = 0
+        days_count = 0
+        for year in range(2023, today.year + 1):
+            for month in range(1, 13):
+                if datetime(year, month, 19) < datetime(today.year, today.month, today.day):
+                    month_count += 1
+                else:
+                    days_count = (datetime(today.year, today.month, today.day) - datetime(year, month - 1, 19)).days
+
+        age_year = month_count / 12
+        age_month = month_count
+        age_day = days_count
 
         if age_year >= 3:
             age_str = '%d년 %s개월' % (age_year, age_month)
         else:
-            age_str = '%s개월' % age_month
+            age_str = '%s개월 %s일' % (age_month, age_day)
 
         msg = '@here `%s`\n오늘은 **진하**:baby:가 태어난지 %s일째(%s) 되는 날!' \
               % (today.strftime('%Y년 %m월 %d일'), days_after_birth, age_str)

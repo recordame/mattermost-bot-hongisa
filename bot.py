@@ -8,7 +8,6 @@ from alarm.builtin.jinha import JinhaAlarm
 from alarm.builtin.kordle import KordleAlarm
 from alarm.builtin.mass import MassAlarm
 from alarm.builtin.medicine import MedicineAlarm
-from alarm.builtin.random import RandomAlarm
 from alarm.builtin.weather import WeatherAlarm
 from alarm.command.alarm_list import Alarms
 from alarm.custom.channel_alarm import ChannelAlarm
@@ -40,8 +39,7 @@ bot = Bot(
         CurrencyAlarm(),
         ChannelAlarm(),
         UserAlarm(),
-        JinhaAlarm(),
-        RandomAlarm()
+        JinhaAlarm()
     ],
 )
 

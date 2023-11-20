@@ -31,7 +31,6 @@ def load_channel_alarms_from_file():
     mass_alarm = getattr(sys.modules['alarm.builtin.mass'], 'MassAlarm')
     medicine_alarm = getattr(sys.modules['alarm.builtin.medicine'], 'MedicineAlarm')
     jinha_alarm = getattr(sys.modules['alarm.builtin.jinha'], 'JinhaAlarm')
-    random_alarm = getattr(sys.modules['alarm.builtin.random'], 'RandomAlarm')
     channel_alarm = getattr(sys.modules['alarm.custom.channel_alarm'], 'ChannelAlarm')
 
     for channel in alarm_json:
@@ -78,11 +77,6 @@ def load_channel_alarms_from_file():
                     message,
                     alarm['hour'],
                     alarm['minute'],
-                    recovery_mode
-                )
-            elif alarm_id == 'random':
-                random_alarm.add_alarm(
-                    message,
                     recovery_mode
                 )
             else:
