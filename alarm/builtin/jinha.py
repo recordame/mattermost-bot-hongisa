@@ -29,7 +29,7 @@ class JinhaAlarm(AbstractBuiltinAlarm):
                 if datetime(year, month, 19) < datetime(today.year, today.month, today.day):
                     month_count += 1
                 else:
-                    days_count = (datetime(today.year, today.month, today.day) - datetime(year, month - 1, 19)).days
+                    days_count = (datetime(today.year, today.month, today.day) - datetime(year, month - 1, 19)).days + 1
 
         age_year = month_count / 12
         age_month = month_count
