@@ -1,9 +1,8 @@
-import urllib
-from urllib.request import Request, urlopen
+import datetime
 
-import bs4
 import urllib3
 from mmpy_bot import Plugin, listen_to, Message
+from sphinx.util import requests
 
 urllib3.disable_warnings()
 
@@ -23,29 +22,47 @@ class CurrencyAlarm(Plugin):
 
 ########################
 
-# 네이버 환율
+# 서울외국환 중계소
 def get_info():
-    url: str = 'https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=1&ie=utf8&query=' + urllib.parse.quote(
-        '환율')
+    today = datetime.datetime.now().strftime('%Y-%m-%d')
+    url: str = 'http://www.smbs.biz/Flash/TodayExRate_flash.jsp?tr_date=' + today
 
-    req = Request(url)
-    page = urlopen(req)
-    html = page.read().decode('utf-8')
-    soup = bs4.BeautifulSoup(html, 'html.parser')
+    result = extract_currency(requests.get(url).text)
 
-    return soup
+    for days in range(1, 10):
+        if result is not None:
+            return result
+        else:
+            one_day_before = (datetime.datetime.now() - datetime.timedelta(days=days)).strftime('%Y-%m-%d')
+            url = 'http://www.smbs.biz/Flash/TodayExRate_flash.jsp?tr_date=' + one_day_before
+
+            result = extract_currency(requests.get(url).text)
 
 
 # 미국 원달러 환율 정보 추출
 def extract_currency(info: str):
-    won_dollar: str
-    raw_info = info.find('span', class_='spt_con dw').text.strip(' ').replace('  ', ' ')
+    result: str = ''
 
-    try:
-        index = raw_info.find(' 전일대비하락')
-        won_dollar = f'- 지수: `{raw_info[:index]}`원\n- 전일: `{raw_info[(index + " 전일대비하락".__len__()):].replace(" ", "▼")}`'
-    except:
-        index = raw_info.find(' 전일대비상승')
-        won_dollar = f'- 지수: `{raw_info[:index]}`원\n- 전일: `{raw_info[(index + " 전일대비상승".__len__()):].replace(" ", "▲")}`'
+    if info.replace('\r', '').replace('\n', '') == '?test0=test&updown=0&loading=ok&':
+        return None
 
-    return won_dollar
+    # updown=0&USD=1,303.80&updown1=0&&diff1 =3.6
+    idx_start = info.index('USD')
+    info = info[idx_start:]
+    idx_diff = info.index('diff')
+    idx_end = info.find('&', idx_diff)
+
+    info = info[:idx_end + 1]
+
+    # USD=1,303.80&updown1=0&&diff1=3.2
+    info = info.replace('&&', '&')
+
+    # USD=1,303.80&updown1=0&diff1=3.2
+    info_list = info.split('&')
+
+    # [USD=1,303.80, updown1=0, diff1=3.2]
+    result += f'원달러 환율: {info_list[0][info_list[0].index("=") + 1:]}원'
+    result += f'{"▲" if info_list[1][info_list[1].index("=") + 1:] == "0" else "▼"}'
+    result += f'{info_list[2][info_list[2].index("=") + 1:]}'
+
+    return result
