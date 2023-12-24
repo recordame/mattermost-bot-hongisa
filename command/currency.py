@@ -8,8 +8,7 @@ urllib3.disable_warnings()
 
 
 def generate_msg():
-    info = get_info()
-    msg = '**오늘의 환율** :dollar:\n%s' % extract_currency(info)
+    msg = '**오늘의 환율** :dollar:\n%s' % get_info()
 
     return msg
 
@@ -24,17 +23,14 @@ class CurrencyAlarm(Plugin):
 
 # 서울외국환 중계소
 def get_info():
-    today = datetime.datetime.now().strftime('%Y-%m-%d')
-    url: str = 'http://www.smbs.biz/Flash/TodayExRate_flash.jsp?tr_date=' + today
+    result = None
 
-    result = extract_currency(requests.get(url).text)
-
-    for days in range(1, 10):
+    for days in range(0, 10):
         if result is not None:
             return result
         else:
-            one_day_before = (datetime.datetime.now() - datetime.timedelta(days=days)).strftime('%Y-%m-%d')
-            url = 'http://www.smbs.biz/Flash/TodayExRate_flash.jsp?tr_date=' + one_day_before
+            target_date = (datetime.datetime.now() - datetime.timedelta(days=days)).strftime('%Y-%m-%d')
+            url = 'http://www.smbs.biz/Flash/TodayExRate_flash.jsp?tr_date=' + target_date
 
             result = extract_currency(requests.get(url).text)
 
@@ -43,7 +39,9 @@ def get_info():
 def extract_currency(info: str):
     result: str = ''
 
-    if info.replace('\r', '').replace('\n', '') == '?test0=test&updown=0&loading=ok&':
+    info = info.replace('\r', '').replace('\n', '')
+    print(info)
+    if info == '?test0=test&updown=0&loading=ok&':
         return None
 
     # updown=0&USD=1,303.80&updown1=0&&diff1 =3.6
@@ -61,8 +59,9 @@ def extract_currency(info: str):
     info_list = info.split('&')
 
     # [USD=1,303.80, updown1=0, diff1=3.2]
-    result += f'원달러 환율: {info_list[0][info_list[0].index("=") + 1:]}원'
-    result += f'{"▲" if info_list[1][info_list[1].index("=") + 1:] == "0" else "▼"}'
-    result += f'{info_list[2][info_list[2].index("=") + 1:]}'
+    result += (f'- 원달러 환율: {info_list[0][info_list[0].index("=") + 1:]}원\n'
+               f'- 전일대비: '
+               f'{"▲" if info_list[1][info_list[1].index("=") + 1:] == "0" else "▼"}'
+               f'{info_list[2][info_list[2].index("=") + 1:]}원')
 
     return result
