@@ -14,6 +14,7 @@ from alarm.custom.channel_alarm import ChannelAlarm
 from alarm.custom.user_alarm import UserAlarm
 from command.currency import CurrencyAlarm
 from command.help import Help
+from command.the_more import TheMore
 from common import constant
 
 ssl._create_default_https_context = ssl._create_unverified_context
@@ -39,7 +40,8 @@ bot = Bot(
         CurrencyAlarm(),
         ChannelAlarm(),
         UserAlarm(),
-        JinhaAlarm()
+        JinhaAlarm(),
+        TheMore()
     ],
 )
 

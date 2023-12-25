@@ -1,6 +1,5 @@
 import re
 from abc import ABCMeta, abstractmethod
-from datetime import datetime
 
 from apscheduler.job import Job
 from apscheduler.schedulers.background import BackgroundScheduler

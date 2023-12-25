@@ -1,9 +1,7 @@
 import json
 import sys
-from datetime import datetime, timedelta
-from mmpy_bot import Message
 
-from common import constant
+from mmpy_bot import Message
 
 
 def get_alarms(alarm_type: str, alarm_contexts: dict):
