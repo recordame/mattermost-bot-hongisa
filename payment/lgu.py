@@ -56,12 +56,14 @@ class LGU(Plugin):
                     logging.info('LG U+ 요금청구 페이지 호출')
                     update_post(self.driver, post_to_update, f'[{display_progress(step, last_step)}] LG U+ 요금청구 페이지 호출')
                     chrome_driver.get(url)
+                    time.sleep(5)
 
                     break
                 except Exception as e:
                     logging.info(e)
 
                     step -= 1
+                    time.sleep(1)
                     continue
 
             # 로그인 방법 선택 U+ID
@@ -73,6 +75,8 @@ class LGU(Plugin):
                     step += 1
 
                     chrome_driver.find_element(by=By.ID, value='_uid_236').click()
+                    time.sleep(3)
+
                     logging.info('U+ID 로그인 선택')
                     update_post(self.driver, post_to_update, f'[{display_progress(step, last_step)}] U+ID 로그인 선택')
 
@@ -81,7 +85,7 @@ class LGU(Plugin):
                     logging.info(e)
 
                     step -= 1
-                    time.sleep(0.5)
+                    time.sleep(1)
                     continue
 
             time.sleep(2)
@@ -104,23 +108,22 @@ class LGU(Plugin):
                     for btn in chrome_driver.find_elements(by=By.TAG_NAME, value='button'):
                         if btn.text.__contains__('로그인'):
                             btn.click()
+                            time.sleep(3)
 
                             logging.info('로그인 시도중')
                             update_post(self.driver, post_to_update, f'[{display_progress(step, last_step)}] 로그인 시도중')
 
-                            time.sleep(3)
-
                             found = True
                             break
                     if not found:
-                        raise BaseException('로그인 버튼 식별 실패')
+                        raise BaseException(self, '로그인 버튼 식별 실패')
 
                     break
                 except Exception as e:
                     logging.info(e)
 
                     step -= 1
-                    time.sleep(0.5)
+                    time.sleep(1)
                     continue
 
             # 요금바로 납부 선택
@@ -134,6 +137,7 @@ class LGU(Plugin):
                     for btn in chrome_driver.find_elements(by=By.TAG_NAME, value='button'):
                         if btn.text == '요금바로 납부':
                             btn.click()
+                            time.sleep(3)
 
                             logging.info('요금 바로 납부 요청')
                             update_post(self.driver, post_to_update, f'[{display_progress(step, last_step)}] 요금 바로 납부 요청')
@@ -141,14 +145,14 @@ class LGU(Plugin):
                             found = True
                             break
                     if not found:
-                        raise BaseException('요금바로 납부 버튼 식별 실패')
+                        raise BaseException(self, '요금바로 납부 버튼 식별 실패')
 
                     break
                 except Exception as e:
                     logging.info(e)
 
                     step -= 1
-                    time.sleep(0.5)
+                    time.sleep(1)
                     continue
 
             # 금액 확인
@@ -177,7 +181,7 @@ class LGU(Plugin):
                     logging.info(e)
 
                     step -= 1
-                    time.sleep(0.5)
+                    time.sleep(1)
                     continue
 
             step += 1

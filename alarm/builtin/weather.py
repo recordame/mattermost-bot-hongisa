@@ -1,3 +1,4 @@
+import time
 import urllib
 from datetime import datetime
 from urllib.request import urlopen, Request
@@ -82,6 +83,9 @@ def load_web_page(loc: str):
 
     req = Request(url)
     page = urlopen(req)
+
+    time.sleep(2)
+
     html = page.read().decode('utf-8')
     soup = bs4.BeautifulSoup(html, 'html.parser')
 

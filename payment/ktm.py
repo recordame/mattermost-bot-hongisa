@@ -56,12 +56,14 @@ class KTM(Plugin):
                     logging.info('KTM 요금청구 페이지 호출')
                     update_post(self.driver, post_to_update, f'[{display_progress(step, last_step)}] KTM 요금청구 페이지 호출')
                     chrome_driver.get(url)
+                    time.sleep(5)
 
                     break
                 except Exception as e:
                     logging.info(e)
 
                     step -= 1
+                    time.sleep(1)
                     continue
 
             # 로그인
@@ -72,8 +74,13 @@ class KTM(Plugin):
                 try:
                     step += 1
                     chrome_driver.find_element(by=By.ID, value='userId').send_keys('recordame')
+                    time.sleep(2)
+
                     chrome_driver.find_element(by=By.ID, value='passWord').send_keys('lkg0473PA!')
+                    time.sleep(2)
+
                     chrome_driver.find_element(by=By.ID, value='loginBtn').click()
+                    time.sleep(7)
 
                     logging.info('로그인 시도중')
                     update_post(self.driver, post_to_update, f'[{display_progress(step, last_step)}] 로그인 시도중')
@@ -83,7 +90,7 @@ class KTM(Plugin):
                     logging.info(e)
 
                     step -= 1
-                    time.sleep(0.5)
+                    time.sleep(1)
                     continue
 
             # SMS 인증을 요구 확인
@@ -111,11 +118,10 @@ class KTM(Plugin):
                 # 재로그인 시도
                 step += 1
                 chrome_driver.find_element(by=By.ID, value='loginBtn').click()
+                time.sleep(3)
 
                 logging.info('재로그인 중')
                 update_post(self.driver, post_to_update, f'[{display_progress(step, last_step)}] 재로그인 중')
-
-                time.sleep(3)
 
             except Exception as e:
                 logging.info(e)
@@ -145,7 +151,7 @@ class KTM(Plugin):
                     logging.info(e)
 
                     step -= 1
-                    time.sleep(0.5)
+                    time.sleep(1)
                     continue
 
             step += 1

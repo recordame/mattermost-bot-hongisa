@@ -31,7 +31,7 @@ class LiivM(Plugin):
         url = 'https://www.liivm.com/mypage/bill/bill/billPayment'
 
         chrome_options = Options()
-        # chrome_options.add_argument('headless')
+        chrome_options.add_argument('headless')
         chrome_options.add_argument('--disable-gpu')
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('disable-popup-blocking')
@@ -56,12 +56,14 @@ class LiivM(Plugin):
                     logging.info('리브엠 요금청구 페이지 호출')
                     update_post(self.driver, post_to_update, f'[{display_progress(step, last_step)}] 리브엠 요금청구 페이지 호출')
                     chrome_driver.get(url)
+                    time.sleep(5)
 
                     break
                 except Exception as e:
                     logging.info(e)
 
                     step -= 1
+                    time.sleep(1)
                     continue
 
             # 아이디 비밀번호 기반 로그인 텝으로 이동
@@ -113,6 +115,7 @@ class LiivM(Plugin):
                     step += 1
 
                     chrome_driver.find_element(by=By.ID, value='btnIdLogin').click()
+                    time.sleep(3)
 
                     logging.info('로그인 시도중')
                     update_post(self.driver, post_to_update, f'[{display_progress(step, last_step)}] 로그인 시도중')
@@ -134,6 +137,7 @@ class LiivM(Plugin):
                     step += 1
 
                     charge_to_pay = int(chrome_driver.find_element(by=By.ID, value='totBillAmt').text.replace('원', ''))
+                    time.sleep(1)
 
                     logging.info('금액 확인 중')
                     update_post(self.driver, post_to_update, f'[{display_progress(step, last_step)}] 금액 확인 중')

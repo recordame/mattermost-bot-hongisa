@@ -31,10 +31,8 @@ class AbstractBuiltinAlarm(Plugin, metaclass=ABCMeta):
 
     def alarm(self, post_to: str, *args):
         try:
-            self.driver.channels.get_channel(post_to)
-
             self.driver.create_post(post_to, self.generate_message(args))
-        except ResourceNotFound:
+        except Exception:
             self.driver.direct_message(post_to, self.generate_message(args))
 
     def schedule_alarm(self, ctx: AlarmContext, recovery_mode: bool = False, *args):
