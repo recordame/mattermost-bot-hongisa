@@ -4,6 +4,7 @@ import ssl
 import urllib3
 from mmpy_bot import Bot, Settings
 
+from alarm.alarm_util import load_channel_alarms_from_file, load_user_alarms_from_file
 from alarm.builtin.jinha import JinhaAlarm
 from alarm.builtin.kordle import KordleAlarm
 from alarm.builtin.mass import MassAlarm
@@ -51,13 +52,13 @@ bot = Bot(
 )
 
 # 알람을 위한 백그라운드 스케쥴 시작
-# constant.CHANNEL_ALARM_SCHEDULER.start()
+constant.CHANNEL_ALARM_SCHEDULER.start()
 
 # 사용자 정의 알람을 위한 백그라운드 스케쥴 시작
-# constant.USER_ALARM_SCHEDULER.start()
+constant.USER_ALARM_SCHEDULER.start()
 
-# load_channel_alarms_from_file()
-# load_user_alarms_from_file()
+load_channel_alarms_from_file()
+load_user_alarms_from_file()
 
 # 로봇 서비스 시작
 bot.run()
