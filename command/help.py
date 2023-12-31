@@ -1,4 +1,7 @@
+import urllib3
 from mmpy_bot import Message, Plugin, listen_to
+
+urllib3.disable_warnings()
 
 
 class Help(Plugin):

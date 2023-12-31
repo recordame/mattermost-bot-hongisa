@@ -1,7 +1,10 @@
+import urllib3
 from mmpy_bot import Message, Plugin, listen_to
 
 from alarm.alarm_util import get_alarms
 from common import constant
+
+urllib3.disable_warnings()
 
 
 class Alarms(Plugin):
@@ -16,7 +19,8 @@ class Alarms(Plugin):
 
     @listen_to('^채널알람목록$')
     def get_channel_alarms(self, message: Message):
-        msg = get_alarms('채널', constant.CHANNEL_ALARMS)
+        msg = get_urllib3.disable_warnings()
+        alarms('채널', constant.CHANNEL_ALARMS)
         self.driver.direct_message(message.user_id, msg)
 
     @listen_to('^개인알람목록$')

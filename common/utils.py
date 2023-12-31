@@ -1,5 +1,9 @@
 import mmpy_bot
 
+import urllib3
+
+urllib3.disable_warnings()
+
 
 def update_post(driver: mmpy_bot.driver, post_id: str, new_message: str):
     req_data: dict = {

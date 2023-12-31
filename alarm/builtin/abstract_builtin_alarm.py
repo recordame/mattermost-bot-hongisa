@@ -1,5 +1,6 @@
 from abc import ABCMeta, abstractmethod
 
+import urllib3
 from mattermostdriver.exceptions import ResourceNotFound
 from mmpy_bot import Message
 from mmpy_bot import Plugin
@@ -7,6 +8,8 @@ from mmpy_bot import Plugin
 from alarm.alarm_context import AlarmContext
 from alarm.alarm_util import save_alarms_to_file_in_json
 from common import constant
+
+urllib3.disable_warnings()
 
 
 class AbstractBuiltinAlarm(Plugin, metaclass=ABCMeta):

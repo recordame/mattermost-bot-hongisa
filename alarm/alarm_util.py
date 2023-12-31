@@ -1,7 +1,10 @@
 import json
 import sys
 
+import urllib3
 from mmpy_bot import Message
+
+urllib3.disable_warnings()
 
 
 def get_alarms(alarm_type: str, alarm_contexts: dict):

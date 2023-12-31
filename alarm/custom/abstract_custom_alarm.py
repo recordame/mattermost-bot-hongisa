@@ -1,6 +1,7 @@
 import re
 from abc import ABCMeta, abstractmethod
 
+import urllib3
 from apscheduler.job import Job
 from apscheduler.schedulers.background import BackgroundScheduler
 from mmpy_bot import Plugin
@@ -8,6 +9,8 @@ from mmpy_bot import Plugin
 from alarm.alarm_context import AlarmContext
 from alarm.alarm_util import save_alarms_to_file_in_json
 from common import constant
+
+urllib3.disable_warnings()
 
 
 class AbstractCustomAlarm(Plugin, metaclass=ABCMeta):

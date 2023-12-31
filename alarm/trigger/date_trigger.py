@@ -1,6 +1,9 @@
 import datetime
 
+import urllib3
 from apscheduler.triggers.base import BaseTrigger
+
+urllib3.disable_warnings()
 
 
 class CustomTrigger(BaseTrigger):

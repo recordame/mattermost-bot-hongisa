@@ -1,8 +1,11 @@
+import urllib3
 from mmpy_bot import Message, listen_to
 
 from alarm.alarm_context import AlarmContextBuilder
 from alarm.custom.abstract_custom_alarm import AbstractCustomAlarm
 from common import constant
+
+urllib3.disable_warnings()
 
 
 class UserAlarm(AbstractCustomAlarm):

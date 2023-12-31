@@ -1,10 +1,13 @@
 import datetime
 
+import urllib3
 from mmpy_bot import listen_to, Message
 
 from alarm.alarm_context import AlarmContextBuilder
 from alarm.builtin.abstract_builtin_alarm import AbstractBuiltinAlarm
 from common import constant
+
+urllib3.disable_warnings()
 
 
 class KordleAlarm(AbstractBuiltinAlarm):
