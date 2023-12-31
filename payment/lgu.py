@@ -6,6 +6,8 @@ from mmpy_bot import Plugin, listen_to, Message
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.support.wait import WebDriverWait
 
 from common.utils import update_post, display_progress
 
@@ -56,14 +58,11 @@ class LGU(Plugin):
                     logging.info('LG U+ 요금청구 페이지 호출')
                     update_post(self.driver, post_to_update, f'[{display_progress(step, last_step)}] LG U+ 요금청구 페이지 호출')
                     chrome_driver.get(url)
-                    time.sleep(5)
 
                     break
                 except Exception as e:
                     logging.info(e)
-
                     step -= 1
-                    time.sleep(1)
                     continue
 
             # 로그인 방법 선택 U+ID
@@ -73,9 +72,7 @@ class LGU(Plugin):
 
                 try:
                     step += 1
-
-                    chrome_driver.find_element(by=By.ID, value='_uid_236').click()
-                    time.sleep(3)
+                    WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, '_uid_236'))).click()
 
                     logging.info('U+ID 로그인 선택')
                     update_post(self.driver, post_to_update, f'[{display_progress(step, last_step)}] U+ID 로그인 선택')
@@ -83,12 +80,8 @@ class LGU(Plugin):
                     break
                 except Exception as e:
                     logging.info(e)
-
                     step -= 1
-                    time.sleep(1)
                     continue
-
-            time.sleep(2)
 
             # 로그인
             for retry in range(max_retry):
@@ -99,11 +92,11 @@ class LGU(Plugin):
                     step += 1
                     found = False
 
-                    chrome_driver.find_element(by=By.ID, value='username-1-6').clear()
-                    chrome_driver.find_element(by=By.ID, value='password-1').clear()
+                    WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, 'username-1-6'))).clear()
+                    WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, 'password-1'))).clear()
 
-                    chrome_driver.find_element(by=By.ID, value='username-1-6').send_keys('recordame@naver.com')
-                    chrome_driver.find_element(by=By.ID, value='password-1').send_keys('lkg0473PA!')
+                    WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, 'username-1-6'))).send_keys('recordame@naver.com')
+                    WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, 'password-1'))).send_keys('lkg0473PA!')
 
                     for btn in chrome_driver.find_elements(by=By.TAG_NAME, value='button'):
                         if btn.text.__contains__('로그인'):
@@ -116,14 +109,12 @@ class LGU(Plugin):
                             found = True
                             break
                     if not found:
-                        raise BaseException(self, '로그인 버튼 식별 실패')
+                        raise Exception(self, '로그인 버튼 식별 실패')
 
                     break
                 except Exception as e:
                     logging.info(e)
-
                     step -= 1
-                    time.sleep(1)
                     continue
 
             # 요금바로 납부 선택
@@ -140,23 +131,19 @@ class LGU(Plugin):
                             time.sleep(3)
 
                             logging.info('요금 바로 납부 요청')
-                            update_post(self.driver, post_to_update, f'[{display_progress(step, last_step)}] 요금 바로 납부 요청')
+                            update_post(self.driver, post_to_update, f'[{display_progress(step, last_step)}] 요금바로 납부 요청')
 
                             found = True
                             break
                     if not found:
-                        raise BaseException(self, '요금바로 납부 버튼 식별 실패')
-
+                        raise Exception(self, '요금바로 납부 버튼 식별 실패')
                     break
                 except Exception as e:
                     logging.info(e)
-
                     step -= 1
-                    time.sleep(1)
                     continue
 
             # 금액 확인
-            time.sleep(2)
             for retry in range(max_retry):
                 if retry == max_retry - 1:
                     return -1
@@ -164,7 +151,8 @@ class LGU(Plugin):
                 try:
                     step += 1
                     try:
-                        charge_to_pay = int(chrome_driver.find_element(by=By.CLASS_NAME, value='pay-total-txt').text.replace('원', ''))
+
+                        charge_to_pay = int(WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.CLASS_NAME, 'pay-total-txt'))).text.replace('원', ''))
                     except ValueError:
                         charge_to_pay = 0
 
@@ -175,13 +163,10 @@ class LGU(Plugin):
                         pass
                     else:
                         pass
-
                     break
                 except Exception as e:
                     logging.info(e)
-
                     step -= 1
-                    time.sleep(1)
                     continue
 
             step += 1

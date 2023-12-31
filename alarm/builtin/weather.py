@@ -25,7 +25,7 @@ class WeatherAlarm(AbstractBuiltinAlarm):
         self.add_builtin_alarm(self.name, self)
 
     def generate_message(self, *args):
-        loc: str = args[0][0][0]
+        loc: str = args[0][0]
 
         if loc is None:
             loc = "성남시금광동"
@@ -83,8 +83,6 @@ def load_web_page(loc: str):
 
     req = Request(url)
     page = urlopen(req)
-
-    time.sleep(2)
 
     html = page.read().decode('utf-8')
     soup = bs4.BeautifulSoup(html, 'html.parser')

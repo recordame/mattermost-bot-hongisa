@@ -6,6 +6,8 @@ from mmpy_bot import Plugin, listen_to, Message
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.support.wait import WebDriverWait
 
 from common.utils import update_post, display_progress
 
@@ -56,14 +58,11 @@ class LiivM(Plugin):
                     logging.info('리브엠 요금청구 페이지 호출')
                     update_post(self.driver, post_to_update, f'[{display_progress(step, last_step)}] 리브엠 요금청구 페이지 호출')
                     chrome_driver.get(url)
-                    time.sleep(5)
 
                     break
                 except Exception as e:
                     logging.info(e)
-
                     step -= 1
-                    time.sleep(1)
                     continue
 
             # 아이디 비밀번호 기반 로그인 텝으로 이동
@@ -73,7 +72,7 @@ class LiivM(Plugin):
 
                 try:
                     step += 1
-                    chrome_driver.find_element(by=By.ID, value='loginT3').click()
+                    WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, 'loginT3'))).click()
 
                     logging.info('로그인 페이지 이동')
                     update_post(self.driver, post_to_update, f'[{display_progress(step, last_step)}] 로그인 페이지 이동')
@@ -81,7 +80,6 @@ class LiivM(Plugin):
                     break
                 except Exception as e:
                     logging.info(e)
-
                     step -= 1
                     continue
 
@@ -93,8 +91,8 @@ class LiivM(Plugin):
                 try:
                     step += 1
 
-                    chrome_driver.find_element(by=By.ID, value='loginUserId').send_keys('recordame')
-                    chrome_driver.find_element(by=By.ID, value='loginUserIdPw').send_keys('hahows1003!')
+                    WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, 'loginUserId'))).send_keys('recordame')
+                    WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, 'loginUserIdPw'))).send_keys('hahows1003!')
 
                     logging.info('계정정보 입력')
                     update_post(self.driver, post_to_update, f'[{display_progress(step, last_step)}] 계정정보 입력 완료')
@@ -102,7 +100,6 @@ class LiivM(Plugin):
                     break
                 except Exception as e:
                     logging.info(e)
-
                     step -= 1
                     continue
 
@@ -114,8 +111,7 @@ class LiivM(Plugin):
                 try:
                     step += 1
 
-                    chrome_driver.find_element(by=By.ID, value='btnIdLogin').click()
-                    time.sleep(3)
+                    WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, 'btnIdLogin'))).click()
 
                     logging.info('로그인 시도중')
                     update_post(self.driver, post_to_update, f'[{display_progress(step, last_step)}] 로그인 시도중')
@@ -123,9 +119,7 @@ class LiivM(Plugin):
                     break
                 except Exception as e:
                     logging.info(e)
-
                     step -= 1
-                    time.sleep(0.5)
                     continue
 
             # 금액 확인
@@ -136,8 +130,7 @@ class LiivM(Plugin):
                 try:
                     step += 1
 
-                    charge_to_pay = int(chrome_driver.find_element(by=By.ID, value='totBillAmt').text.replace('원', ''))
-                    time.sleep(1)
+                    charge_to_pay = int(WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, 'totBillAmt'))).text.replace('원', ''))
 
                     logging.info('금액 확인 중')
                     update_post(self.driver, post_to_update, f'[{display_progress(step, last_step)}] 금액 확인 중')
@@ -150,9 +143,7 @@ class LiivM(Plugin):
                     break
                 except Exception as e:
                     logging.info(e)
-
                     step -= 1
-                    time.sleep(0.5)
                     continue
 
             step += 1
