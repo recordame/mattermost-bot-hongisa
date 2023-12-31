@@ -1,5 +1,6 @@
 import logging
 import time
+from typing import Tuple
 
 import urllib3
 from mmpy_bot import Plugin, listen_to, Message
@@ -58,6 +59,7 @@ class LGU(Plugin):
                     logging.info('LG U+ 요금청구 페이지 호출')
                     update_post(self.driver, post_to_update, f'[{display_progress(step, last_step)}] LG U+ 요금청구 페이지 호출')
                     chrome_driver.get(url)
+                    WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, '_uid_236')))
 
                     break
                 except Exception as e:
@@ -101,8 +103,6 @@ class LGU(Plugin):
                     for btn in chrome_driver.find_elements(by=By.TAG_NAME, value='button'):
                         if btn.text.__contains__('로그인'):
                             btn.click()
-                            time.sleep(3)
-
                             logging.info('로그인 시도중')
                             update_post(self.driver, post_to_update, f'[{display_progress(step, last_step)}] 로그인 시도중')
 

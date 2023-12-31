@@ -54,10 +54,12 @@ class KTM(Plugin):
 
                 try:
                     step += 1
+                    chrome_driver.get(url)
+                    time.sleep(5)
 
                     logging.info('KTM 요금청구 페이지 호출')
                     update_post(self.driver, post_to_update, f'[{display_progress(step, last_step)}] KTM 요금청구 페이지 호출')
-                    chrome_driver.get(url)
+
                     break
                 except Exception as e:
                     logging.info(e)
@@ -65,16 +67,17 @@ class KTM(Plugin):
                     continue
 
             # 로그인
-            time.sleep(3)
             for retry in range(max_retry):
                 if retry == max_retry - 1:
                     return -1
 
                 try:
                     step += 1
-                    WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, 'userId'))).send_keys('recordame')
-                    WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, 'passWord'))).send_keys('lkg0473PA!')
-                    WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, 'loginBtn'))).click()
+                    WebDriverWait(chrome_driver, 10).until(lambda x: x.find_element(By.ID, 'userId')).send_keys(
+                        'recordame')
+                    WebDriverWait(chrome_driver, 10).until(lambda x: x.find_element(By.ID, 'passWord')).send_keys(
+                        'lkg0473PA!')
+                    WebDriverWait(chrome_driver, 10).until(lambda x: x.find_element(By.ID, 'loginBtn')).click()
 
                     logging.info('로그인 시도중')
                     update_post(self.driver, post_to_update, f'[{display_progress(step, last_step)}] 로그인 시도중')
@@ -87,7 +90,8 @@ class KTM(Plugin):
 
             # SMS 인증을 요구 확인
             try:
-                WebDriverWait(chrome_driver, 5).until(expected_conditions.visibility_of_element_located((By.CLASS_NAME, 'c-button--w460'))).click()
+                WebDriverWait(chrome_driver, 5).until(
+                    expected_conditions.visibility_of_element_located((By.CLASS_NAME, 'c-button--w460'))).click()
                 last_step = 9
                 step += 1
 
@@ -96,14 +100,16 @@ class KTM(Plugin):
 
                 # SMS 인증 취소
                 step += 1
-                WebDriverWait(chrome_driver, 5).until(expected_conditions.visibility_of_element_located((By.ID, 'smsClosePopBtn'))).click()
+                WebDriverWait(chrome_driver, 5).until(
+                    expected_conditions.visibility_of_element_located((By.ID, 'smsClosePopBtn'))).click()
 
                 logging.info('SMS 인증 취소 중')
                 update_post(self.driver, post_to_update, f'[{display_progress(step, last_step)}] SMS 인증 취소 중')
 
                 # 재로그인 시도
                 step += 1
-                WebDriverWait(chrome_driver, 5).until(expected_conditions.visibility_of_element_located((By.ID, 'loginBtn'))).click()
+                WebDriverWait(chrome_driver, 5).until(
+                    expected_conditions.visibility_of_element_located((By.ID, 'loginBtn'))).click()
 
                 logging.info('재로그인 중')
                 update_post(self.driver, post_to_update, f'[{display_progress(step, last_step)}] 재로그인 중')
@@ -119,7 +125,8 @@ class KTM(Plugin):
                 try:
                     step += 1
 
-                    charge_to_pay = int(WebDriverWait(chrome_driver, 5).until(expected_conditions.visibility_of_element_located((By.ID, 'totalCnt'))).text.replace('원', ''))
+                    charge_to_pay = int(WebDriverWait(chrome_driver, 5).until(
+                        expected_conditions.visibility_of_element_located((By.ID, 'totalCnt'))).text.replace('원', ''))
 
                     logging.info('금액 확인 중')
                     update_post(self.driver, post_to_update, f'[{display_progress(step, last_step)}] 금액 확인 중')
