@@ -32,7 +32,7 @@ bot = Bot(
         BOT_TOKEN=constant.BOT_TOKEN,
         BOT_TEAM=constant.BOT_TEAM,
         SSL_VERIFY=False,
-        LOG_FILE='./bot.log',
+        LOG_FILE='bot.log',
     ),
     plugins=[
         KordleAlarm(),

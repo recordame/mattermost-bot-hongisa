@@ -73,14 +73,13 @@ class KTM(Plugin):
 
                 try:
                     step += 1
-                    WebDriverWait(chrome_driver, 10).until(lambda x: x.find_element(By.ID, 'userId')).send_keys(
-                        'recordame')
-                    WebDriverWait(chrome_driver, 10).until(lambda x: x.find_element(By.ID, 'passWord')).send_keys(
-                        'lkg0473PA!')
+                    WebDriverWait(chrome_driver, 10).until(lambda x: x.find_element(By.ID, 'userId')).send_keys('recordame')
+                    WebDriverWait(chrome_driver, 10).until(lambda x: x.find_element(By.ID, 'passWord')).send_keys('lkg0473PA!')
                     WebDriverWait(chrome_driver, 10).until(lambda x: x.find_element(By.ID, 'loginBtn')).click()
 
                     logging.info('로그인 시도중')
                     update_post(self.driver, post_to_update, f'[{display_progress(step, last_step)}] 로그인 시도중')
+                    time.sleep(3)
 
                     break
                 except Exception as e:
@@ -90,8 +89,9 @@ class KTM(Plugin):
 
             # SMS 인증을 요구 확인
             try:
-                WebDriverWait(chrome_driver, 5).until(
-                    expected_conditions.visibility_of_element_located((By.CLASS_NAME, 'c-button--w460'))).click()
+                WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.CLASS_NAME, 'c-button--w460'))).click()
+                time.sleep(5)
+
                 last_step = 9
                 step += 1
 
@@ -100,16 +100,17 @@ class KTM(Plugin):
 
                 # SMS 인증 취소
                 step += 1
-                WebDriverWait(chrome_driver, 5).until(
-                    expected_conditions.visibility_of_element_located((By.ID, 'smsClosePopBtn'))).click()
+
+                WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, 'smsClosePopBtn'))).click()
+                time.sleep(5)
 
                 logging.info('SMS 인증 취소 중')
                 update_post(self.driver, post_to_update, f'[{display_progress(step, last_step)}] SMS 인증 취소 중')
 
                 # 재로그인 시도
                 step += 1
-                WebDriverWait(chrome_driver, 5).until(
-                    expected_conditions.visibility_of_element_located((By.ID, 'loginBtn'))).click()
+                WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, 'loginBtn'))).click()
+                time.sleep(5)
 
                 logging.info('재로그인 중')
                 update_post(self.driver, post_to_update, f'[{display_progress(step, last_step)}] 재로그인 중')
@@ -125,8 +126,7 @@ class KTM(Plugin):
                 try:
                     step += 1
 
-                    charge_to_pay = int(WebDriverWait(chrome_driver, 5).until(
-                        expected_conditions.visibility_of_element_located((By.ID, 'totalCnt'))).text.replace('원', ''))
+                    charge_to_pay = int(WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, 'totalCnt'))).text.replace('원', ''))
 
                     logging.info('금액 확인 중')
                     update_post(self.driver, post_to_update, f'[{display_progress(step, last_step)}] 금액 확인 중')

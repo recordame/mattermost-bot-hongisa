@@ -1,12 +1,12 @@
 import logging
 import time
-from typing import Tuple
 
 import urllib3
 from mmpy_bot import Plugin, listen_to, Message
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.webelement import BaseWebElement
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 
@@ -59,7 +59,6 @@ class LGU(Plugin):
                     logging.info('LG U+ 요금청구 페이지 호출')
                     update_post(self.driver, post_to_update, f'[{display_progress(step, last_step)}] LG U+ 요금청구 페이지 호출')
                     chrome_driver.get(url)
-                    WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, '_uid_236')))
 
                     break
                 except Exception as e:
@@ -74,12 +73,27 @@ class LGU(Plugin):
 
                 try:
                     step += 1
-                    WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, '_uid_236'))).click()
+                    found = False
 
-                    logging.info('U+ID 로그인 선택')
-                    update_post(self.driver, post_to_update, f'[{display_progress(step, last_step)}] U+ID 로그인 선택')
+                    for img in chrome_driver.find_elements(by=By.TAG_NAME, value='img'):
+                        if img.get_attribute('alt') == 'u+ID':
+                            loging_btn = img.find_element(by=By.XPATH, value='..')
+                            loging_btn.click()
+                            found = True
+                            break
 
-                    break
+                    if found:
+                        time.sleep(3)
+
+                        logging.info('U+ID 로그인 선택')
+                        update_post(self.driver, post_to_update, f'[{display_progress(step, last_step)}] U+ID 로그인 선택')
+                        break
+                    else:
+                        logging.info('U+ID 로그인 찾기 실패')
+                        update_post(self.driver, post_to_update, f'[{display_progress(step, last_step)}] U+ID 로그인 찾기 실패')
+
+                        return -1
+
                 except Exception as e:
                     logging.info(e)
                     step -= 1
@@ -94,6 +108,8 @@ class LGU(Plugin):
                     step += 1
                     found = False
 
+                    time.sleep(1)
+
                     WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, 'username-1-6'))).clear()
                     WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, 'password-1'))).clear()
 
@@ -101,7 +117,7 @@ class LGU(Plugin):
                     WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, 'password-1'))).send_keys('lkg0473PA!')
 
                     for btn in chrome_driver.find_elements(by=By.TAG_NAME, value='button'):
-                        if btn.text.__contains__('로그인'):
+                        if btn.text.replace(' ','').replace('\n','').replace('\r','') == ('U+ID로그인'):
                             btn.click()
                             logging.info('로그인 시도중')
                             update_post(self.driver, post_to_update, f'[{display_progress(step, last_step)}] 로그인 시도중')
@@ -124,6 +140,8 @@ class LGU(Plugin):
                 try:
                     step += 1
                     found = False
+
+                    time.sleep(3)
 
                     for btn in chrome_driver.find_elements(by=By.TAG_NAME, value='button'):
                         if btn.text == '요금바로 납부':
