@@ -26,7 +26,6 @@ class JinhaAlarm(AbstractBuiltinAlarm):
         days_after_birth = (today - jinha_birth_day).days + 1
 
         month_count = 0
-        days_count = 0
         for year in range(2023, today.year + 1):
             for month in range(1, 13):
                 if datetime(year, month, 19) < datetime(today.year, today.month, today.day):
@@ -35,7 +34,10 @@ class JinhaAlarm(AbstractBuiltinAlarm):
         if jinha_birth_day.day <= today.day:
             days_count = today.day - jinha_birth_day.day + 1
         else:
-            days_count = (datetime(today.year, today.month, today.day) - datetime(today.year, today.month - 1, 19)).days
+            last_year = today.year if today.month - 1 != 0 else today.year - 1
+            last_month = (today.month - 1) if today.month - 1 != 0 else 12
+
+            days_count = (datetime(today.year, today.month, today.day) - datetime(last_year, last_month, 19)).days
 
         age_year = month_count / 12
         age_month = month_count
