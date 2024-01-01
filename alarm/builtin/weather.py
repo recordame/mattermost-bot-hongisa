@@ -1,4 +1,3 @@
-import time
 import urllib
 from datetime import datetime
 from urllib.request import urlopen, Request
@@ -79,7 +78,7 @@ def load_web_page(loc: str):
     if loc == '':
         url += urllib.parse.quote('날씨')
     else:
-        url += urllib.parse.quote(loc) + '+' + urllib.parse.quote('날씨')
+        url += urllib.parse.quote(loc) + urllib.parse.quote(' 날씨')
 
     req = Request(url)
     page = urlopen(req)
