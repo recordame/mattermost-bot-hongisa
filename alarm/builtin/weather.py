@@ -30,19 +30,17 @@ class WeatherAlarm(AbstractBuiltinAlarm):
             loc = "성남시금광동"
 
         info = load_web_page(loc)
-        msg = extract_today_weather_information(info) + \
-              '\n-----------------------------\n' + \
-              extract_tomorrow_weather_information(info)
+        msg = extract_today_weather_information(info) + '\n-------\n' + extract_tomorrow_weather_information(info)
 
         return msg
 
     @listen_to('^%s$' % name)
     def default_location(self, message: Message):
-        self.alarm(message.user_id, '성남시금광동')
+        self.driver.direct_message(message.user_id, self.generate_message(['성남시금광동']))
 
     @listen_to('^%s\\s([가-힣]+)$' % name)
     def direct(self, message: Message, location: str):
-        self.alarm(message.user_id, location.strip(' '))
+        self.driver.direct_message(message.user_id, self.generate_message([location.strip(' ')]))
 
     @listen_to(
         '^%s알람등록'
@@ -68,17 +66,9 @@ class WeatherAlarm(AbstractBuiltinAlarm):
 
 ##################################
 
-def load_web_page(loc: str):
-    if loc is None:
-        loc = ''
-
+def load_web_page(loc: str = '성남시금광동'):
     # 네이버 날씨
-    url: str = "https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=1&ie=utf8&query="
-
-    if loc == '':
-        url += urllib.parse.quote('날씨')
-    else:
-        url += urllib.parse.quote(loc) + urllib.parse.quote(' 날씨')
+    url: str = f'https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=1&ie=utf8&query={urllib.parse.quote(f"{loc}+날씨")}'
 
     req = Request(url)
     page = urlopen(req)

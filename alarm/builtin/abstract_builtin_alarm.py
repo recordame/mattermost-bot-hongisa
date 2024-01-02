@@ -31,8 +31,9 @@ class AbstractBuiltinAlarm(Plugin, metaclass=ABCMeta):
 
     def alarm(self, post_to: str, *args):
         try:
+            self.driver.channels.get_channel(post_to)
             self.driver.create_post(post_to, self.generate_message(args))
-        except Exception:
+        except:
             self.driver.direct_message(post_to, self.generate_message(args))
 
     def schedule_alarm(self, ctx: AlarmContext, recovery_mode: bool = False, *args):
@@ -73,6 +74,7 @@ class AbstractBuiltinAlarm(Plugin, metaclass=ABCMeta):
 
     def is_alarm_already_scheduled(self, ctx: AlarmContext) -> bool:
         job = constant.CHANNEL_ALARM_SCHEDULER.get_job(ctx.job_id)
+
 
         if job is not None:
             # 기존에 등록된 알람이 있는 경우, 기존 알람 정보 출력

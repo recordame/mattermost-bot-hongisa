@@ -1,4 +1,5 @@
 from datetime import datetime
+from datetime import datetime
 
 import urllib3
 from mmpy_bot import listen_to, Message
@@ -37,7 +38,7 @@ class JinhaAlarm(AbstractBuiltinAlarm):
             last_year = today.year if today.month - 1 != 0 else today.year - 1
             last_month = (today.month - 1) if today.month - 1 != 0 else 12
 
-            days_count = (datetime(today.year, today.month, today.day) - datetime(last_year, last_month, 19)).days
+            days_count = (datetime(today.year, today.month, today.day) - datetime(last_year, last_month, 19)).days + 1
 
         age_year = month_count / 12
         age_month = month_count

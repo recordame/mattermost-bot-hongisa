@@ -7,8 +7,8 @@ urllib3.disable_warnings()
 class Help(Plugin):
     @listen_to('^명령어$')
     def help(self, message: Message):
-        self.driver.direct_message(
-            message.user_id,
+        self.driver.reply_to(
+            message,
             '**채널알람**\n'
             '- **날씨**\n'
             '   - `날씨알람등록` `{지역}` `{시1,시2}` `{분}`\n'
