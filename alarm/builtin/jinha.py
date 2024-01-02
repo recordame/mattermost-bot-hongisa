@@ -1,5 +1,4 @@
 from datetime import datetime
-from datetime import datetime
 
 import urllib3
 from mmpy_bot import listen_to, Message
