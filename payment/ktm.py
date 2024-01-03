@@ -15,7 +15,7 @@ urllib3.disable_warnings()
 
 
 class KTM(Plugin):
-    step = 1
+    step = 0
     last_step = 6
     max_retry = 10
 
@@ -41,7 +41,7 @@ class KTM(Plugin):
         chrome_options.add_experimental_option("detach", True)
 
         with webdriver.Chrome(options=chrome_options) as chrome_driver:
-            self.step += 1
+            self.step = 1
 
             logging.info('크롬 드라이브 호출')
             reply_msg = self.driver.reply_to(message, f'[{display_progress(self.step, self.last_step)}] 크롬 드라이브 호출')
