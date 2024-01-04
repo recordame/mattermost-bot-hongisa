@@ -1,5 +1,5 @@
 import logging
-import time
+import os
 
 import urllib3
 from mmpy_bot import Plugin, listen_to, Message
@@ -18,6 +18,9 @@ class LiivM(Plugin):
     step = 0
     last_step = 7
     max_retry = 10
+
+    id = 'recordame'
+    password = 'hahows1003!'
 
     @listen_to('^더모아 리브엠$')
     def liiv_m(self, message: Message):
@@ -97,6 +100,10 @@ class LiivM(Plugin):
             logging.info('금액 확인 완료')
             update_post(self.driver, post_to_update, f'[{display_progress(self.step, self.last_step)}] 금액 확인 완료')
 
+            file = os.getcwd() + '/afterLogin-liivm.png'
+            chrome_driver.find_element(by=By.TAG_NAME, value='html').screenshot(file)
+            self.driver.reply_to(message, '', file_paths=[file])
+
         return charge_to_pay
 
     def login_liivm(self, chrome_driver, post_to_update):
@@ -126,8 +133,8 @@ class LiivM(Plugin):
             try:
                 self.step += 1
 
-                WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, 'loginUserId'))).send_keys('recordame')
-                WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, 'loginUserIdPw'))).send_keys('hahows1003!')
+                WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, 'loginUserId'))).send_keys(self.id)
+                WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, 'loginUserIdPw'))).send_keys(self.password)
 
                 logging.info('계정정보 입력')
                 update_post(self.driver, post_to_update, f'[{display_progress(self.step, self.last_step)}] 계정정보 입력 완료')

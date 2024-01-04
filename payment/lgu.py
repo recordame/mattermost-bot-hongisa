@@ -1,4 +1,5 @@
 import logging
+import os
 import time
 
 import urllib3
@@ -18,6 +19,9 @@ class LGU(Plugin):
     step = 0
     last_step = 8
     max_retry = 10
+
+    id = 'recordame@naver.com'
+    password = 'lkg0473PA!'
 
     @listen_to('^더모아 인터넷$')
     def internet(self, message: Message):
@@ -66,7 +70,9 @@ class LGU(Plugin):
                     continue
 
             # 로그인
-            self.login_lgu(chrome_driver, post_to_update)
+            self.login_lgu(chrome_driver, post_to_update, message)
+
+            time.sleep(3)
 
             # 요금바로 납부 선택
             for retry in range(self.max_retry):
@@ -75,8 +81,6 @@ class LGU(Plugin):
                 try:
                     self.step += 1
                     found = False
-
-                    time.sleep(3)
 
                     for btn in chrome_driver.find_elements(by=By.TAG_NAME, value='button'):
                         if btn.text == '요금바로 납부':
@@ -89,7 +93,6 @@ class LGU(Plugin):
                             found = True
                             break
                     if not found:
-                        print(chrome_driver.page_source)
                         raise Exception(self, '요금바로 납부 버튼 식별 실패')
                     break
                 except Exception as e:
@@ -105,7 +108,6 @@ class LGU(Plugin):
                 try:
                     self.step += 1
                     try:
-
                         charge_to_pay = int(WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.CLASS_NAME, 'pay-total-txt'))).text.replace('원', ''))
                     except ValueError:
                         charge_to_pay = 0
@@ -128,9 +130,15 @@ class LGU(Plugin):
             logging.info('금액 확인 완료')
             update_post(self.driver, post_to_update, f'[{display_progress(self.step, self.last_step)}] 금액 확인 완료')
 
+            file = os.getcwd() + 'afterLogin-lgu.png'
+            chrome_driver.find_element(by=By.TAG_NAME, value='html').screenshot(file)
+            self.driver.reply_to(message, '', file_paths=[file])
+
         return charge_to_pay
 
-    def login_lgu(self, chrome_driver, post_to_update):
+    def login_lgu(self, chrome_driver, post_to_update, message):
+        time.sleep(3)
+
         # 로그인 방법 선택 U+ID
         for retry in range(self.max_retry):
             if retry == self.max_retry - 1:
@@ -178,8 +186,8 @@ class LGU(Plugin):
                 WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, 'username-1-6'))).clear()
                 WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, 'password-1'))).clear()
 
-                WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, 'username-1-6'))).send_keys('recordame@naver.com')
-                WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, 'password-1'))).send_keys('lkg0473PA!')
+                WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, 'username-1-6'))).send_keys(self.id)
+                WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, 'password-1'))).send_keys(self.password)
 
                 for btn in chrome_driver.find_elements(by=By.TAG_NAME, value='button'):
                     if btn.text.replace(' ', '').replace('\n', '').replace('\r', '') == ('U+ID로그인'):

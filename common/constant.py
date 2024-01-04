@@ -15,9 +15,9 @@ BUILTIN_ALARM_INSTANCE: dict[str, object] = {}
 # 채널 알람 목록 저장용 변수
 CHANNEL_ALARMS: dict[str, dict[str, object]] = {}
 # 채널 알람 백그라운드 JOB
-CHANNEL_ALARM_SCHEDULER = BackgroundScheduler()
+CHANNEL_ALARM_SCHEDULER = BackgroundScheduler(timezone='Asia/Seoul')
 
 # 개인 알람 목록 저장용 변수
 USER_ALARMS: dict[str, dict[str, object]] = {}
 # 개인 알람 백그라운드 JOB
-USER_ALARM_SCHEDULER = BackgroundScheduler()
+USER_ALARM_SCHEDULER = BackgroundScheduler(timezone='Asia/Seoul')
