@@ -1,23 +1,22 @@
 import logging
 import os
+import time
 
 import urllib3
 from mmpy_bot import Plugin, listen_to, Message
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions
-from selenium.webdriver.support.wait import WebDriverWait
 
-from common.utils import update_post, display_progress
+from common.utils import update_post, display_progress, full_screenshot
 
 urllib3.disable_warnings()
 
 
 class LiivM(Plugin):
-    step = 0
-    last_step = 7
     max_retry = 10
+    step = 1
+    last_step = 7
 
     id = 'recordame'
     password = 'hahows1003!'
@@ -45,6 +44,7 @@ class LiivM(Plugin):
 
         with webdriver.Chrome(options=chrome_options) as chrome_driver:
             self.step = 1
+            self.last_step = 7
 
             logging.info('크롬 드라이브 호출')
             reply_msg = self.driver.reply_to(message, f'[{display_progress(self.step, self.last_step)}] 크롬 드라이브 호출')
@@ -79,7 +79,7 @@ class LiivM(Plugin):
                 try:
                     self.step += 1
 
-                    charge_to_pay = int(WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, 'totBillAmt'))).text.replace('원', ''))
+                    charge_to_pay = int(chrome_driver.find_element(By.ID, 'totBillAmt').text.replace('원', ''))
 
                     logging.info('금액 확인 중')
                     update_post(self.driver, post_to_update, f'[{display_progress(self.step, self.last_step)}] 금액 확인 중')
@@ -89,20 +89,24 @@ class LiivM(Plugin):
                     else:
                         pass
 
+                    time.sleep(3)
+
                     break
                 except Exception as e:
                     logging.info(e)
                     self.step -= 1
                     continue
 
+            file = os.getcwd() + '/afterLogin-liivm.png'
+            with open(file, 'wb') as img:
+                img.write(full_screenshot(chrome_driver))
+                self.driver.reply_to(message, '', file_paths=[file])
+                os.remove(file)
+
             self.step += 1
 
             logging.info('금액 확인 완료')
             update_post(self.driver, post_to_update, f'[{display_progress(self.step, self.last_step)}] 금액 확인 완료')
-
-            file = os.getcwd() + '/afterLogin-liivm.png'
-            chrome_driver.find_element(by=By.TAG_NAME, value='html').screenshot(file)
-            self.driver.reply_to(message, '', file_paths=[file])
 
         return charge_to_pay
 
@@ -114,10 +118,13 @@ class LiivM(Plugin):
 
             try:
                 self.step += 1
-                WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, 'loginT3'))).click()
+
+                chrome_driver.find_element(By.ID, 'loginT3').click()
 
                 logging.info('로그인 페이지 이동')
                 update_post(self.driver, post_to_update, f'[{display_progress(self.step, self.last_step)}] 로그인 페이지 이동')
+
+                time.sleep(3)
 
                 break
             except Exception as e:
@@ -133,11 +140,13 @@ class LiivM(Plugin):
             try:
                 self.step += 1
 
-                WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, 'loginUserId'))).send_keys(self.id)
-                WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, 'loginUserIdPw'))).send_keys(self.password)
+                chrome_driver.find_element(By.ID, 'loginUserId').send_keys(self.id)
+                chrome_driver.find_element(By.ID, 'loginUserIdPw').send_keys(self.password)
 
                 logging.info('계정정보 입력')
                 update_post(self.driver, post_to_update, f'[{display_progress(self.step, self.last_step)}] 계정정보 입력 완료')
+
+                time.sleep(3)
 
                 break
             except Exception as e:
@@ -153,13 +162,17 @@ class LiivM(Plugin):
             try:
                 self.step += 1
 
-                WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, 'btnIdLogin'))).click()
+                chrome_driver.find_element(By.ID, 'btnIdLogin').click()
 
                 logging.info('로그인 시도중')
                 update_post(self.driver, post_to_update, f'[{display_progress(self.step, self.last_step)}] 로그인 시도중')
+
+                time.sleep(1)
 
                 break
             except Exception as e:
                 logging.info(e)
                 self.step -= 1
                 continue
+
+        time.sleep(3)

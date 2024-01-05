@@ -7,18 +7,16 @@ from mmpy_bot import Plugin, listen_to, Message
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions
-from selenium.webdriver.support.wait import WebDriverWait
 
-from common.utils import update_post, display_progress
+from common.utils import update_post, display_progress, full_screenshot
 
 urllib3.disable_warnings()
 
 
 class LGU(Plugin):
-    step = 0
-    last_step = 8
     max_retry = 10
+    step = 1
+    last_step = 7
 
     id = 'recordame@naver.com'
     password = 'lkg0473PA!'
@@ -46,6 +44,7 @@ class LGU(Plugin):
 
         with webdriver.Chrome(options=chrome_options) as chrome_driver:
             self.step = 1
+            self.last_step = 7
 
             logging.info('크롬 드라이브 호출')
             reply_msg = self.driver.reply_to(message, f'[{display_progress(self.step, self.last_step)}] 크롬 드라이브 호출')
@@ -59,9 +58,10 @@ class LGU(Plugin):
                 try:
                     self.step += 1
 
-                    logging.info('LG U+ 요금청구 페이지 호출')
                     update_post(self.driver, post_to_update, f'[{display_progress(self.step, self.last_step)}] LG U+ 요금청구 페이지 호출')
                     chrome_driver.get(url)
+
+                    logging.info('LG U+ 요금청구 페이지 호출')
 
                     break
                 except Exception as e:
@@ -70,9 +70,7 @@ class LGU(Plugin):
                     continue
 
             # 로그인
-            self.login_lgu(chrome_driver, post_to_update, message)
-
-            time.sleep(3)
+            self.login_lgu(chrome_driver, post_to_update)
 
             # 요금바로 납부 선택
             for retry in range(self.max_retry):
@@ -80,6 +78,7 @@ class LGU(Plugin):
                     return -1
                 try:
                     self.step += 1
+
                     found = False
 
                     for btn in chrome_driver.find_elements(by=By.TAG_NAME, value='button'):
@@ -92,8 +91,10 @@ class LGU(Plugin):
 
                             found = True
                             break
+
                     if not found:
                         raise Exception(self, '요금바로 납부 버튼 식별 실패')
+
                     break
                 except Exception as e:
                     logging.info(e)
@@ -107,8 +108,9 @@ class LGU(Plugin):
 
                 try:
                     self.step += 1
+
                     try:
-                        charge_to_pay = int(WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.CLASS_NAME, 'pay-total-txt'))).text.replace('원', ''))
+                        charge_to_pay = int(chrome_driver.find_element(By.CLASS_NAME, 'pay-total-txt').text.replace('원', ''))
                     except ValueError:
                         charge_to_pay = 0
 
@@ -119,26 +121,27 @@ class LGU(Plugin):
                         pass
                     else:
                         pass
+
                     break
                 except Exception as e:
                     logging.info(e)
                     self.step -= 1
                     continue
 
+            file = os.getcwd() + 'afterLogin-lgu.png'
+            with open(file, 'wb') as img:
+                img.write(full_screenshot(chrome_driver))
+                self.driver.reply_to(message, '', file_paths=[file])
+                os.remove(file)
+
             self.step += 1
 
             logging.info('금액 확인 완료')
             update_post(self.driver, post_to_update, f'[{display_progress(self.step, self.last_step)}] 금액 확인 완료')
 
-            file = os.getcwd() + 'afterLogin-lgu.png'
-            chrome_driver.find_element(by=By.TAG_NAME, value='html').screenshot(file)
-            self.driver.reply_to(message, '', file_paths=[file])
-
         return charge_to_pay
 
-    def login_lgu(self, chrome_driver, post_to_update, message):
-        time.sleep(3)
-
+    def login_lgu(self, chrome_driver, post_to_update):
         # 로그인 방법 선택 U+ID
         for retry in range(self.max_retry):
             if retry == self.max_retry - 1:
@@ -146,6 +149,7 @@ class LGU(Plugin):
 
             try:
                 self.step += 1
+
                 found = False
 
                 for img in chrome_driver.find_elements(by=By.TAG_NAME, value='img'):
@@ -160,6 +164,7 @@ class LGU(Plugin):
 
                     logging.info('U+ID 로그인 선택')
                     update_post(self.driver, post_to_update, f'[{display_progress(self.step, self.last_step)}] U+ID 로그인 선택')
+
                     break
                 else:
                     logging.info('U+ID 로그인 찾기 실패')
@@ -179,23 +184,28 @@ class LGU(Plugin):
 
             try:
                 self.step += 1
+
                 found = False
 
                 time.sleep(1)
 
-                WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, 'username-1-6'))).clear()
-                WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, 'password-1'))).clear()
+                chrome_driver.find_element(By.ID, 'username-1-6').clear()
+                chrome_driver.find_element(By.ID, 'password-1').clear()
 
-                WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, 'username-1-6'))).send_keys(self.id)
-                WebDriverWait(chrome_driver, 10).until(expected_conditions.visibility_of_element_located((By.ID, 'password-1'))).send_keys(self.password)
+                time.sleep(1)
+
+                chrome_driver.find_element(By.ID, 'username-1-6').send_keys(self.id)
+                chrome_driver.find_element(By.ID, 'password-1').send_keys(self.password)
 
                 for btn in chrome_driver.find_elements(by=By.TAG_NAME, value='button'):
                     if btn.text.replace(' ', '').replace('\n', '').replace('\r', '') == ('U+ID로그인'):
                         btn.click()
+
                         logging.info('로그인 시도중')
                         update_post(self.driver, post_to_update, f'[{display_progress(self.step, self.last_step)}] 로그인 시도중')
 
                         found = True
+
                         break
                 if not found:
                     raise Exception(self, '로그인 버튼 식별 실패')
@@ -205,3 +215,5 @@ class LGU(Plugin):
                 logging.info(e)
                 self.step -= 1
                 continue
+
+        time.sleep(3)
