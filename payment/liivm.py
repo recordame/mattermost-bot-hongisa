@@ -40,7 +40,7 @@ class LiivM(Plugin):
         url = 'https://www.liivm.com/mypage/bill/bill/billPayment'
 
         chrome_options = Options()
-        # chrome_options.add_argument('headless')
+        chrome_options.add_argument('headless')
         chrome_options.add_argument('--disable-gpu')
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('disable-popup-blocking')

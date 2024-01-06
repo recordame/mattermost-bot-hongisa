@@ -40,7 +40,7 @@ class KTM(Plugin):
         url = 'https://www.ktmmobile.com/mypage/unpaidChargeList.do'
 
         chrome_options = Options()
-        # chrome_options.add_argument('headless')
+        chrome_options.add_argument('headless')
         chrome_options.add_argument('--disable-gpu')
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('disable-popup-blocking')
@@ -159,13 +159,13 @@ class KTM(Plugin):
             pass
 
         if require_sms_auth:
-            for retry in range(100):
-                if retry == 100 - 1:
+            self.last_step += 3
+
+            for retry in range(self.max_retry):
+                if retry == self.max_retry - 1:
                     screenshot(self.driver, message, chrome_driver, self.screenshot_path)
                     return -1
                 try:
-                    self.last_step += 2
-
                     # SMS 인증을 요구 확인
                     self.step += 1
 
@@ -174,9 +174,6 @@ class KTM(Plugin):
 
                     condition = expected_conditions.visibility_of_element_located((By.CLASS_NAME, 'c-button--w460'))
                     self.waiter.until(condition).click()
-
-                    time.sleep(2)
-
                     # SMS 인증 취소
                     self.step += 1
 
@@ -185,8 +182,6 @@ class KTM(Plugin):
 
                     logging.info('SMS 인증 취소 중')
                     update_post(self.driver, post_to_update, f'[{display_progress(self.step, self.last_step)}] SMS 인증 취소 중')
-
-                    time.sleep(2)
 
                     # 재로그인 시도
                     self.step += 1
@@ -203,9 +198,11 @@ class KTM(Plugin):
                         condition = expected_conditions.visibility_of_element_located((By.CLASS_NAME, 'c-button--w460'))
                         self.waiter.until(condition)
 
+                        self.step -= 3
+
                         continue
                     except:
-                        break
+                        return
                 except Exception as e:
                     logging.info(e)
                     self.step -= 1
