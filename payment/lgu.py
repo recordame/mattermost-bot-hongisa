@@ -64,8 +64,8 @@ class LGU(Plugin):
             # 요금납부 페이지 호출
             for retry in range(self.max_retry):
                 if retry == self.max_retry - 1:
+                    screenshot(self.driver, message, chrome_driver, self.screenshot_path)
                     return -1
-
                 try:
                     self.step += 1
 
@@ -106,7 +106,6 @@ class LGU(Plugin):
                 if retry == self.max_retry - 1:
                     screenshot(self.driver, message, chrome_driver, self.screenshot_path)
                     return -1
-
                 try:
                     self.step += 1
 
@@ -177,6 +176,8 @@ class LGU(Plugin):
 
                 condition = expected_conditions.visibility_of_element_located((By.ID, 'password-1'))
                 self.waiter.until(condition).clear()
+
+                time.sleep(1)
 
                 condition = expected_conditions.visibility_of_element_located((By.ID, 'username-1-6'))
                 self.waiter.until(condition).send_keys(self.id)
