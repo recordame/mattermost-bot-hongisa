@@ -7,6 +7,7 @@ from mmpy_bot import Plugin, listen_to, Message
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.wait import WebDriverWait
 
 from common.utils import update_post, display_progress, full_screenshot
 
@@ -17,6 +18,8 @@ class KTM(Plugin):
     max_retry = 10
     step = 1
     last_step = 6
+
+    waiter: WebDriverWait
 
     id = 'recordame'
     password = 'hahows1003!'
@@ -43,6 +46,9 @@ class KTM(Plugin):
         chrome_options.add_experimental_option("detach", True)
 
         with webdriver.Chrome(options=chrome_options) as chrome_driver:
+            chrome_driver.implicitly_wait(10)
+
+            self.waiter = WebDriverWait(chrome_driver, 10)
             self.step = 1
             self.last_step = 6
 

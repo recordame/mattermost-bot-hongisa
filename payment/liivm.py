@@ -7,6 +7,8 @@ from mmpy_bot import Plugin, listen_to, Message
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions
+from selenium.webdriver.support.wait import WebDriverWait
 
 from common.utils import update_post, display_progress, full_screenshot
 
@@ -17,6 +19,8 @@ class LiivM(Plugin):
     max_retry = 10
     step = 1
     last_step = 7
+
+    waiter: WebDriverWait
 
     id = 'recordame'
     password = 'hahows1003!'
@@ -43,6 +47,9 @@ class LiivM(Plugin):
         chrome_options.add_experimental_option("detach", True)
 
         with webdriver.Chrome(options=chrome_options) as chrome_driver:
+            chrome_driver.implicitly_wait(10)
+
+            self.waiter = WebDriverWait(chrome_driver, 10)
             self.step = 1
             self.last_step = 7
 
@@ -79,7 +86,8 @@ class LiivM(Plugin):
                 try:
                     self.step += 1
 
-                    charge_to_pay = int(chrome_driver.find_element(By.ID, 'totBillAmt').text.replace('원', ''))
+                    self.waiter.until(expected_conditions.visibility_of_element_located(By.ID, 'totBillAmt')).text.replace('원', '')
+                    charge_to_pay = int()
 
                     logging.info('금액 확인 중')
                     update_post(self.driver, post_to_update, f'[{display_progress(self.step, self.last_step)}] 금액 확인 중')
