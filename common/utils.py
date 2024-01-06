@@ -1,13 +1,14 @@
 import base64
+import os
 
-import mmpy_bot
 import urllib3
+from mmpy_bot.driver import Driver, Message
 from selenium.webdriver.chrome.webdriver import WebDriver
 
 urllib3.disable_warnings()
 
 
-def update_post(driver: mmpy_bot.driver, post_id: str, new_message: str):
+def update_post(driver: Driver, post_id: str, new_message: str):
     req_data: dict = {
         'id': post_id,
         'message': new_message
@@ -26,6 +27,14 @@ def display_progress(current_step, total_steps):
         progress_bar += '□'
 
     return progress_bar
+
+
+def screenshot(driver: Driver, message: Message, chrome_driver: WebDriver, path: str):
+    with open(path, 'wb') as img:
+        img.write(full_screenshot(chrome_driver))
+        driver.reply_to(message, '', file_paths=[path])
+
+    os.remove(path)
 
 
 def full_screenshot(chrome_driver: WebDriver) -> bytes:

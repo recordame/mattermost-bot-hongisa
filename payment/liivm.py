@@ -10,7 +10,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 
-from common.utils import update_post, display_progress, full_screenshot
+from common.utils import update_post, display_progress, screenshot
 
 urllib3.disable_warnings()
 
@@ -18,9 +18,10 @@ urllib3.disable_warnings()
 class LiivM(Plugin):
     max_retry = 10
     step = 1
-    last_step = 7
+    last_step = 5
 
     waiter: WebDriverWait
+    screenshot_path = os.getcwd() + '/liivm.png'
 
     id = 'recordame'
     password = 'hahows1003!'
@@ -39,19 +40,21 @@ class LiivM(Plugin):
         url = 'https://www.liivm.com/mypage/bill/bill/billPayment'
 
         chrome_options = Options()
-        chrome_options.add_argument('headless')
+        # chrome_options.add_argument('headless')
         chrome_options.add_argument('--disable-gpu')
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('disable-popup-blocking')
 
         chrome_options.add_experimental_option("detach", True)
 
-        with webdriver.Chrome(options=chrome_options) as chrome_driver:
-            chrome_driver.implicitly_wait(10)
+        charge_to_pay = -1
 
-            self.waiter = WebDriverWait(chrome_driver, 10)
+        with webdriver.Chrome(options=chrome_options) as chrome_driver:
+            chrome_driver.implicitly_wait(3)
+
+            self.waiter = WebDriverWait(chrome_driver, 3)
             self.step = 1
-            self.last_step = 7
+            self.last_step = 5
 
             logging.info('크롬 드라이브 호출')
             reply_msg = self.driver.reply_to(message, f'[{display_progress(self.step, self.last_step)}] 크롬 드라이브 호출')
@@ -60,8 +63,8 @@ class LiivM(Plugin):
             # 요금납부 페이지 호출
             for retry in range(self.max_retry):
                 if retry == self.max_retry - 1:
+                    screenshot(self.driver, message, chrome_driver, self.screenshot_path)
                     return -1
-
                 try:
                     self.step += 1
 
@@ -76,28 +79,29 @@ class LiivM(Plugin):
                     continue
 
             # 로그인
-            self.login_liivm(chrome_driver, post_to_update)
+            if self.login_liivm(message, chrome_driver, post_to_update) == -1:
+                return -1
 
             # 금액 확인
             for retry in range(self.max_retry):
                 if retry == self.max_retry - 1:
+                    screenshot(self.driver, message, chrome_driver, self.screenshot_path)
                     return -1
-
                 try:
                     self.step += 1
 
-                    self.waiter.until(expected_conditions.visibility_of_element_located(By.ID, 'totBillAmt')).text.replace('원', '')
-                    charge_to_pay = int()
+                    condition = expected_conditions.visibility_of_element_located((By.ID, 'totBillAmt'))
+                    charge_info = self.waiter.until(condition).text.replace('원', '')
+                    charge_to_pay = int(charge_info)
 
-                    logging.info('금액 확인 중')
-                    update_post(self.driver, post_to_update, f'[{display_progress(self.step, self.last_step)}] 금액 확인 중')
+                    logging.info('금액 확인 완료')
+                    update_post(self.driver, post_to_update, f'[{display_progress(self.step, self.last_step)}] 금액 확인 완료')
 
                     if charge_to_pay > 0:
-                        chrome_driver.find_element(by=By.ID, value='btn_paymentSelfLayer').click()
+                        condition = expected_conditions.visibility_of_element_located((By.ID, 'btn_paymentSelfLayer'))
+                        self.waiter.until(condition).click()
                     else:
                         pass
-
-                    time.sleep(3)
 
                     break
                 except Exception as e:
@@ -105,34 +109,26 @@ class LiivM(Plugin):
                     self.step -= 1
                     continue
 
-            file = os.getcwd() + '/afterLogin-liivm.png'
-            with open(file, 'wb') as img:
-                img.write(full_screenshot(chrome_driver))
-                self.driver.reply_to(message, '', file_paths=[file])
-                os.remove(file)
+            time.sleep(2)
 
-            self.step += 1
-
-            logging.info('금액 확인 완료')
-            update_post(self.driver, post_to_update, f'[{display_progress(self.step, self.last_step)}] 금액 확인 완료')
+            screenshot(self.driver, message, chrome_driver, self.screenshot_path)
 
         return charge_to_pay
 
-    def login_liivm(self, chrome_driver, post_to_update):
+    def login_liivm(self, message, chrome_driver, post_to_update):
         # 아이디 비밀번호 기반 로그인 텝으로 이동
         for retry in range(self.max_retry):
             if retry == self.max_retry - 1:
+                screenshot(self.driver, message, chrome_driver, self.screenshot_path)
                 return -1
-
             try:
                 self.step += 1
 
-                chrome_driver.find_element(By.ID, 'loginT3').click()
+                condition = expected_conditions.visibility_of_element_located((By.ID, 'loginT3'))
+                self.waiter.until(condition).click()
 
                 logging.info('로그인 페이지 이동')
                 update_post(self.driver, post_to_update, f'[{display_progress(self.step, self.last_step)}] 로그인 페이지 이동')
-
-                time.sleep(3)
 
                 break
             except Exception as e:
@@ -143,44 +139,27 @@ class LiivM(Plugin):
         # 계정 정보 입력
         for retry in range(self.max_retry):
             if retry == self.max_retry - 1:
+                screenshot(self.driver, message, chrome_driver, self.screenshot_path)
                 return -1
-
             try:
                 self.step += 1
 
-                chrome_driver.find_element(By.ID, 'loginUserId').send_keys(self.id)
-                chrome_driver.find_element(By.ID, 'loginUserIdPw').send_keys(self.password)
+                condition = expected_conditions.visibility_of_element_located((By.ID, 'loginUserId'))
+                self.waiter.until(condition).send_keys(self.id)
 
-                logging.info('계정정보 입력')
-                update_post(self.driver, post_to_update, f'[{display_progress(self.step, self.last_step)}] 계정정보 입력 완료')
+                condition = expected_conditions.visibility_of_element_located((By.ID, 'loginUserIdPw'))
+                self.waiter.until(condition).send_keys(self.password)
 
-                time.sleep(3)
+                time.sleep(1)
 
-                break
-            except Exception as e:
-                logging.info(e)
-                self.step -= 1
-                continue
-
-        # 로그인
-        for retry in range(self.max_retry):
-            if retry == self.max_retry - 1:
-                return -1
-
-            try:
-                self.step += 1
-
-                chrome_driver.find_element(By.ID, 'btnIdLogin').click()
+                condition = expected_conditions.visibility_of_element_located((By.ID, 'btnIdLogin'))
+                self.waiter.until(condition).click()
 
                 logging.info('로그인 시도중')
                 update_post(self.driver, post_to_update, f'[{display_progress(self.step, self.last_step)}] 로그인 시도중')
 
-                time.sleep(1)
-
                 break
             except Exception as e:
                 logging.info(e)
                 self.step -= 1
                 continue
-
-        time.sleep(3)
