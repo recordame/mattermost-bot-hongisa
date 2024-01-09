@@ -27,7 +27,7 @@ class WeatherAlarm(AbstractBuiltinAlarm):
         loc: str = args[0][0]
 
         if loc is None:
-            loc = "성남시금광동"
+            loc = "중원구금광동"
 
         info = load_web_page(loc)
         msg = extract_today_weather_information(info) + '\n-------\n' + extract_tomorrow_weather_information(info)
@@ -36,7 +36,7 @@ class WeatherAlarm(AbstractBuiltinAlarm):
 
     @listen_to('^%s$' % name)
     def default_location(self, message: Message):
-        self.driver.direct_message(message.user_id, self.generate_message(['성남시금광동']))
+        self.driver.direct_message(message.user_id, self.generate_message(['중원구금광동']))
 
     @listen_to('^%s\\s([가-힣]+)$' % name)
     def direct(self, message: Message, location: str):
