@@ -66,7 +66,7 @@ class WeatherAlarm(AbstractBuiltinAlarm):
 
 ##################################
 
-def load_web_page(loc: str = '성남시금광동'):
+def load_web_page(loc: str = '중원구금광동'):
     # 네이버 날씨
     url: str = f'https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=1&ie=utf8&query={urllib.parse.quote(f"{loc}+날씨")}'
 
