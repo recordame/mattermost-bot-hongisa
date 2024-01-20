@@ -2,7 +2,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 BOT_TOKEN: str = 'fj6kf9txdiygu8ga8ca7oth1qr'
 BOT_TEAM: str = 'hongeejanggun'
-MATTERMOST_URL = 'http://recordame.synology.me'
+MATTERMOST_URL = 'http://recordame.ddns.net'
 ADMINS: list = ['recordame']
 
 # 채널 정보
