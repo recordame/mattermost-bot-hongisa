@@ -66,7 +66,7 @@ class AlarmContext:
         message += f'   - 대상: `{self.post_to}`'
 
         if self.post_to != self.creator_id:
-            message += f'(`{get_info_by_id('channels', self.post_to)["display_name"]}`)'
+            message += f'(`{get_info_by_id("channels", self.post_to)["display_name"]}`)'
 
         message += '\n'
 

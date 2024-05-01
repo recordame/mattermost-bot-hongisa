@@ -1,5 +1,7 @@
 # !/usr/bin/env python
+import ssl
 
+import urllib3
 from mmpy_bot import Bot, Settings
 
 from alarm.alarm_util import load_channel_alarms_from_file, load_user_alarms_from_file, load_ephemeral_alarms_from_file
@@ -14,8 +16,12 @@ from alarm.custom.ephemeral_alarm import EphemeralAlarm
 from alarm.custom.user_alarm import UserAlarm
 from command.currency import CurrencyAlarm
 from command.help import Help
+from command.todo import Todo
 from common import constant
 from webserver.controller import WebServer
+
+urllib3.disable_warnings()
+ssl._create_default_https_context = ssl._create_unverified_context
 
 bot = Bot(
     settings=Settings(
@@ -39,6 +45,7 @@ bot = Bot(
         UserAlarm(),
         EphemeralAlarm(),
         AlarmList(),
+        Todo(),
         WebServer(),
     ],
 )

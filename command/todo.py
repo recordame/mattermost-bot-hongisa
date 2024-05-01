@@ -18,7 +18,7 @@ class Todo(Plugin):
             func=lambda: self.notify_daily(self.user_todo_list),
             trigger='cron',
             day_of_week='mon-fri',
-            hour='09',
+            hour='07',
             minute='00',
             misfire_grace_time=60
         )
@@ -116,7 +116,7 @@ def generate_todo_list(todo_list: list, user_id: str):
 
 
 def load_todo_from_file():
-    return read_json_file('./json-db/todo.json')
+    return dict(read_json_file('./json-db/todo.json'))
 
 
 def save_todo_to_file_in_json(user_todo_list: dict):
