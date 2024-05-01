@@ -9,7 +9,7 @@ KR_TIME_ZONE = timezone('Asia/Seoul')
 
 BOT_TOKEN: str = 'fj6kf9txdiygu8ga8ca7oth1qr'
 BOT_TEAM: str = 'hongeejanggun'
-MATTERMOST_URL = 'http://125.241.62.3/e'
+MATTERMOST_URL = 'http://125.241.62.3/'
 MATTERMOST_PORT = 8065
 ADMINS: list = ['recordame']
 
