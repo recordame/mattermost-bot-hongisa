@@ -1,14 +1,11 @@
-import urllib3
 from mmpy_bot import listen_to, Message
 
 from alarm.alarm_context import AlarmContextBuilder
-from alarm.builtin.abstract_builtin_alarm import AbstractBuiltinAlarm
+from alarm.builtin.abstract_builtin_alarm import AbstractChannelAlarm
 from common import constant
 
-urllib3.disable_warnings()
 
-
-class MedicineAlarm(AbstractBuiltinAlarm):
+class MedicineAlarm(AbstractChannelAlarm):
     name = '복약'
     id = 'medicine'
     day = 'mon-sun'
@@ -16,7 +13,7 @@ class MedicineAlarm(AbstractBuiltinAlarm):
 
     def __init__(self):
         super().__init__()
-        self.add_builtin_alarm(self.name, self)
+        self.register_instance(self.name, self)
 
     def generate_message(self, option: str = ''):
         msg = '@here 건강을 위해 **약** 먹을 시간 입니다! :pill::muscle:'

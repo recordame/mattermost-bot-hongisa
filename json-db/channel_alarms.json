@@ -1,0 +1,118 @@
+[
+  {
+    "channel": "np83b9aggif98j1omio1m3zozo",
+    "alarm": [
+      {
+        "creator_name": "recordame",
+        "creator_id": "ne44boutnbyn7d5m53bcctzezc",
+        "post_to": "np83b9aggif98j1omio1m3zozo",
+        "name": "복약",
+        "id": "medicine",
+        "day": "mon-sun",
+        "hour": "7,20",
+        "minute": "30",
+        "second": "00",
+        "interval": "",
+        "interval_from": "",
+        "message": "",
+        "job_id": "np83b9aggif98j1omio1m3zozo_medicine",
+        "job_status": "실행"
+      },
+      {
+        "creator_name": "recordame",
+        "creator_id": "ne44boutnbyn7d5m53bcctzezc",
+        "post_to": "np83b9aggif98j1omio1m3zozo",
+        "name": "미사",
+        "id": "mass",
+        "day": "sun",
+        "hour": "10",
+        "minute": "00",
+        "second": "00",
+        "interval": "",
+        "interval_from": "",
+        "message": "",
+        "job_id": "np83b9aggif98j1omio1m3zozo_mass",
+        "job_status": "실행"
+      },
+      {
+        "creator_name": "recordame",
+        "creator_id": "ne44boutnbyn7d5m53bcctzezc",
+        "post_to": "np83b9aggif98j1omio1m3zozo",
+        "name": "날씨",
+        "id": "weather",
+        "day": "mon-sun",
+        "hour": "7,12",
+        "minute": "00",
+        "second": "00",
+        "interval": "",
+        "interval_from": "",
+        "message": "성남시금광동",
+        "job_id": "np83b9aggif98j1omio1m3zozo_weather",
+        "job_status": "실행"
+      }
+    ]
+  },
+  {
+    "channel": "b9j1mpuxdjbxdkjr4tdzht9uey",
+    "alarm": [
+      {
+        "creator_name": "recordame",
+        "creator_id": "ne44boutnbyn7d5m53bcctzezc",
+        "post_to": "b9j1mpuxdjbxdkjr4tdzht9uey",
+        "name": "꼬들",
+        "id": "kordle",
+        "day": "mon-sun",
+        "hour": "7",
+        "minute": "20",
+        "second": "00",
+        "interval": "",
+        "interval_from": "",
+        "message": "",
+        "job_id": "b9j1mpuxdjbxdkjr4tdzht9uey_kordle",
+        "job_status": "실행"
+      }
+    ]
+  },
+  {
+    "channel": "wske4xkn3tn7br5t1h3f4czx4o",
+    "alarm": [
+      {
+        "creator_name": "recordame",
+        "creator_id": "ne44boutnbyn7d5m53bcctzezc",
+        "post_to": "wske4xkn3tn7br5t1h3f4czx4o",
+        "name": "진하",
+        "id": "jinha",
+        "day": "*",
+        "hour": "06",
+        "minute": "00",
+        "second": "00",
+        "interval": "",
+        "interval_from": "",
+        "message": "",
+        "job_id": "wske4xkn3tn7br5t1h3f4czx4o_jinha",
+        "job_status": "실행"
+      }
+    ]
+  },
+  {
+    "channel": "ihj6pc74sjyk5n3jrrzaubrxpr",
+    "alarm": [
+      {
+        "creator_name": "recordame",
+        "creator_id": "ne44boutnbyn7d5m53bcctzezc",
+        "post_to": "ihj6pc74sjyk5n3jrrzaubrxpr",
+        "name": "",
+        "id": "가계부",
+        "day": "last",
+        "hour": "17",
+        "minute": "00",
+        "second": "00",
+        "interval": "",
+        "interval_from": "",
+        "message": "@here 월말입니다. 가계부를 정리해 주세요!\n[찬광민의 가정](https://docs.google.com/spreadsheets/d/1JGHTW_5fBvOxX_us5ixVnvrghrWbyzjFMy28Gmdn-AY/edit#gid=0)",
+        "job_id": "ihj6pc74sjyk5n3jrrzaubrxpr_가계부",
+        "job_status": "실행"
+      }
+    ]
+  }
+]

@@ -1,3 +1,6 @@
+from common.utils import get_info_by_id
+
+
 class AlarmContext:
     creator_name: str
     creator_id: str
@@ -15,7 +18,6 @@ class AlarmContext:
     interval_from: str
 
     message: str
-    message_argument: str
 
     job_id: str
     job_status: str
@@ -26,7 +28,7 @@ class AlarmContext:
             name: str, id: str,
             day='', hour='00', minute='00', second='00',
             interval='', interval_from='',
-            message='', message_argument='',
+            message='',
             job_status='실행'
     ):
         self.creator_name = creator_name
@@ -45,37 +47,42 @@ class AlarmContext:
         self.interval_from = interval_from
 
         self.message = message
-        self.message_argument = message_argument
 
-        self.job_id = post_to + '_' + id
+        self.job_id = post_to + "_" + id
         self.job_status = job_status
 
     def get_dict(self):
         return self.__dict__
 
     def get_info(self):
-        msg: str = ''
-        msg += '   - 등록 : `%s`\n' % self.creator_name
+        message: str = ''
+        message += f'   - 등록: @{self.creator_name}\n'
 
         if str(self.name).__len__() != 0:
-            msg += '   - 알람 : `%s`\n' % self.name
+            message += f'   - 알람: `{self.name}`\n'
         else:
-            msg += '   - 알람 : `%s`\n' % self.id
+            message += f'   - 알람: `{self.id}`\n'
 
-        msg += '   - 대상 : `%s`\n' % self.post_to
+        message += f'   - 대상: `{self.post_to}`'
 
-        if self.interval == '':
-            msg += '   - 주기 : `%s %s:%s:%s`\n' % (self.day, self.hour, self.minute, self.second)
+        if self.post_to != self.creator_id:
+            message += f'(`{get_info_by_id('channels', self.post_to)["display_name"]}`)'
+
+        message += '\n'
+
+        if self.interval == "":
+            message += f'   - 주기: `{self.day} {self.hour}:{self.minute}:{self.second}`\n'
         else:
-            msg += '   - 주기 : `%s`\n' % self.interval
-            msg += '   - 시작 : `%s`\n' % self.interval_from
+            message += f'   - 주기: `{self.interval}`\n'
+            message += f'   - 기준: `{self.interval_from}`\n'
 
         if str(self.message).__len__() != 0:
-            msg += '   - 내용 : %s\n' % self.message
+            tmp = self.message.replace('\n', '\\n')
+            message += f'   - 내용: `{tmp}`\n'
 
-        msg += '   - 상태 : `%s` :%s:' % (self.job_status, 'recycle' if self.job_status == '실행' else 'red_circle')
+        message += f'   - 상태: `{self.job_status}` :{"recycle" if self.job_status == "실행" else "red_circle"}:'
 
-        return msg
+        return message
 
 
 class AlarmContextBuilder:
@@ -91,8 +98,10 @@ class AlarmContextBuilder:
     _minute: str
     _second: str
 
+    _interval: str
+    _interval_from: str
+
     _message: str
-    _message_argument: str
 
     _job_status: str
 
@@ -108,7 +117,6 @@ class AlarmContextBuilder:
         self._interval_from = ''
 
         self._message = ''
-        self._message_argument = ''
 
         self._job_status = '실행'
 
@@ -172,11 +180,6 @@ class AlarmContextBuilder:
 
         return self
 
-    def message_argument(self, message_argument: str):
-        self._message_argument = message_argument
-
-        return self
-
     def job_status(self, job_status: str):
         self._job_status = job_status
 
@@ -200,7 +203,6 @@ class AlarmContextBuilder:
             self._interval_from,
 
             self._message,
-            self._message_argument,
 
             self._job_status
         )

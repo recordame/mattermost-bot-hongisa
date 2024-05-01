@@ -1,16 +1,13 @@
 import datetime
 
-import urllib3
 from mmpy_bot import listen_to, Message
 
 from alarm.alarm_context import AlarmContextBuilder
-from alarm.builtin.abstract_builtin_alarm import AbstractBuiltinAlarm
+from alarm.builtin.abstract_builtin_alarm import AbstractChannelAlarm
 from common import constant
 
-urllib3.disable_warnings()
 
-
-class KordleAlarm(AbstractBuiltinAlarm):
+class KordleAlarm(AbstractChannelAlarm):
     name = '꼬들'
     id = 'kordle'
     day = 'mon-sun'
@@ -18,7 +15,7 @@ class KordleAlarm(AbstractBuiltinAlarm):
 
     def __init__(self):
         super().__init__()
-        self.add_builtin_alarm(self.name, self)
+        self.register_instance(self.name, self)
 
     def generate_message(self, option: str = ''):
         now = datetime.datetime.now()

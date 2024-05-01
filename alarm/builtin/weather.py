@@ -3,17 +3,14 @@ from datetime import datetime
 from urllib.request import urlopen, Request
 
 import bs4
-import urllib3
 from mmpy_bot import listen_to, Message
 
 from alarm.alarm_context import AlarmContextBuilder
-from alarm.builtin.abstract_builtin_alarm import AbstractBuiltinAlarm
+from alarm.builtin.abstract_builtin_alarm import AbstractChannelAlarm
 from common import constant
 
-urllib3.disable_warnings()
 
-
-class WeatherAlarm(AbstractBuiltinAlarm):
+class WeatherAlarm(AbstractChannelAlarm):
     name = '날씨'
     id = 'weather'
     day = 'mon-sun'
@@ -21,7 +18,7 @@ class WeatherAlarm(AbstractBuiltinAlarm):
 
     def __init__(self):
         super().__init__()
-        self.add_builtin_alarm(self.name, self)
+        self.register_instance(self.name, self)
 
     def generate_message(self, *args):
         loc: str = args[0][0]
@@ -54,7 +51,7 @@ class WeatherAlarm(AbstractBuiltinAlarm):
             .creator_name(message.sender_name).creator_id(message.user_id).post_to(self.channel_id) \
             .name(self.name).id(self.id) \
             .day(self.day).hour(hour).minute(minute) \
-            .message_argument(location) \
+            .message(location) \
             .build()
 
         self.schedule_alarm(alarm_context, recovery_mode)
@@ -74,7 +71,7 @@ def load_web_page(loc: str = '중원구금광동'):
     page = urlopen(req)
 
     html = page.read().decode('utf-8')
-    soup = bs4.BeautifulSoup(html, 'html.parser')
+    soup = bs4.BeautifulSoup(html, 'html.parser').text
 
     return soup
 
@@ -147,7 +144,8 @@ def extract_today_weather_information(info: str):
           '**`%s`** 날씨정보' % location + \
           '\n\n-----------------------------\n' + \
           '**현재 날씨**는 %s이고,\n**기온**은 `%s`로 어제보다 %s.\n오늘 **최저** `%s`, **최고** `%s`로 예상돼요.\n* 미세먼지 %s\n* 초미세먼지 %s' \
-          % (status, temp, temp_yesterday, temp_lowest, temp_highest, add_icon(fine_particle), add_icon(ultra_fine_particle))
+          % (status, temp, temp_yesterday, temp_lowest, temp_highest, add_icon(fine_particle),
+             add_icon(ultra_fine_particle))
 
     return msg
 

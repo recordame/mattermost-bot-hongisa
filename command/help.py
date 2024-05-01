@@ -5,7 +5,7 @@ urllib3.disable_warnings()
 
 
 class Help(Plugin):
-    @listen_to('^명령어$')
+    @listen_to('^\\?$')
     def help(self, message: Message):
         self.driver.reply_to(
             message,

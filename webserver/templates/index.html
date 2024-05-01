@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>홍집사</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 40px;
+            text-align: center;
+            -webkit-font-smoothing: antialiased; /* Chrome, Safari, Opera */
+            -moz-osx-font-smoothing: grayscale; /* Firefox */
+        }
+
+        h1 {
+            font-size: 3em;
+            background: linear-gradient(to right, #ff6b6b, #3b5998); /* 그라데이션 색상 조절 */
+            -webkit-background-clip: text;
+            color: transparent;
+            text-fill-color: transparent;
+            margin-bottom: 0px;
+            line-height: 1; /* 줄간격 조절 */
+            display: inline-block; /* 그라데이션 적용을 위해 필요한 속성 */
+        }
+
+        .subtitle {
+        	font-weight: bold;
+            color: #333;
+            font-size: 0.7em; /* 폰트 크기 줄임 */
+            margin-bottom: 20px;
+        }
+
+        select {
+            padding: 8px;
+            width: 150px;
+            font-size: 1em;
+            margin-bottom: 20px;
+            text-rendering: optimizeLegibility;
+        }
+
+        .dynamic-inputs {
+            display: flex;
+            flex-direction: column; /* 수직으로 배열 */
+            align-items: center; /* 중앙 정렬 */
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+
+        .dynamic-input {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 5px; /* 텍스트 박스 사이의 간격 조절 */
+        }
+
+        .dynamic-input label {
+        	font-weight: bold;
+            margin-right: 10px;
+            width: 70px;
+        }
+
+        .dynamic-input input {
+            width: 300px;
+            padding: 5px;
+        }
+
+        .dynamic-input textarea{
+            width: 300px;
+            height: 100px;
+            padding: 5px;
+        }
+
+        .description {
+            text-align: left;
+            color: silver;
+            width: 160px;
+            padding-left: 5px;
+            font-size: 0.8em;
+        }
+
+        .btn-newline {
+            margin-right: 10px;
+            padding: 10px;
+            background-color: #4c7eaf;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn-register {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<h1>홍집사</h1>
+<p></p>
+<select id="type">
+    <option selected>유형</option>
+</select>
+
+<select id="alarm">
+    <option selected>알람</option>
+</select>
+
+<form action="/result" method="POST" id="dynamicInputs" class="dynamic-inputs">
+
+</form>
+
+<hr>
+<div style="font-size: 13px">
+    <p>알람등록 외 부가기능 사용법은, 홍집사와 1:1 대화방에서 "도움말|?|help" 입력 후 설명을 읽어보세요 :)</p>
+</div>
+
+<script>
+let type_object= {
+    // 항목명(예시)<정규식>
+    "채널알람": {
+        "날씨": [
+            "채널 ID()<^([a-zA-Z\\d]+)$>",
+            "시(예: 9, 10-13, *)<^(\\d+|\\*|(\\*|\\d+)/\\d+|\\d+([-,]\\d+)+)$>",
+            "분(예: 30, 00, *)<^(\\d+|\\*|(\\*|\\d+)/\\d+|\\d+([-,]\\d+)+)$>",
+            "지역"
+        ],
+        "진하": [
+            "채널 ID()<^([a-zA-Z\\d]+)$>",
+            "시(예: 9, 10-13, *)<^(\\d+|\\*|(\\*|\\d+)/\\d+|\\d+([-,]\\d+)+)$>",
+            "분(예: 30, 00, *)<^(\\d+|\\*|(\\*|\\d+)/\\d+|\\d+([-,]\\d+)+)$>"
+        ],
+        "꼬들": [
+            "채널 ID()<^([a-zA-Z\\d]+)$>",
+            "시(예: 9, 10-13, *)<^(\\d+|\\*|(\\*|\\d+)/\\d+|\\d+([-,]\\d+)+)$>",
+            "분(예: 30, 00, *)<^(\\d+|\\*|(\\*|\\d+)/\\d+|\\d+([-,]\\d+)+)$>"
+        ],
+        "미사": [
+            "채널 ID()<^([a-zA-Z\\d]+)$>",
+            "시(예: 9, 10-13, *)<^(\\d+|\\*|(\\*|\\d+)/\\d+|\\d+([-,]\\d+)+)$>",
+            "분(예: 30, 00, *)<^(\\d+|\\*|(\\*|\\d+)/\\d+|\\d+([-,]\\d+)+)$>"
+        ],
+        "복약": [
+            "채널 ID()<^([a-zA-Z\\d]+)$>",
+            "시(예: 9, 10-13, *)<^(\\d+|\\*|(\\*|\\d+)/\\d+|\\d+([-,]\\d+)+)$>",
+            "분(예: 30, 00, *)<^(\\d+|\\*|(\\*|\\d+)/\\d+|\\d+([-,]\\d+)+)$>"
+        ],
+        "특정 일자 반복": [
+            "채널 ID()<^([a-zA-Z\\d]+)$>",
+            "알람명()<^([가-힣a-zA-Z\\-_\\d]+)$>",
+            "일자(예: *, mon-fri, wed, 21, 1st|2nd|3rd|xth mon, last)<^(last|1st|2nd|3rd|\\dth)\\s(sun|mon|tue|wed|thu|fri|sat)|(last|(\\d{1,2}([-,]\\d{1,2})*))|(\\*|((sun|mon|tue|wed|thu|fri|sat)([-,](sun|mon|tue|wed|thu|fri|sat))*))$>",
+            "시(예: 9, 10-13, *)<^(\\d+|\\*|(\\*|\\d+)/\\d+|\\d+([-,]\\d+)+)$>",
+            "분(예: 30, 00, *)<^(\\d+|\\*|(\\*|\\d+)/\\d+|\\d+([-,]\\d+)+)$>",
+            "초(예: 00, 30, *)<^(\\d+|\\*|(\\*|\\d+)/\\d+|\\d+([-,]\\d+)+)$>",
+            "메시지"
+        ],
+        "특정 주기 반복": [
+            "채널 ID()<^([a-zA-Z\\d]+)$>",
+            "알람명()<^([가-힣a-zA-Z\\-_\\d]+)$>",
+            "주기(예: 2주, 15일, 2시간, 5분, 60초)<^(\\d+(초|분|시간|일|주))$>",
+            "기준 시점(예: 2023-09-01T09:30:00)<^(\\d{4}-\\d{1,2}-\\d{1,2}(T\\d{1,2}:\\d{1,2}:\\d{1,2})?)$>",
+            "메시지"
+        ],
+        "1회 예약 발송": [
+            "채널 ID()<^([a-zA-Z\\d]+)$>",
+            "예약명()<^([가-힣a-zA-Z\\-_\\d]+)$>",
+            "년(예: 2023)<^(\\d{4})$>",
+            "월(예: 01)<^(\\d{1,2})$>",
+            "일(예: 30)<^(\\d{1,2})$>",
+            "시(예: 09)<^(\\d{1,2})$>",
+            "분(예: 30)<^(\\d{1,2})$>",
+            "초(예: 00)<^(\\d{1,2})$>",
+            "메시지"
+        ]
+    },
+    "개인알람": {
+        "특정 일자 반복": [
+            "알람명()<^([가-힣a-zA-Z\\-_\\d]+)$>",
+            "일자(예: *, mon-fri, wed, 21, 1st|2nd|3rd|xth mon, last)<^(last|1st|2nd|3rd|\\dth)\\s(sun|mon|tue|wed|thu|fri|sat)|(\\d{1,2}((-|,)\\d{1,2})*)|(\\*|((sun|mon|tue|wed|thu|fri|sat)((-|,)(sun|mon|tue|wed|thu|fri|sat))*))$>",
+            "시(예: 9, 10-13, *)<^(\\d+|\\*|(\\*|\\d+)/\\d+|\\d+([-,]\\d+)+)$>",
+            "분(예: 30, 00, *)<^(\\d+|\\*|(\\*|\\d+)/\\d+|\\d+([-,]\\d+)+)$>",
+            "초(예: 00, 30, *)<^(\\d+|\\*|(\\*|\\d+)/\\d+|\\d+([-,]\\d+)+)$>",
+            "메시지(메시지 치환: $점심, $당직청경, $날짜, $휴가조회)"
+        ],
+        "특정 주기 반복": [
+            "알람명()<^([가-힣a-zA-Z\\-_\\d]+)$>",
+            "주기(예: 2주, 15일, 2시간, 5분, 60초)<^(\\d+(초|분|시간|일|주))$>",
+            "기준 시점(예: 2023-09-01T09:30:00)<^(\\d{4}-\\d{1,2}-\\d{1,2}(T\\d{1,2}:\\d{1,2}:\\d{1,2})?)$>",
+            "메시지(메시지 치환: $점심, $당직청경, $날짜, $휴가조회)"
+        ],
+        "1회 예약 발송": [
+            "예약명()<^([가-힣a-zA-Z\\-_\\d]+)$>",
+            "년(예: 2023)<^(\\d{4})$>",
+            "월(예: 01)<^(\\d{1,2})$>",
+            "일(예: 30)<^(\\d{1,2})$>",
+            "시(예: 09)<^(\\d{1,2})$>",
+            "분(예: 30)<^(\\d{1,2})$>",
+            "초(예: 00)<^(\\d{1,2})$>",
+            "메시지(메시지 치환: $점심, $당직청경, $날짜, $휴가조회)"
+        ]
+    }
+}
+
+window.onload = function() {
+    let type = document.getElementById("type");
+    let alarm = document.getElementById("alarm");
+    let inputs = document.getElementById("dynamicInputs");
+
+    for(let x in type_object) {
+        type.options[type.options.length] = new Option(x, x);
+    }
+
+    type.onchange = function() {
+        alarm.length = 1;
+
+        while(inputs.hasChildNodes()) {
+            inputs.removeChild(inputs.lastChild);
+        }
+
+        for(let y in type_object[this.value]) {
+            alarm.options[alarm.options.length] = new Option(y, y);
+        }
+    }
+
+    alarm.onchange = function() {
+        let requiredInputList = type_object[type.value][this.value];
+
+        while(inputs.hasChildNodes()) {
+            inputs.removeChild(inputs.lastChild);
+        }
+
+        let input_type = document.createElement("input");
+        input_type.type = "text";
+        input_type.name = "type";
+        input_type.value = type[type.selectedIndex].value;
+        input_type.required = "true";
+        input_type.hidden = "true";
+        inputs.appendChild(input_type);
+
+        let input_alarm = document.createElement("input");
+        input_alarm.type = "text";
+		input_alarm.name = "alarm";
+		input_alarm.value = this[this.selectedIndex].value;
+		input_alarm.required = "true";
+        input_alarm.hidden = "true"
+        inputs.appendChild(input_alarm);
+
+        let user_id = document.createElement("input");
+        user_id.type = "text";
+		user_id.name = "사용자 ID";
+		user_id.value = "{{user_id}}";
+		user_id.required = "true";
+        user_id.hidden = "true"
+        inputs.appendChild(user_id);
+
+        let user_name = document.createElement("input");
+        user_name.type = "text";
+		user_name.name = "사용자 명";
+		user_name.value = "{{user_name}}"
+		user_name.required = "true";
+        user_name.hidden = "true"
+        inputs.appendChild(user_name);
+
+        for(let i = 0; i < requiredInputList.length; i++) {
+            // 입력 값 레이블
+            let inputContainer = document.createElement("div");
+            inputContainer.className = "dynamic-input";
+
+            let label = document.createElement("label");
+            let title = requiredInputList[i];
+            let description = "";
+
+            label.className = "dynamic-input";
+
+            // 입력 예시 텍스트
+            if(title.indexOf('(') >= 0 && title.indexOf('(') >= 0) {
+                title = title.split("(")[0];
+                description = (requiredInputList[i].split("(")[1]).split(")")[0];
+            }
+
+            label.innerHTML = title;
+            inputContainer.appendChild(label);
+
+            // 입력 값 폼
+            let input;
+            let newline = null;
+
+            if(title == "메시지") {
+                input = document.createElement("textarea");
+
+                newline = document.createElement("button");
+                newline.type = "button";
+                newline.innerHTML = "줄바꿈 넣기";
+                newline.className = "btn-newline";
+                newline.addEventListener('click', function addNewLine() {
+                    input.value += "\\n";
+                    input.focus();
+
+                    return;
+                });
+            }
+            else {
+                input = document.createElement("input");
+            }
+
+            input.type = "text";
+            input.name = title;
+            input.className = "dynamic-input";
+            input.required = "true";
+
+            // 입력 정규식 설정
+            if(requiredInputList[i].indexOf('<') >= 0 && requiredInputList[i].indexOf('>') >= 0) {
+                input.pattern = (requiredInputList[i].split("<")[1]).split(">")[0];
+            }
+
+            inputContainer.appendChild(input);
+
+            let desc = document.createElement("div");
+            desc.innerHTML = description;
+            desc.className = "description";
+
+            inputContainer.appendChild(desc);
+
+            inputs.appendChild(inputContainer);
+
+            if(i == requiredInputList.length - 1) {
+                let template = document.createElement("div");
+
+                if(newline) {
+                    template.appendChild(newline);
+                }
+
+                let createCommand = document.createElement("input");
+
+                createCommand.className = "btn-register";
+                createCommand.type = "submit";
+                createCommand.value = "등록";
+
+                template.appendChild(createCommand);
+
+                inputs.appendChild(template);
+            }
+        }
+    }
+}
+
+
+</script>
+</body>
+</html>

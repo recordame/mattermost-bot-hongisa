@@ -1,17 +1,14 @@
 from urllib.request import urlopen, Request
 
 import bs4
-import urllib3
 from mmpy_bot import listen_to, Message
 
 from alarm.alarm_context import AlarmContextBuilder
-from alarm.builtin.abstract_builtin_alarm import AbstractBuiltinAlarm
+from alarm.builtin.abstract_builtin_alarm import AbstractChannelAlarm
 from common import constant
 
-urllib3.disable_warnings()
 
-
-class MassAlarm(AbstractBuiltinAlarm):
+class MassAlarm(AbstractChannelAlarm):
     name = '미사'
     id = 'mass'
     day = 'sun'
@@ -19,7 +16,7 @@ class MassAlarm(AbstractBuiltinAlarm):
 
     def __init__(self):
         super().__init__()
-        self.add_builtin_alarm(self.name, self)
+        self.register_instance(self.name, self)
 
     def generate_message(self, option: str = ''):
         web_page = load_web_page()
@@ -68,7 +65,7 @@ def load_web_page():
     req = Request(url)
     page = urlopen(req)
     html = page.read().decode('utf-8')
-    soup = bs4.BeautifulSoup(html, 'html.parser')
+    soup = bs4.BeautifulSoup(html, 'html.parser').text
 
     return soup
 
