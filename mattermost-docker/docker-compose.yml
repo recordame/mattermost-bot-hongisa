@@ -1,5 +1,5 @@
 # docker-compose run -p 8065:8065 mattermost mattermost
-# docker-compose run postgres postgres
+# docker-compose run -p 5432:5432 postgres  postgres
 
 version: '2.4'
 

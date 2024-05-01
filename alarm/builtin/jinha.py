@@ -25,7 +25,7 @@ class JinhaAlarm(AbstractChannelAlarm):
         month_count = 0
         for year in range(2023, today.year + 1):
             for month in range(1, 13):
-                if datetime(year, month, 19) < datetime(today.year, today.month, today.day):
+                if datetime(year, month, 19) <= datetime(today.year, today.month, today.day):
                     month_count += 1
 
         if jinha_birth_day.day <= today.day:
