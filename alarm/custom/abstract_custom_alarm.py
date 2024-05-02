@@ -6,6 +6,8 @@ from abc import ABCMeta, abstractmethod
 import urllib3
 from apscheduler.job import Job
 from apscheduler.schedulers.background import BackgroundScheduler
+
+from alarm.builtin.mass import MassAlarm
 from common.utils import get_today_str
 from mmpy_bot import Plugin, Message
 
@@ -281,6 +283,11 @@ class AbstractCustomAlarm(Plugin, metaclass=ABCMeta):
             after_insertion = alarm_message.split('$날짜')[1].replace('\\n', '\n')
 
             return lambda: self.post_message(post_to, alarm_message=before_insertion + get_today_str() + after_insertion)
+        elif '$미사' in alarm_message:
+            before_insertion = alarm_message.split('$미사')[0].replace('\\n', '\n')
+            after_insertion = alarm_message.split('$미사')[1].replace('\\n', '\n')
+
+            return lambda: self.post_message(post_to, alarm_message=before_insertion + MassAlarm.generate_message() + after_insertion)
         else:
             return lambda: self.post_message(post_to, alarm_message)
 

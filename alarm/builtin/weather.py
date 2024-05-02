@@ -71,12 +71,12 @@ def load_web_page(loc: str = '중원구금광동'):
     page = urlopen(req)
 
     html = page.read().decode('utf-8')
-    soup = bs4.BeautifulSoup(html, 'html.parser').text
+    soup = bs4.BeautifulSoup(html, 'html.parser')
 
     return soup
 
 
-def extract_today_weather_information(info: str):
+def extract_today_weather_information(info):
     try:
         location = info \
             .find('div', class_='title_area') \
@@ -150,9 +150,8 @@ def extract_today_weather_information(info: str):
     return msg
 
 
-def extract_tomorrow_weather_information(info: str):
-    status_am = info \
-        .find('div', class_='weather_info type_tomorrow') \
+def extract_tomorrow_weather_information(info):
+    status_am = info.find('div', class_='weather_info type_tomorrow') \
         .find('ul', class_='weather_info_list _tomorrow') \
         .find('div', class_='weather_main') \
         .text \

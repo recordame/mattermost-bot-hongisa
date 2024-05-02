@@ -1,10 +1,8 @@
 import logging
 import threading
 
-import mattermostdriver
-import mmpy_bot.driver
 from flask import Flask, render_template, request, redirect
-from mmpy_bot import listen_to, Message, Plugin
+from mmpy_bot import listen_to, Plugin, Message
 
 from alarm.builtin.jinha import JinhaAlarm
 from alarm.builtin.kordle import KordleAlarm
@@ -19,9 +17,10 @@ from common import constant
 from common.utils import create_mattermost_message_by_user_id_and_name, get_info_by_id
 
 # 웹 서버 기동
-
 app = Flask(__name__)
 threading.Thread(daemon=True, target=app.run, kwargs={'host': '0.0.0.0', 'port': constant.FLASK_SERVER_PORT}).start()
+
+window_close_script = '<script>setTimeout(function(){ window.close(); }, 2000);</script>'
 
 
 # 알람 등록 용 웹 페이지 호출
@@ -38,6 +37,7 @@ def process_command_and_redirect_to_index():
     error_page = f'<!DOCTYPE HTML>' \
                  f'<html>' \
                  f'문제가 발생했어요.. 홍집사아빠를 찾아 주세요!' \
+                 f'{window_close_script}' \
                  f'</html>'
 
     inputs = request.form
@@ -63,9 +63,9 @@ def delete_todo(user_id: str, todo_id: str):
 
     try:
         Todo.done_todo(message, todo_id)
-        return '할일 삭제 완료! 창을 닫아주세요! ', 200
+        return f'할일 삭제 완료! {window_close_script}', 200
     except:
-        return '오류가 발생했어요ㅠ 홍집사 주인에게 문의해 주세요!', 500
+        return f'오류가 발생했어요ㅠ 홍집사 주인에게 문의해 주세요! {window_close_script}', 500
 
 
 # 알람 등록 처리
@@ -247,11 +247,13 @@ def cancel_alarm(user_id: str, destination_id: str, alarm_id: str):
                f'- 삭제 요청 항목: {alarm_id}<br/><br/>' \
                f'<a href="http://{constant.FLASK_SERVER_IP}:{constant.FLASK_SERVER_PORT}/' \
                f'{message.user_id}/' \
-               f'{message.sender_name}">신규알람 등록하기</a>', 200
+               f'{message.sender_name}">신규알람 등록하기</a>' \
+               f'{window_close_script}', 200
     else:
         return f'오류가 발생했어요ㅠ 홍집사아빠에게 문의해 주세요!<br>' \
                f'- 채널/유저 ID: {destination_id}<br/>' \
-               f'- 삭제 요청 항목: {alarm_id}', 500
+               f'- 삭제 요청 항목: {alarm_id}' \
+               f'{window_close_script}', 500
 
 
 # 개인 알람 정지 처리
@@ -275,11 +277,13 @@ def pause_user_alarm(user_id: str, destination_id: str, alarm_id: str):
     if is_processed:
         return f'홍집사에게 정지 요청 전달 완료! 홍집사와 대화창에서 결과를 확인해 보세요!<br/>' \
                f'- 유저 ID: {destination_id}<br/>' \
-               f'- 정지 요청 항목: {alarm_id}<br/><br/><br/>', 200
+               f'- 정지 요청 항목: {alarm_id}<br/>' \
+               f'{window_close_script}', 200
     else:
         return f'오류가 발생했어요ㅠ 홍집사아빠에게 문의해 주세요!<br>' \
                f'- 유저 ID: {destination_id}<br/>' \
-               f'- 정지 요청 항목: {alarm_id}', 500
+               f'- 정지 요청 항목: {alarm_id}' \
+               f'{window_close_script}', 500
 
 
 # 개인 알람 재개 처리
@@ -303,26 +307,32 @@ def resume_user_alarm(user_id: str, destination_id: str, alarm_id: str):
     if is_processed:
         return f'홍집사에게 재개 요청 전달 완료! 홍집사와 대화창에서 결과를 확인해 보세요!<br/>' \
                f'- 유저 ID: {destination_id}<br/>' \
-               f'- 재개 요청 항목: {alarm_id}<br/><br/><br/>', 200
+               f'- 재개 요청 항목: {alarm_id}<br/>' \
+               f'{window_close_script}', 200
     else:
         return f'오류가 발생했어요ㅠ 홍집사아빠에게 문의해 주세요!<br>' \
                f'- 유저 ID: {destination_id}<br/>' \
-               f'- 재개 요청 항목: {alarm_id}', 500
+               f'- 재개 요청 항목: {alarm_id}' \
+               f'{window_close_script}', 500
 
 
 class WebServer(Plugin):
     @listen_to("^홍집사$")
     def create_command_api_url(self, message: Message):
-        self.driver.direct_message(message.user_id, f'[홍집사:coffee:]('
-                                                    f'http://{constant.FLASK_SERVER_IP}:{constant.FLASK_SERVER_PORT}/'
-                                                    f'{message.user_id}/'
-                                                    f'{message.sender_name}'
-                                                    f') 입장하기!'
-                                   )
+        self.driver.direct_message(
+            message.user_id,
+            f'[홍집사:coffee:]('
+            f'http://{constant.FLASK_SERVER_IP}:{constant.FLASK_SERVER_PORT}/'
+            f'{message.user_id}/'
+            f'{message.sender_name}'
+            f') 입장하기!'
+        )
 
     @listen_to("^사다리게임$")
     def post_ladder_game_url(self, message: Message):
-        self.driver.direct_message(message.user_id, f'[사다리 게임]('
-                                                    f'http://{constant.FLASK_SERVER_IP}:{constant.FLASK_SERVER_PORT}/ladder-game'
-                                                    f') 입장하기!'
-                                   )
+        self.driver.direct_message(
+            message.user_id,
+            f'[사다리 게임]('
+            f'http://{constant.FLASK_SERVER_IP}:{constant.FLASK_SERVER_PORT}/ladder-game'
+            f') 입장하기!'
+        )
