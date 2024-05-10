@@ -1,3 +1,4 @@
+import logging
 from urllib.request import urlopen, Request
 
 import bs4
@@ -30,7 +31,7 @@ class MassAlarm(AbstractChannelAlarm):
 
     @listen_to('^%s$' % name)
     def direct(self, message: Message):
-        self.alarm(message.user_id)
+        self.driver.direct_message(message.user_id, self.generate_message())
 
     @listen_to('^%s알림$' % name)
     def notify(self, message: Message, post_to=channel_id):
@@ -65,12 +66,12 @@ def load_web_page():
     req = Request(url)
     page = urlopen(req)
     html = page.read().decode('utf-8')
-    soup = bs4.BeautifulSoup(html, 'html.parser').text
+    soup = bs4.BeautifulSoup(html, 'html.parser')
 
     return soup
 
 
-def extract_mass_information(info: str):
+def extract_mass_information(info):
     today = info.find('p', class_='bibleBox').text.replace('  ', ' ')
     mass_day = info.find('em').text
     mass_title = info.find('p', class_='bibleTit').text;

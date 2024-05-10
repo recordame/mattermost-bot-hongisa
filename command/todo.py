@@ -17,7 +17,7 @@ class Todo(Plugin):
             id='todo_notifier',
             func=lambda: self.notify_daily(self.user_todo_list),
             trigger='cron',
-            day_of_week='mon-fri',
+            day_of_week='*',
             hour='07',
             minute='00',
             misfire_grace_time=60

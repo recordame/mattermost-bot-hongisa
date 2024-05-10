@@ -3,17 +3,14 @@ import logging
 import re
 from abc import ABCMeta, abstractmethod
 
-import urllib3
 from apscheduler.job import Job
 from apscheduler.schedulers.background import BackgroundScheduler
-
-from alarm.builtin.mass import MassAlarm
-from common.utils import get_today_str
 from mmpy_bot import Plugin, Message
 
 from alarm.alarm_context import AlarmContext
 from alarm.alarm_util import save_alarms_to_file_in_json
 from common import constant
+from common.utils import get_today_str
 
 
 class AbstractCustomAlarm(Plugin, metaclass=ABCMeta):
@@ -282,12 +279,12 @@ class AbstractCustomAlarm(Plugin, metaclass=ABCMeta):
             before_insertion = alarm_message.split('$날짜')[0].replace('\\n', '\n')
             after_insertion = alarm_message.split('$날짜')[1].replace('\\n', '\n')
 
-            return lambda: self.post_message(post_to, alarm_message=before_insertion + get_today_str() + after_insertion)
+            return lambda: self.post_message(post_to, alarm_message=f'{before_insertion}{get_today_str()}{after_insertion}')
         elif '$미사' in alarm_message:
             before_insertion = alarm_message.split('$미사')[0].replace('\\n', '\n')
             after_insertion = alarm_message.split('$미사')[1].replace('\\n', '\n')
 
-            return lambda: self.post_message(post_to, alarm_message=before_insertion + MassAlarm.generate_message() + after_insertion)
+            return lambda: self.post_message(post_to, alarm_message=f'{before_insertion}{str(constant.BUILTIN_ALARM_INSTANCES.get("미사").generate_message()).removeprefix("@here").strip(" ")}{after_insertion}')
         else:
             return lambda: self.post_message(post_to, alarm_message)
 
