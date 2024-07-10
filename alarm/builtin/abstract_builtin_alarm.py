@@ -72,8 +72,6 @@ class AbstractChannelAlarm(Plugin, metaclass=ABCMeta):
                     f'`{ctx.name}` 을/를 `{ctx.day} {ctx.hour}:{ctx.minute}:{ctx.second}` 에 전달해드릴게요 :dizzy:'
                 )
 
-                self.advertise_web_interface(ctx.creator_id, ctx.creator_name)
-
     def is_already_scheduled(self, ctx: AlarmContext):
         job = constant.CHANNEL_ALARM_SCHEDULER.get_job(ctx.job_id)
 
@@ -84,6 +82,7 @@ class AbstractChannelAlarm(Plugin, metaclass=ABCMeta):
                 ctx.creator_id, f'이미 등록된 항목이 있어요! 취소 후 재등록해주세요.\n'
                                 f'**항목 정보**\n'
                                 f'{existing_ctx.get_info()}\n'
+                                f'   - [취소하기](http://{constant.FLASK_SERVER_IP}:{constant.FLASK_SERVER_PORT}/alarm/{existing_ctx.creator_id}/{existing_ctx.post_to}/{existing_ctx.id}/cancel)'
             )
 
             return True

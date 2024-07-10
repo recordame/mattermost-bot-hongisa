@@ -61,6 +61,7 @@ class AbstractCustomAlarm(Plugin, metaclass=ABCMeta):
                 message.user_id, f'이미 등록된 항목이 있어요! 취소 후 재등록해주세요.\n'
                                  f'**항목 정보**\n'
                                  f'{existing_ctx.get_info()}\n'
+                                 f'   - [취소하기](http://{constant.FLASK_SERVER_IP}:{constant.FLASK_SERVER_PORT}/alarm/{existing_ctx.creator_id}/{existing_ctx.post_to}/{existing_ctx.id}/cancel)'
             )
 
             return
