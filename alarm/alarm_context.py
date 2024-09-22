@@ -77,8 +77,11 @@ class AlarmContext:
             message += f'   - 기준: `{self.interval_from}`\n'
 
         if str(self.message).__len__() != 0:
-            tmp = self.message.replace('\n', '\\n')
-            message += f'   - 내용: `{tmp}`\n'
+            try:
+                tmp = self.message.replace('\n', '\\n')
+                message += f'   - 내용: `{tmp}`\n'
+            except:
+                pass
 
         message += f'   - 상태: `{self.job_status}` :{"recycle" if self.job_status == "실행" else "red_circle"}:'
 

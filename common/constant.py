@@ -2,14 +2,14 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from pytz import timezone
 
 # 웹서버 정보
-FLASK_SERVER_IP: str = '125.241.62.3'
+FLASK_SERVER_IP: str = '122.153.62.5'
 FLASK_SERVER_PORT: str = '8006'
 
 KR_TIME_ZONE = timezone('Asia/Seoul')
 
 BOT_TOKEN: str = 'fj6kf9txdiygu8ga8ca7oth1qr'
 BOT_TEAM: str = 'hongeejanggun'
-MATTERMOST_URL = 'http://125.241.62.3'
+MATTERMOST_URL = 'http://172.22.0.3'
 MATTERMOST_PORT = 8065
 ADMINS: list = ['recordame']
 

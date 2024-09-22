@@ -9,11 +9,14 @@ from alarm.alarm_context import AlarmContextBuilder
 from alarm.builtin.abstract_builtin_alarm import AbstractChannelAlarm
 from common import constant
 
+default_loc = '송파구풍납2동'
+
 
 class WeatherAlarm(AbstractChannelAlarm):
     name = '날씨'
     id = 'weather'
     day = 'mon-sun'
+
     channel_id = constant.CH_NOTIFICATIONS_ID
 
     def __init__(self):
@@ -24,16 +27,17 @@ class WeatherAlarm(AbstractChannelAlarm):
         loc: str = args[0][0]
 
         if loc is None:
-            loc = "중원구금광동"
+            loc = default_loc
 
         info = load_web_page(loc)
-        msg = extract_today_weather_information(info) + '\n-------\n' + extract_tomorrow_weather_information(info)
+        msg = extract_today_weather_information(info)
+        # + '\n-------\n' + extract_tomorrow_weather_information(info))
 
         return msg
 
     @listen_to('^%s$' % name)
     def default_location(self, message: Message):
-        self.driver.direct_message(message.user_id, self.generate_message(['중원구금광동']))
+        self.driver.direct_message(message.user_id, self.generate_message([default_loc]))
 
     @listen_to('^%s\\s([가-힣]+)$' % name)
     def direct(self, message: Message, location: str):
@@ -63,7 +67,7 @@ class WeatherAlarm(AbstractChannelAlarm):
 
 ##################################
 
-def load_web_page(loc: str = '중원구금광동'):
+def load_web_page(loc: str = default_loc):
     # 네이버 날씨
     url: str = f'https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=1&ie=utf8&query={urllib.parse.quote(f"{loc}+날씨")}'
 
@@ -141,11 +145,9 @@ def extract_today_weather_information(info):
     today = datetime.now()
 
     msg = '@here `%s`\n' % today.strftime("%Y년 %m월 %d일 %H시") + \
-          '**`%s`** 날씨정보' % location + \
+          f'**`{location}`** 날씨정보' + \
           '\n\n-----------------------------\n' + \
-          '**현재 날씨**는 %s이고,\n**기온**은 `%s`로 어제보다 %s.\n오늘 **최저** `%s`, **최고** `%s`로 예상돼요.\n* 미세먼지 %s\n* 초미세먼지 %s' \
-          % (status, temp, temp_yesterday, temp_lowest, temp_highest, add_icon(fine_particle),
-             add_icon(ultra_fine_particle))
+          f'**현재 날씨**는 {status}, **기온**은 `{temp}`예요.\n오늘 **최저** `{temp_lowest}`, **최고** `{temp_highest}`로 예상돼요.\n* 미세먼지 {add_icon(fine_particle)}\n* 초미세먼지 {add_icon(ultra_fine_particle)}'
 
     return msg
 

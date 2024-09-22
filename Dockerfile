@@ -15,6 +15,8 @@ RUN pip install -r requirements.txt
 COPY lib-patch/usr/local/lib/python/site-packages/mattermostdriver/websocket.py /usr/local/lib/python3.10/site-packages/mattermostdriver
 
 # 또는 docker -v HOST_파일경로:IMAGE_경로 명령어로 파일 연결
-# docker run -d --name hong-zip-sa -p 8006:8006 -v /Users/Gwangui/PycharmProjects/mattermost-bot-1404/:/app -v /Users/Gwangui/PycharmProjects/mattermost-bot-1404/json-db:/json-db mattermost-bot
+# docker network create mattermost-network
+# docker network inspect mattermost-network
+# docker run -d --name hong-zip-sa -p 8006:8006 -v /Users/Gwangui/PycharmProjects/mattermost-bot-1404/:/app -v /Users/Gwangui/PycharmProjects/mattermost-bot-1404/json-db:/json-db mattermost-bot --network mattermost-network
 
 ENTRYPOINT ["python","/app/bot.py"]
