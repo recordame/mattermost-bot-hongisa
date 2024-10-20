@@ -83,7 +83,7 @@ class AlarmContext:
             except:
                 pass
 
-        message += f'   - 상태: `{self.job_status}` :{"recycle" if self.job_status == "실행" else "red_circle"}:'
+        message += f'   - 상태: `{self.job_status}` :{"recycle" if self.job_status.__contains__("실행") else "red_circle"}:'
 
         return message
 

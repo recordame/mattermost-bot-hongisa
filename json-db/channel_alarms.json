@@ -33,6 +33,38 @@
         "message": null,
         "job_id": "np83b9aggif98j1omio1m3zozo_weather",
         "job_status": "실행"
+      },
+      {
+        "creator_name": "recordame",
+        "creator_id": "ne44boutnbyn7d5m53bcctzezc",
+        "post_to": "np83b9aggif98j1omio1m3zozo",
+        "name": "채널",
+        "id": "정수기-세디먼트",
+        "day": "",
+        "hour": "00",
+        "minute": "00",
+        "second": "00",
+        "interval": "121일",
+        "interval_from": "2024-10-20T09:00:00",
+        "message": "@here 정수기 세디먼트 필터를 교체해 주세요!",
+        "job_id": "np83b9aggif98j1omio1m3zozo_정수기-세디먼트",
+        "job_status": "실행"
+      },
+      {
+        "creator_name": "recordame",
+        "creator_id": "ne44boutnbyn7d5m53bcctzezc",
+        "post_to": "np83b9aggif98j1omio1m3zozo",
+        "name": "채널",
+        "id": "정수기-카본-나노",
+        "day": "",
+        "hour": "00",
+        "minute": "00",
+        "second": "00",
+        "interval": "363일",
+        "interval_from": "2024-10-20T09:00:00",
+        "message": "@here 정수기 카본필터와 나노필터를 교체해 주세요!",
+        "job_id": "np83b9aggif98j1omio1m3zozo_정수기-카본-나노",
+        "job_status": "실행"
       }
     ]
   },

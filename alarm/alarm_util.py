@@ -198,8 +198,8 @@ def load_channel_alarms_from_file():
                         alarm['interval_from'],
                         None,
                         alarm['message'],
-                        recovery_mode,
-                        alarm['job_status']
+                        alarm['job_status'],
+                        recovery_mode
                     )
                 else:
                     channel_alarm.add_alarm(

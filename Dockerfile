@@ -19,4 +19,11 @@ COPY lib-patch/usr/local/lib/python/site-packages/mattermostdriver/websocket.py 
 # docker network inspect mattermost-network
 # docker run -d --name hong-zip-sa -p 8006:8006 -v /Users/Gwangui/PycharmProjects/mattermost-bot-1404/:/app -v /Users/Gwangui/PycharmProjects/mattermost-bot-1404/json-db:/json-db mattermost-bot --network mattermost-network
 
+# docker network create mattermost-network
+# docker network connect mattermost-network postgresql
+# docker inspect postgresql | grep IPAddress
+# docker network connect mattermost-network mattermost
+# docker inspect mattermost | grep IPAddress
+# docker network connect mattermost-network hong-zip-sa
+
 ENTRYPOINT ["python","/app/bot.py"]

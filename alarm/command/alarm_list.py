@@ -2,7 +2,7 @@ import logging
 
 import mmpy_bot
 
-from alarm.alarm_util import get_alarm_info, count_alarms
+from alarm.alarm_util import get_alarm_info, count_alarms, reload_user_alarms_from_file, reload_channel_alarms_from_file
 from common import constant
 
 
@@ -38,3 +38,12 @@ class AlarmList(mmpy_bot.Plugin):
         msg = '----\n\n'
         msg = msg + get_alarm_info('예약', constant.EPHEMERAL_ALARMS, channel_id, message.user_id)
         self.driver.reply_to(message, msg)
+
+    @mmpy_bot.listen_to('^알람갱신$', direct_only=True)
+    def refresh_all_alarms(self, message: mmpy_bot.Message):
+        logging.info('[stat] 알람갱신')
+
+        reload_user_alarms_from_file()
+        reload_channel_alarms_from_file()
+        reload_channel_alarms_from_file()
+        self.driver.reply_to(message, '사용자, 채널, 예약 알람을 갱신 했어요!')
