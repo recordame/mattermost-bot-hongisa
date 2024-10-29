@@ -2,7 +2,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from pytz import timezone
 
 # 웹서버 정보
-FLASK_SERVER_IP: str = '122.153.62.5'
+FLASK_SERVER_IP: str = 'recordame.ddns.net'
 FLASK_SERVER_PORT: str = '8006'
 
 KR_TIME_ZONE = timezone('Asia/Seoul')

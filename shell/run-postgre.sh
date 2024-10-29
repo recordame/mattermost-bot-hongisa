@@ -1,0 +1,20 @@
+docker run \
+-p 5432:5432 \
+--name=postgresql \
+--network mattermost-network \
+--ip 172.22.0.4 \
+--env=TZ=Asia/Seoul \
+--env=POSTGRES_USER=mmuser \
+--env=POSTGRES_PASSWORD=mmuser_password \
+--env=POSTGRES_DB=mattermost \
+--env=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+--env=LANG=en_US.utf8 \
+--env=PG_MAJOR=13 \
+--env=PG_VERSION=13.11 \
+--env=PG_SHA256=4992ff647203566b670d4e54dc5317499a26856c93576d0ea951bdf6bee50bfb \
+--env='DOCKER_PG_LLVM_DEPS=llvm15-dev clang15' \
+--env=PGDATA=/var/lib/postgresql/data \
+--volume=/Users/gwangui/mattermost/db/postgresql/data:/var/lib/postgresql/data:rw \
+--volume=/var/lib/postgresql/data \
+--restart=always \
+--runtime=runc -d postgres:13-alpine

@@ -1,0 +1,26 @@
+docker run \
+--name=mattermost \
+--network mattermost-network \
+--ip 172.22.0.2 \
+--user=mattermost \
+--env=MM_SERVICESETTINGS_ALLOWCORSFROM=* \
+--env=TZ=Asia/Seoul \
+--env=MM_SQLSETTINGS_DRIVERNAME=postgres \
+--env=MM_SQLSETTINGS_DATASOURCE='postgres://mmuser:mmuser_password@172.22.0.4:5432/mattermost?sslmode=disable&connect_timeout=10' \
+--env=MM_BLEVESETTINGS_INDEXDIR=/mattermost/bleve-indexes \
+--env=PATH=/mattermost/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+--volume=/Users/gwangui/mattermost/app/logs:/mattermost/logs:rw \
+--volume=/Users/gwangui/mattermost/app/plugins:/mattermost/plugins:rw \
+--volume=/Users/gwangui/mattermost/app/client/plugins:/mattermost/client/plugins:rw \
+--volume=/Users/gwangui/mattermost/app/bleve-indexes:/mattermost/bleve-indexes:rw \
+--volume=/Users/gwangui/mattermost/app/config:/mattermost/config:rw \
+--volume=/Users/gwangui/mattermost/app/data:/mattermost/data:rw \
+--volume=/mattermost/client/plugins \
+--volume=/mattermost/config \
+--volume=/mattermost/data \
+--volume=/mattermost/logs \
+--volume=/mattermost/plugins \
+--restart=always \
+--workdir=/mattermost \
+-p 8065:8065 \
+--runtime=runc -t -d mattermost/mattermost-team-edition:release-10.1

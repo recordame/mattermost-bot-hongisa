@@ -1,0 +1,12 @@
+docker run \
+--name=mattermost-nginx \
+--network mattermost-network \
+--ip 172.22.0.3 \
+-p 80:80 \
+-p 443:443 \
+--volume=/Users/Gwangui/mattermost/nginx/conf/recordame.synology.me.conf:/etc/nginx/conf.d/recordame.synology.me.conf \
+--volume=/Users/Gwangui/mattermost/nginx/conf/nginx.conf:/etc/nginx/nginx.conf \
+--volume=/Users/Gwangui/mattermost/nginx/cert/server.crt:/etc/ssl/cert/server.crt \
+--volume=/Users/Gwangui/mattermost/nginx/cert/server.key:/etc/ssl/cert/server.key \
+--restart=always \
+-d nginx

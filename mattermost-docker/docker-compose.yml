@@ -6,7 +6,7 @@ version: '2.4'
 services:
   postgres:
     image: postgres:${POSTGRES_IMAGE_TAG}
-    restart: ${RESTART_POLICY}
+    restart: always
     security_opt:
       - no-new-privileges:true
     pids_limit: 100
@@ -31,11 +31,11 @@ services:
     depends_on:
       - postgres
     image: ${MATTERMOST_IMAGE}:${MATTERMOST_IMAGE_TAG}
-    restart: ${RESTART_POLICY}
+    restart: always
     security_opt:
       - no-new-privileges:true
     pids_limit: 200
-    read_only: ${MATTERMOST_CONTAINER_READONLY}
+    read_only: false
     tmpfs:
       - /tmp
     volumes:

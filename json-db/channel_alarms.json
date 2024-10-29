@@ -118,6 +118,22 @@
         "message": "@here 내일 어린이집에 가져갈 이불 챙겨주세요!",
         "job_id": "wske4xkn3tn7br5t1h3f4czx4o_어린이집준비",
         "job_status": "실행"
+      },
+      {
+        "creator_name": "recordame",
+        "creator_id": "ne44boutnbyn7d5m53bcctzezc",
+        "post_to": "wske4xkn3tn7br5t1h3f4czx4o",
+        "name": "채널",
+        "id": "어린이집오전죽",
+        "day": "tue",
+        "hour": "20",
+        "minute": "50",
+        "second": "00",
+        "interval": "",
+        "interval_from": "",
+        "message": "@here 내일은 야호 은물 어린이집에서 **오전**에 **죽**이나와요! 도시락을 준비할 필요가 없어요😄",
+        "job_id": "wske4xkn3tn7br5t1h3f4czx4o_어린이집오전죽",
+        "job_status": "실행"
       }
     ]
   },
