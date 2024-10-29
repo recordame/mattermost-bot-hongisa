@@ -24,7 +24,7 @@ window_close_script = '<script>setTimeout(function(){ window.close(); }, 2000);<
 
 
 # 알람 등록 용 웹 페이지 호출
-@app.route("/<user_id>/<user_name>", methods=['GET'])
+@app.route("/hongisa/<user_id>/<user_name>", methods=['GET'])
 def display_index(user_id: str, user_name: str):
     logging.info(f'[Web] 입장')
 
@@ -32,11 +32,11 @@ def display_index(user_id: str, user_name: str):
 
 
 # 알람 등록 후, 처음으로 돌아가기
-@app.route("/result", methods=['POST'])
+@app.route("/hongisa/result", methods=['POST'])
 def process_command_and_redirect_to_index():
     error_page = f'<!DOCTYPE HTML>' \
                  f'<html>' \
-                 f'문제가 발생했어요.. 홍집사아빠를 찾아 주세요!' \
+                 f'문제가 발생했어요.. 홍기사 주인을 찾아 주세요!' \
                  f'{window_close_script}' \
                  f'</html>'
 
@@ -45,19 +45,19 @@ def process_command_and_redirect_to_index():
     try:
         register_alarm(inputs)
 
-        return redirect(f'/{inputs.get("사용자 ID")}/{inputs.get("사용자 명")}')
+        return redirect(f'/hongisa/{inputs.get("사용자 ID")}/{inputs.get("사용자 명")}')
     except:
         return error_page
 
 
 # 사다리타기 호출
-@app.route("/ladder-game", methods=['GET'])
+@app.route("/hongisa/ladder-game", methods=['GET'])
 def ladder_game():
     return render_template('ladder_game.html')
 
 
 # 할일 끝내기 호출
-@app.route("/todo/<user_id>/<todo_id>/done", methods=['GET'])
+@app.route("/hongisa/todo/<user_id>/<todo_id>/done", methods=['GET'])
 def delete_todo(user_id: str, todo_id: str):
     message = create_mattermost_message_by_user_id_and_name(user_id, '')
 
@@ -65,7 +65,7 @@ def delete_todo(user_id: str, todo_id: str):
         Todo.done_todo(message, todo_id)
         return f'할일 삭제 완료! {window_close_script}', 200
     except:
-        return f'오류가 발생했어요ㅠ 홍집사 주인에게 문의해 주세요! {window_close_script}', 500
+        return f'오류가 발생했어요ㅠ 홍기사 주인에게 문의해 주세요! {window_close_script}', 500
 
 
 # 알람 등록 처리
@@ -178,7 +178,7 @@ def register_alarm(inputs: dict):
 
 
 # 알람 취소 처리
-@app.route("/alarm/<user_id>/<destination_id>/<alarm_id>/cancel", methods=['GET'])
+@app.route("/hongisa/alarm/<user_id>/<destination_id>/<alarm_id>/cancel", methods=['GET'])
 def cancel_alarm(user_id: str, destination_id: str, alarm_id: str):
     user = get_info_by_id('users', user_id)
     message = create_mattermost_message_by_user_id_and_name(user_id, user['username'])
@@ -242,22 +242,22 @@ def cancel_alarm(user_id: str, destination_id: str, alarm_id: str):
 
     # 결과 출력
     if is_processed:
-        return f'홍집사에게 삭제 요청 전달 완료! 홍집사와 대화창에서 결과를 확인해 보세요!<br/>' \
+        return f'홍기사에게 삭제 요청 전달 완료! 홍기사와 대화창에서 결과를 확인해 보세요!<br/>' \
                f'- 채널/유저 ID: {destination_id}<br/>' \
                f'- 삭제 요청 항목: {alarm_id}<br/><br/>' \
-               f'<a href="http://{constant.FLASK_SERVER_IP}:{constant.FLASK_SERVER_PORT}/' \
+               f'<a href="https://{constant.FLASK_SERVER_IP}/hongisa' \
                f'{message.user_id}/' \
                f'{message.sender_name}">신규알람 등록하기</a>' \
                f'{window_close_script}', 200
     else:
-        return f'오류가 발생했어요ㅠ 홍집사아빠에게 문의해 주세요!<br>' \
+        return f'오류가 발생했어요ㅠ 홍기사 주인에게 문의해 주세요!<br>' \
                f'- 채널/유저 ID: {destination_id}<br/>' \
                f'- 삭제 요청 항목: {alarm_id}' \
                f'{window_close_script}', 500
 
 
 # 개인 알람 정지 처리
-@app.route("/alarm/<user_id>/<destination_id>/<alarm_id>/pause", methods=['GET'])
+@app.route("/hongisa/alarm/<user_id>/<destination_id>/<alarm_id>/pause", methods=['GET'])
 def pause_user_alarm(user_id: str, destination_id: str, alarm_id: str):
     user = get_info_by_id('users', user_id)
     message = create_mattermost_message_by_user_id_and_name(user_id, user['username'])
@@ -275,19 +275,19 @@ def pause_user_alarm(user_id: str, destination_id: str, alarm_id: str):
 
     # 결과 출력
     if is_processed:
-        return f'홍집사에게 정지 요청 전달 완료! 홍집사와 대화창에서 결과를 확인해 보세요!<br/>' \
+        return f'홍기사에게 정지 요청 전달 완료! 홍기사와 대화창에서 결과를 확인해 보세요!<br/>' \
                f'- 유저 ID: {destination_id}<br/>' \
                f'- 정지 요청 항목: {alarm_id}<br/>' \
                f'{window_close_script}', 200
     else:
-        return f'오류가 발생했어요ㅠ 홍집사아빠에게 문의해 주세요!<br>' \
+        return f'오류가 발생했어요ㅠ 홍기사 주인에게 문의해 주세요!<br>' \
                f'- 유저 ID: {destination_id}<br/>' \
                f'- 정지 요청 항목: {alarm_id}' \
                f'{window_close_script}', 500
 
 
 # 개인 알람 재개 처리
-@app.route("/alarm/<user_id>/<destination_id>/<alarm_id>/resume", methods=['GET'])
+@app.route("/hongisa/alarm/<user_id>/<destination_id>/<alarm_id>/resume", methods=['GET'])
 def resume_user_alarm(user_id: str, destination_id: str, alarm_id: str):
     user = get_info_by_id('users', user_id)
     message = create_mattermost_message_by_user_id_and_name(user_id, user['username'])
@@ -305,34 +305,26 @@ def resume_user_alarm(user_id: str, destination_id: str, alarm_id: str):
 
     # 결과 출력
     if is_processed:
-        return f'홍집사에게 재개 요청 전달 완료! 홍집사와 대화창에서 결과를 확인해 보세요!<br/>' \
+        return f'홍기사에게 재개 요청 전달 완료! 홍기사와 대화창에서 결과를 확인해 보세요!<br/>' \
                f'- 유저 ID: {destination_id}<br/>' \
                f'- 재개 요청 항목: {alarm_id}<br/>' \
                f'{window_close_script}', 200
     else:
-        return f'오류가 발생했어요ㅠ 홍집사아빠에게 문의해 주세요!<br>' \
+        return f'오류가 발생했어요ㅠ 홍기사 아빠에게 문의해 주세요!<br>' \
                f'- 유저 ID: {destination_id}<br/>' \
                f'- 재개 요청 항목: {alarm_id}' \
                f'{window_close_script}', 500
 
 
 class WebServer(Plugin):
-    @listen_to("^홍집사$")
+    @listen_to("^홍기사$")
     def create_command_api_url(self, message: Message):
         self.driver.direct_message(
-            message.user_id,
-            f'[홍집사:coffee:]('
-            f'http://{constant.FLASK_SERVER_IP}:{constant.FLASK_SERVER_PORT}/'
-            f'{message.user_id}/'
-            f'{message.sender_name}'
-            f') 입장하기!'
+            message.user_id, f'[홍기사:coffee:](https://{constant.FLASK_SERVER_IP}/hongisa/{message.user_id}/{message.sender_name}) 입장하기!'
         )
 
     @listen_to("^사다리게임$")
     def post_ladder_game_url(self, message: Message):
         self.driver.direct_message(
-            message.user_id,
-            f'[사다리 게임]('
-            f'http://{constant.FLASK_SERVER_IP}:{constant.FLASK_SERVER_PORT}/ladder-game'
-            f') 입장하기!'
+            message.user_id, f'[사다리 게임](https://{constant.FLASK_SERVER_IP}/hongisa/ladder-game) 입장하기!'
         )

@@ -29,7 +29,7 @@ class Todo(Plugin):
             try:
                 todo_list = self.user_todo_list[user_id]
 
-                msg = f'`{get_today_str()}` 좋은 아침이에요 :sunny: 홍집사가 할일을 알려드릴게요!\n'
+                msg = f'`{get_today_str()}` 좋은 아침이에요 :sunny: 홍기사가 할일을 알려드릴게요!\n'
                 msg += generate_todo_list(todo_list, user_id)
 
                 self.driver.direct_message(user_id, msg)
@@ -109,7 +109,7 @@ def generate_todo_list(todo_list: list, user_id: str):
           '|---|---|---|\n'
 
     for todo in todo_list:
-        msg += f'|{todo_id}|{todo}|[끝내기](http://{constant.FLASK_SERVER_IP}:{constant.FLASK_SERVER_PORT}/todo/{user_id}/{todo_id}/done)|\n'
+        msg += f'|{todo_id}|{todo}|[끝내기](https://{constant.FLASK_SERVER_IP}/hongisa/todo/{user_id}/{todo_id}/done)|\n'
         todo_id = todo_id + 1
 
     return msg

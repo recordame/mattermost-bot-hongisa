@@ -21,7 +21,7 @@ CH_JINHA_ID: str = 'wske4xkn3tn7br5t1h3f4czx4o'
 # 빌트인 유형 알람 인스턴스 저장용 변수 : AbstractAlarm
 BUILTIN_ALARM_INSTANCES: dict[str, object] = {}
 
-# 홍집사 백그라운드 작업 JOB
+# 홍기사 백그라운드 작업 JOB
 BACKGROUND_SCHEDULER = BackgroundScheduler(timezone='Asia/Seoul')
 
 # 채널 알람 목록 저장용 변수

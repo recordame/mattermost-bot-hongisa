@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>홍집사</title>
+    <title>홍기사</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -110,7 +110,7 @@
     <option selected>알람</option>
 </select>
 
-<form action="/result" method="POST" id="dynamicInputs" class="dynamic-inputs">
+<form action="/hongisa/result" method="POST" id="dynamicInputs" class="dynamic-inputs">
 
 </form>
 
@@ -305,6 +305,26 @@ window.onload = function() {
             }
             else {
                 input = document.createElement("input");
+
+                let today = new Date();
+                if(title == "년") {
+                    input.value = "" + today.getFullYear();
+                }
+                else if(title == "월") {
+                    input.value = "" + (today.getMonth() + 1).toString().padStart(2, "0");
+                }
+                else if(title == "일") {
+                    input.value = today.getDate().toString().padStart(2, "0");
+                }
+                else if(title == "시") {
+                    input.value = "" + today.getHours().toString().padStart(2, "0");
+                }
+                else if(title == "분") {
+                    input.value = "" + today.getMinutes().toString().padStart(2, "0");
+                }
+                else if(title == "초") {
+                    input.value = "00";
+                }
             }
 
             input.type = "text";

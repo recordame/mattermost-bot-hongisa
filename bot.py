@@ -51,7 +51,7 @@ bot = Bot(
 )
 
 # 로봇 설정
-# 홍집사 스케쥴러 시작
+# 홍기사 스케쥴러 시작
 constant.BACKGROUND_SCHEDULER.start()
 
 # 할일 목록 알람 백그라운드 스케쥴 시작

@@ -128,7 +128,7 @@ def get_info_by_id(info: str, info_id: str) -> dict:
         return {}
 
 
-# 홍집사와 1:1 대화방인지, 채널에서 요청인지 확인하여 응답 전달
+# 홍기사와 1:1 대화방인지, 채널에서 요청인지 확인하여 응답 전달
 def send_or_post_message(driver: Driver, message: Message, msg: str):
     if message.body['data']['channel_name'] == constant.BOT_ID + '__' + message.user_id:
         driver.direct_message(message.user_id, msg)

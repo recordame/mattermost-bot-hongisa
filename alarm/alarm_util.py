@@ -7,7 +7,7 @@ from common import constant
 from common.utils import create_mattermost_message_by_user_id_and_name, read_json_file
 
 
-# 홍집사에 등록된 총 알람수 계산
+# 홍기사에 등록된 총 알람수 계산
 def count_alarms(alarm_contexts: dict):
     count: int = 0
 
@@ -33,13 +33,13 @@ def get_alarm_info(alarm_type_kr: str, alarm_contexts: dict, channel_id: str = N
                     index += 1
                     message += f'[{alarm_type_kr}{index}]\n' \
                                f'{alarm.get_info()}\n' \
-                               f'   - [취소하기](http://{constant.FLASK_SERVER_IP}:{constant.FLASK_SERVER_PORT}/alarm/{creator_id}/{alarm.post_to}/{alarm.id}/cancel)'
+                               f'   - [취소하기](https://{constant.FLASK_SERVER_IP}/hongisa/alarm/{creator_id}/{alarm.post_to}/{alarm.id}/cancel)'
 
                     if alarm_type_kr == '개인':
                         if alarm.job_status == '실행':
-                            message += f', [정지하기](http://{constant.FLASK_SERVER_IP}:{constant.FLASK_SERVER_PORT}/alarm/{creator_id}/{alarm.post_to}/{alarm.id}/pause)'
+                            message += f', [정지하기](https://{constant.FLASK_SERVER_IP}/hongisa/alarm/{creator_id}/{alarm.post_to}/{alarm.id}/pause)'
                         else:
-                            message += f', [재개하기](http://{constant.FLASK_SERVER_IP}:{constant.FLASK_SERVER_PORT}/alarm/{creator_id}/{alarm.post_to}/{alarm.id}/resume)'
+                            message += f', [재개하기](https://{constant.FLASK_SERVER_IP}/hongisa/alarm/{creator_id}/{alarm.post_to}/{alarm.id}/resume)'
 
                     message += '\n'
     else:
@@ -50,7 +50,7 @@ def get_alarm_info(alarm_type_kr: str, alarm_contexts: dict, channel_id: str = N
                 index += 1
                 message += f'[{alarm_type_kr}{index}]\n' \
                            f'{alarm.get_info()}\n' \
-                           f'   - [취소하기](http://{constant.FLASK_SERVER_IP}:{constant.FLASK_SERVER_PORT}/alarm/{creator_id}/{alarm.post_to}/{alarm.id}/cancel)\n'
+                           f'   - [취소하기](https://{constant.FLASK_SERVER_IP}/hongisa/alarm/{creator_id}/{alarm.post_to}/{alarm.id}/cancel)\n'
         except KeyError:
             pass
 
