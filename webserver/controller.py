@@ -310,7 +310,7 @@ def resume_user_alarm(user_id: str, destination_id: str, alarm_id: str):
                f'- 재개 요청 항목: {alarm_id}<br/>' \
                f'{window_close_script}', 200
     else:
-        return f'오류가 발생했어요ㅠ 홍기사 아빠에게 문의해 주세요!<br>' \
+        return f'오류가 발생했어요ㅠ 홍기사 주인에게 문의해 주세요!<br>' \
                f'- 유저 ID: {destination_id}<br/>' \
                f'- 재개 요청 항목: {alarm_id}' \
                f'{window_close_script}', 500
