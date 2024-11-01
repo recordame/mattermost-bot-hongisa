@@ -26,12 +26,11 @@ class WeatherAlarm(AbstractChannelAlarm):
     def generate_message(self, *args):
         loc: str = args[0][0]
 
-        if loc is None:
+        if (loc is None) or len(loc) == 0:
             loc = default_loc
 
         info = load_web_page(loc)
         msg = extract_today_weather_information(info)
-        # + '\n-------\n' + extract_tomorrow_weather_information(info))
 
         return msg
 
@@ -144,7 +143,7 @@ def extract_today_weather_information(info):
 
     today = datetime.now()
 
-    msg = '@here `%s`\n' % today.strftime("%Y년 %m월 %d일 %H시") + \
+    msg = '@here `%s`\n' % today.strftime("%Y-%m-%d %H:00") + \
           f'**`{location}`** 날씨정보' + \
           '\n\n-----------------------------\n' + \
           f'**현재 날씨**는 {status}, **기온**은 `{temp}`예요.\n오늘 **최저** `{temp_lowest}`, **최고** `{temp_highest}`로 예상돼요.\n* 미세먼지 {add_icon(fine_particle)}\n* 초미세먼지 {add_icon(ultra_fine_particle)}'

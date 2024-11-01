@@ -46,7 +46,7 @@ class JinhaAlarm(AbstractChannelAlarm):
             age_str = '%s개월 %s일' % (age_month, age_day)
 
         msg = '@here `%s`\n오늘은 **진하**:baby:가 태어난지 %s일째(%s) 되는 날!' \
-              % (today.strftime('%Y년 %m월 %d일'), days_after_birth, age_str)
+              % (today.strftime('%Y-%m-%d'), days_after_birth, age_str)
 
         return msg
 

@@ -16,6 +16,7 @@ from alarm.custom.ephemeral_alarm import EphemeralAlarm
 from alarm.custom.user_alarm import UserAlarm
 from command.currency import CurrencyAlarm
 from command.help import Help
+from command.simple import Simple
 from command.todo import Todo
 from common import constant
 from webserver.controller import WebServer
@@ -46,6 +47,7 @@ bot = Bot(
         EphemeralAlarm(),
         AlarmList(),
         Todo(),
+        Simple(),
         WebServer(),
     ],
 )
