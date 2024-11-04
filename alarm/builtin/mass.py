@@ -7,6 +7,7 @@ from mmpy_bot import listen_to, Message
 from alarm.alarm_context import AlarmContextBuilder
 from alarm.builtin.abstract_builtin_alarm import AbstractChannelAlarm
 from common import constant
+from common.utils import get_today_str
 
 
 class MassAlarm(AbstractChannelAlarm):
@@ -76,6 +77,6 @@ def extract_mass_information(info):
     mass_day = info.find('em').text
     mass_title = info.find('p', class_='bibleTit').text;
 
-    msg = '`' + today + '`' + '\n**' + mass_day + '**\n >' + mass_title + '\n'
+    msg = '`' + get_today_str() + '`' + '\n**' + mass_day + '**\n >' + mass_title + '\n'
 
     return msg

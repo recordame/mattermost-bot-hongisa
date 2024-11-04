@@ -52,7 +52,7 @@ def get_today_str():
     day = ['월', '화', '수', '목', '금', '토', '일']
 
     now = datetime.now(tz=KR_TIME_ZONE)
-    today = f'{now.strftime("%Y.%m.%d.").replace(".0", ".")}({day[now.weekday()]})'
+    today = f'{now.strftime("%Y")}. {int(now.strftime("%m"))}. {int(now.strftime("%d"))}.({day[now.weekday()]})'
 
     return today
 

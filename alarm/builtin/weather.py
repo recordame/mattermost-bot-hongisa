@@ -8,6 +8,7 @@ from mmpy_bot import listen_to, Message
 from alarm.alarm_context import AlarmContextBuilder
 from alarm.builtin.abstract_builtin_alarm import AbstractChannelAlarm
 from common import constant
+from common.utils import get_today_str
 
 default_loc = '송파구풍납2동'
 
@@ -143,7 +144,7 @@ def extract_today_weather_information(info):
 
     today = datetime.now()
 
-    msg = '@here `%s`\n' % today.strftime("%Y-%m-%d %H:00") + \
+    msg = '@here `%s`\n' % get_today_str() + \
           f'**`{location}`** 날씨정보' + \
           '\n\n-----------------------------\n' + \
           f'**현재 날씨**는 {status}, **기온**은 `{temp}`예요.\n오늘 **최저** `{temp_lowest}`, **최고** `{temp_highest}`로 예상돼요.\n* 미세먼지 {add_icon(fine_particle)}\n* 초미세먼지 {add_icon(ultra_fine_particle)}'

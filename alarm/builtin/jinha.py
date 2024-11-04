@@ -5,6 +5,7 @@ from mmpy_bot import listen_to, Message
 from alarm.alarm_context import AlarmContextBuilder
 from alarm.builtin.abstract_builtin_alarm import AbstractChannelAlarm
 from common import constant
+from common.utils import get_today_str
 
 
 class JinhaAlarm(AbstractChannelAlarm):
@@ -46,7 +47,7 @@ class JinhaAlarm(AbstractChannelAlarm):
             age_str = '%s개월 %s일' % (age_month, age_day)
 
         msg = '@here `%s`\n오늘은 **진하**:baby:가 태어난지 %s일째(%s) 되는 날!' \
-              % (today.strftime('%Y-%m-%d'), days_after_birth, age_str)
+              % (get_today_str(), days_after_birth, age_str)
 
         return msg
 
